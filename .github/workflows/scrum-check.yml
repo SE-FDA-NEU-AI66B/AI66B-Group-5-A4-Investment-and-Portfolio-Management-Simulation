@@ -39,7 +39,7 @@ jobs:
             }
             core.info(`Linked. Closing keywords found: ${closes.length}, title ref: ${!!titleRef}`);
 
-      - name: Check the linked issue is in a sprint
+      - name: Check the linked issue is typed and assigned
         uses: actions/github-script@v7
         continue-on-error: true
         with:
