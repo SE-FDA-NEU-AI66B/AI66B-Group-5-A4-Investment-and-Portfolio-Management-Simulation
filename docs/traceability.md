@@ -8,8 +8,8 @@ update this file should not be approved.
 | Route | Purpose | Access | Priority | Feature | Story issue | PR | Status |
 |-------|---------|--------|----------|---------|-------------|-----|--------|
 | `/` | Landing page | G | P0 | F1 | #3 | #14 | Done |
-| `/trade` | Place a market buy or sell order | U | P0 | F2 | US04, US05 | | Not started |
-| `/portfolio` | Holdings with quantity, average cost and unrealised P&L | U | P0 | F3 | US06 | | Not started |
+| `/trade` | Place a market buy or sell order | U | P0 | F2 | #16, #17 | | Not started |
+| `/portfolio` | Holdings with quantity, average cost and unrealised P&L | U | P0 | F3 | #18 | | Not started |
 | | | | | | | | |
 
 **Access codes:** G = guest (not logged in) · U = authenticated user · A = admin
