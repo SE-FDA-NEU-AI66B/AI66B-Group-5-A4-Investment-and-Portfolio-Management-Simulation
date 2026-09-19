@@ -66,6 +66,12 @@ TBD — @Thanh.
 | US11 | TBD — @Thanh | | |
 | US12 | TBD — @Thanh | | |
 
+### US01 - Register / log in to a simulated trading account · P0 · 3 points
+
+### US02 - Receive initial virtual capital when creating an account · P0 · 2 points
+
+### US03 - View the current market price of a stock · P0 · 3 points
+
 ### US04 — Place a market buy order · P0 · 5 points · Screen: `/trade`
 
 As a first-time investor, I want to buy shares at the current market price so
