@@ -53,9 +53,9 @@ TBD — @Thanh.
 
 | ID | Story | Priority | Points |
 |----|-------|----------|--------|
-| US01 | TBD — @Vu | | |
-| US02 | TBD — @Vu | | |
-| US03 | TBD — @Vu | | |
+| US01 | Register / log in to a simulated trading account | P0 | 3 |
+| US02 | Receive initial virtual capital when creating an account | P0 | 2 |
+| US03 | View the current market price of a stock |	P0 | 3 |
 | US04 | Place a market buy order | P0 | 5 |
 | US05 | Place a market sell order | P0 | 5 |
 | US06 | View portfolio holdings with average cost and unrealised P&L | P0 | 3 |
