@@ -62,9 +62,9 @@ TBD - @Thanh.
 | US07 | TBD - @Long | | |
 | US08 | TBD - @Long | | |
 | US09 | TBD - @Long | | |
-| US10 | TBD - @Thanh | | |
-| US11 | TBD - @Thanh | | |
-| US12 | TBD - @Thanh | | |
+| US10 | Receive a warning when an order exceeds available balance | P2 | 2 |
+| US11 | Compare performance against a benchmark index | P2 | 5 |
+| US12 | View a leaderboard of players ranked by performance | P2 | 3 |
 
 ### US01 - Register / log in to a simulation account · P0 · 3 points
 
@@ -143,6 +143,53 @@ temporary profit or loss so that I can decide whether to hold, buy more or sell.
 - Given my account holds no shares, when the portfolio loads, then it shows
   "No positions yet" and the total equals my cash only.
 
+### US10 - Receive a warning when an order exceeds available balance · P2 · 2 points · Screen: `/trade`
+
+As a first-time investor, I want to be warned immediately when an order
+exceeds my balance so I do not misclick.
+
+**Acceptance criteria**
+
+- Given my virtual balance is 500,000 VND, when I enter a buy order worth
+  800,000 VND before confirming, then the form shows the inline warning
+  "Exceeds available balance by 300,000 VND" and disables the confirm button
+  (BR1).
+- Given an over-budget buy order is showing that warning, when I change the
+  quantity so the order total is 500,000 VND or less, then the warning
+  disappears and the confirm button re-enables (BR1).
+
+### US11 - Compare performance against a benchmark index · P2 · 5 points · Screen: `/performance`
+
+As an investor holding shares, I want to compare my portfolio's performance
+against VN-Index so I know whether I am beating or lagging the broader market.
+
+**Acceptance criteria**
+
+- Given my portfolio value changes from 100,000,000 VND to 108,000,000 VND
+  over 30 days and VN-Index changes from 1,000 to 1,050 over those same 30
+  days, when I open the performance comparison page, then it shows two lines
+  over the same timeframe: portfolio +8.0%, VN-Index +5.0%, and a +3.0
+  percentage-point gap (BR7).
+- Given my account was opened 12 days ago and does not yet have 30 days of
+  portfolio data, when I open the performance comparison page, then both lines
+  use those 12 available days and the page shows "Data since account opening"
+  (BR7).
+
+### US12 - View a leaderboard of players ranked by performance · P2 · 3 points · Screen: `/leaderboard`
+
+As an investor holding shares, I want to see a leaderboard so I know where I
+rank against other players.
+
+**Acceptance criteria**
+
+- Given there are 12 active accounts and my account is ranked 11th with +8.0%
+  performance, when I open the leaderboard page, then it shows the 10 highest
+  performing active accounts in descending percentage order and separately
+  shows my rank as #11 (BR8).
+- Given two active accounts both have +12.0% performance, and one first reached
+  +12.0% at 10:00 while the other first reached it at 14:00, when the accounts
+  are ranked, then the 10:00 account is listed first (BR8).
+
 ---
 
 ## 5. Business rules
@@ -155,6 +202,8 @@ temporary profit or loss so that I can decide whether to hold, buy more or sell.
 | BR4 | TBD - @Long | TBD |
 | BR5 | The initial virtual capital is fixed for every new account | Every new account receives exactly 100,000,000 VND. |
 | BR6 | Buying more of a symbol already held recalculates the average cost as a weighted average of every purchase. Selling does not change the average cost. | Buy 100 HPG at 28,000 VND (2,800,000 VND), then 100 HPG at 32,000 VND (3,200,000 VND). Total 200 shares for 6,000,000 VND, so the average cost is 30,000 VND - not 32,000 VND. Selling 100 HPG at 35,000 VND still leaves the average cost of the remaining 100 shares at 30,000 VND. |
+| BR7 | Portfolio and benchmark returns must use the same start and end dates. The comparison period is the most recent 30 calendar days, or the period from account opening when the account is younger than 30 days. | Portfolio: 100,000,000 VND to 108,000,000 VND from 1–31 March = +8.0%. VN-Index: 1,000 to 1,050 from 1–31 March = +5.0%. The displayed gap is +3.0 percentage points. An account opened on 19 March is compared only from 19–31 March and is labelled "Data since account opening". |
+| BR8 | The leaderboard includes active accounts only and sorts by current percentage performance descending. Equal performance is ordered by the earliest timestamp at which that account first reached its current percentage performance. | A +12.0% account that first reached +12.0% at 10:00 ranks above another +12.0% account that first reached it at 14:00. An inactive account at +20.0% is excluded. |
 
 ---
 
