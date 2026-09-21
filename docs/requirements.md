@@ -22,11 +22,26 @@ TBD - @Thanh.
 
 ## 2. Personas
 
-<!-- TODO @Vu: Persona 1 - someone who has never invested. Include role, goal,
-     what blocks them, one quoted sentence, and the interview note (who was
-     spoken to and when). -->
+#### 2.1 Persona
+**Thangkaka - 20-year-old beginner who has never invested**
 
-TBD - @Vu.
+Manages the small amount of money currently available through a banking app.
+They have not invested before and do not feel an urgent need to invest, but are
+open to learning how stock trading works before deciding whether to invest in
+the future.
+
+**Goal:** understand the mechanics of buying and selling stocks and practise
+without risking real money.
+**Blocked by:** limited experience and uncertainty about what to do when placing
+an order; they also want to see the opinions and actions of experienced users.
+
+**In their words:** *"I do not currently need to invest in stocks; I am not
+money-hungry and do not have much experience."*
+
+**Technical skill:** very comfortable with mobile and banking applications and
+can discover features independently, but primarily uses them for transfers.
+
+**Interview note:** thangkaka, interviewed by Vu (SM) on 15/09/2026 at 10:27.
 
 <!-- TODO @Thanh: Persona 2 - someone with more experience (manages several
      symbols). Same fields, plus the interview note. -->
@@ -37,10 +52,23 @@ TBD - @Thanh.
 
 ## 3. Scenarios
 
-<!-- TODO @Vu: Scenario 1 - opening the first position. 6–10 numbered steps in
-     plain language. No screen names, no button names. -->
+#### 3.1 Scenario
+**Scenario 1 - Thangkaka opens a first position safely**
 
-TBD - @Vu.
+1. Thangkaka creates an account and receives 100,000,000 VND in virtual money.
+2. They choose a familiar company and check its current market price.
+3. They read the available information and review the opinions or recent actions
+  of more experienced users.
+4. They decide how many shares they want to practise buying without using real
+  money.
+5. They enter the quantity and review the estimated total cost before sending
+  the order.
+6. The application warns them if the order would exceed their virtual balance
+  and prevents the purchase until they correct it.
+7. They confirm the purchase, and the application records the transaction and
+  updates their remaining virtual balance.
+8. They check their holdings, average cost, and unrealised profit or loss so
+  they can understand what happened.
 
 <!-- TODO @Thanh: Scenario 2 - comparing the performance of several symbols.
      6–10 numbered steps. No screen names, no button names. -->

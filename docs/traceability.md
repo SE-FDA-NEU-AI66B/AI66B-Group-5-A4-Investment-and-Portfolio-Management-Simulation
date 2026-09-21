@@ -26,5 +26,5 @@ Numbered, so issues and tests can cite them.
 | BR2 | Sell quantity may not exceed the quantity held | Order submission (`/trade`) | TBD (Sprint 2) |
 | BR3 | Market order fills at the price quoted when submitted | Order execution (`/trade`) | TBD (Sprint 2) |
 | BR4 | TBD - @Long | | |
-| BR5 | TBD - @Vu | | |
+| BR5 | The initial virtual capital is fixed for every new account | | |
 | BR6 | Average cost is the weighted average of every purchase | Buy execution (`/trade`) | TBD (Sprint 2) |
