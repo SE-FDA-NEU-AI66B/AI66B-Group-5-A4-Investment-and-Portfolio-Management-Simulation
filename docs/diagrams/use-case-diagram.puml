@@ -2,13 +2,7 @@
 ' Use Case Diagram - Investment & Portfolio Management Simulation
 left to right direction
 skinparam packageStyle rectangle
-skinparam actorStyle awesome
 skinparam shadowing false
-skinparam usecase {
-  BackgroundColor #F7F9FC
-  BorderColor #263238
-  ArrowColor #455A64
-}
 
 title Investment & Portfolio Management Simulation - Use Case Diagram
 
@@ -26,8 +20,8 @@ rectangle "Investment & Portfolio Management Simulation" {
   usecase "Set stop-loss / take-profit" as UC07
   usecase "View transaction history" as UC08
   usecase "View portfolio performance" as UC09
-  usecase "Compare with benchmark index" as UC11
   usecase "Receive balance warning" as UC10
+  usecase "Compare with benchmark index" as UC11
   usecase "View performance leaderboard" as UC12
 
   usecase "Validate available cash" as ValidateCash
@@ -45,12 +39,13 @@ investor --> UC06
 investor --> UC07
 investor --> UC08
 investor --> UC09
+investor --> UC10
 investor --> UC11
 investor --> UC12
 
 market --> UC03
 market --> FillOrder
-notify --> TriggerThreshold
+notify --> UC07
 notify --> UC10
 
 UC04 .> ValidateCash : <<include>>
