@@ -1,21 +1,22 @@
 # Daily
 
-**Không bắt buộc.** Nhóm nào muốn duy trì thì ghi vào đây.
+**Optional.** Teams that maintain a daily log should record updates here.
 
-Quy tắc: mỗi người 3 câu, và **commit đúng ngày viết** — đừng gộp cả tuần vào một
-commit. Lịch sử commit của chính file này là bằng chứng nhóm làm thật.
+Rule: each member writes three sentences and **commits on the day of writing**;
+do not combine a whole week into one commit. The file history is evidence that
+the team worked continuously.
 
 ---
 
 ## 2026-09-15
 
-- @linh — Hôm qua: nhận #12, chia checklist. Hôm nay: làm form upload.
-  Vướng: chưa biết để file mẫu ở đâu trong repo.
-- @tuan — Hôm qua: dựng khung project. Hôm nay: viết test cho parser.
-  Vướng: không có.
-- @thao — Hôm qua: đọc tài liệu user story. Hôm nay: viết lại US03 và US05.
-  Vướng: cần @linh xác nhận acceptance criteria của US05.
+- @linh — Yesterday: picked up #12 and split the checklist. Today: build the
+  upload form. Blocker: the sample file location is not confirmed.
+- @tuan — Yesterday: scaffolded the project. Today: write parser tests.
+  Blocker: none.
+- @thao — Yesterday: read the user-story documents. Today: revise US03 and
+  US05. Blocker: waiting for @linh to confirm US05 acceptance criteria.
 
-## <ngày tiếp theo>
+## <next date>
 
 - @ —

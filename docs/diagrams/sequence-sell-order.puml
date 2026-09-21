@@ -1,0 +1,51 @@
+@startuml
+' Sequence diagram for US05 - Place a market sell order
+' Consistent with docs/requirements.md (US05, BR2, BR3)
+title US05 - Place a market sell order
+
+actor Investor
+participant "Trade UI (/trade)" as UI
+participant "OrderService" as Orders
+participant "PriceService" as Prices
+database "AccountStore" as Store
+
+autonumber
+
+Investor -> UI : submit sell order (symbol, quantity) [US05]
+activate UI
+UI -> Orders ++ : placeSellOrder(symbol, quantity)
+
+Orders -> Store ++ : getHolding(symbol)
+Store --> Orders -- : holding (quantity, average cost)
+
+alt quantity > held
+  Orders --> UI -- : rejection "You hold 500 HPG; the maximum you can sell is 500" (BR2, US05-AC2)
+  UI --> Investor : show error message
+else quantity <= held
+  Orders -> Prices ++ : getLatestPrice(symbol)
+  Prices --> Orders -- : price
+  note right of Orders
+    Fill at the latest quoted price
+    at submission time (BR3)
+  end note
+  Orders -> Orders : proceeds = price x quantity; realisedPnL = (price - average cost) x quantity
+  Orders -> Store ++ : reduceHolding(symbol, quantity)
+  Store --> Orders -- : ok
+  Orders -> Store ++ : addCash(proceeds)
+  Store --> Orders -- : ok
+  Orders -> Store ++ : recordTransaction(SELL, quantity, price, realisedPnL)
+  Store --> Orders -- : ok
+  Orders --> UI -- : confirmation (sold quantity @ price, proceeds, realised P&L)
+  UI --> Investor : show confirmation
+end
+
+deactivate UI
+
+note over Investor, Store
+  Worked example from M1 (US05-AC1):
+  sell 1,000 HPG @ 30,000 (avg cost 28,000);
+  proceeds = 30,000,000; realised P&L = +2,000,000; holding = 0
+end note
+
+footer US05 - BR2 - BR3
+@enduml

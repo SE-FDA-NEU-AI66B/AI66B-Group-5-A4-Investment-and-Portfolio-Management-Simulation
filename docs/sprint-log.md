@@ -37,8 +37,11 @@ testable requirements baseline and the first performance-related backlog items.
 | #22 | US10 - Receive warning when an order exceeds available balance | 2 | @bianh13 |
 | #23 | US11 - Compare performance against a benchmark index | 5 | @bianh13 |
 | #24 | US12 - View leaderboard ranked by performance | 3 | @bianh13 |
+| #25 | Chore - Refine backlog for Sprint 1 | 5 | @bianh13 |
+| #35 | Task - Interview investor holding shares persona | 8 | @bianh13 |
+| #26 | Chore - Sprint 1 wrap-up | 5 | @VuSiSi |
 
-**Total committed: 43 points**
+**Total committed: 61 points**
 
 ### Result
 
@@ -58,13 +61,14 @@ testable requirements baseline and the first performance-related backlog items.
 | #24 | 3 | Done | Leaderboard story was completed as part of the Sprint 1 backlog. |
 | #25 | 5 | Done | The 12 stories and their acceptance criteria were reviewed and refined before finalizing the Sprint 1 baseline. |
 | #26 | 5 | Done | Sprint 1 wrap-up was recorded. |
+| #35 | 8 | Done | Investor-holding-shares interview was recorded for the requirements baseline. |
 
 Supporting tasks completed during the sprint:
 
 - #34 [Task] Interview first-time investor persona — completed as a child task of #22 (US10).
 - #35 [Task] Interview investor holding shares persona — completed as a child task of #23 (US11).
 
-**Completed: 43 points. Velocity this sprint: 43**
+**Completed: 61 points. Velocity this sprint: 61**
 
 ### Not finished / carried over
 

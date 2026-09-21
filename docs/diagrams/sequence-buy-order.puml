@@ -1,0 +1,55 @@
+@startuml
+' Sequence diagram for US04 - Place a market buy order
+' Consistent with docs/requirements.md (US04, BR1, BR3, BR6)
+title US04 - Place a market buy order
+
+actor Investor
+participant "Trade UI (/trade)" as UI
+participant "OrderService" as Orders
+participant "PriceService" as Prices
+database "AccountStore" as Store
+
+autonumber
+
+Investor -> UI : submit buy order (symbol, quantity) [US04]
+activate UI
+UI -> Orders ++ : placeBuyOrder(symbol, quantity)
+
+Orders -> Prices ++ : getLatestPrice(symbol)
+Prices --> Orders -- : price
+note right of Orders
+  Fill at the latest quoted price
+  at submission time (BR3)
+end note
+
+Orders -> Store ++ : getAvailableCash()
+Store --> Orders -- : cash
+Orders -> Orders : orderValue = price x quantity
+
+alt orderValue <= cash
+  Orders -> Store ++ : debitCash(orderValue)
+  Store --> Orders -- : ok
+  Orders -> Store ++ : upsertHolding(symbol, quantity, price)
+  note right of Store
+    Weighted average cost (BR6)
+  end note
+  Store --> Orders -- : ok
+  Orders -> Store ++ : recordTransaction(BUY, filled quantity, price)
+  Store --> Orders -- : ok
+  Orders --> UI -- : confirmation (filled quantity @ price, remaining cash)
+  UI --> Investor : show confirmation
+else orderValue > cash
+  Orders --> UI -- : rejection "Insufficient cash: needs X but only Y available" (BR1, US04-AC2)
+  UI --> Investor : show error message
+end
+
+deactivate UI
+
+note over Investor, Store
+  Worked example from M1 (US04-AC1):
+  buy 1,000 HPG @ 28,000 = 28,000,000;
+  cash 100,000,000 -> 72,000,000; holding = 1,000 HPG
+end note
+
+footer US04 - BR1 - BR3 - BR6
+@enduml

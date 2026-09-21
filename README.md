@@ -1,4 +1,4 @@
-# 📈 AI66B – Group 5 – Topic A4: Investment & Portfolio Management Simulation (Paper Trading)
+# AI66B - Group 5 - Topic A4: Investment & Portfolio Management Simulation (Paper Trading)
 
 ## Introduction
 
@@ -19,6 +19,7 @@ A **"paper trading"** application: Users can buy and sell stocks using **virtual
 ## Team Members
 
 | **Full Name** | **Student ID** | **GitHub Username** | **Role** | 
+|----|-------|----------|--------|
 | Pham Huy Thanh | 11247351 | bianh13 | Product Owner | 
 | Pham Quang Vu | 11247372 | VuSiSi | Scrum Master (Current Sprint) | 
 | Nguyen Van Tue | 11247366 | nguyentue110 | Dev Team | 
@@ -34,9 +35,9 @@ If a team member is unresponsive for 48 hours without prior notice, the Scrum Ma
 
 * **Language:** Python 3.10+
 
-* **Backend / UI:** `[To be updated - e.g., Streamlit / FastAPI / Django]`
+* **Backend / UI:** Python application; implementation details are documented in the source tree.
 
-* **Database:** `[To be updated - e.g., SQLite / PostgreSQL]`
+* **Database:** No persistent database is required for the Sprint 1 specification.
 
 * **Version Control & CI:** Git & GitHub · CI pipeline will be set up using GitHub Actions (from Sprint 5).
 
@@ -61,7 +62,21 @@ python app.py
 
 ## Team Workflow
 
-* **Backlog & Board:** [Project Board](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation)
+* **Backlog & Board:** [Project Board](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/projects)
+
+* **Product Owner:** [bianh13](https://github.com/bianh13)
+
+* **Scrum Master for Sprint 1:** [VuSiSi](https://github.com/VuSiSi)
+
+* **Definition of Done:** [docs/definition-of-done.md](docs/definition-of-done.md)
+
+* **Requirements:** [docs/requirements.md](docs/requirements.md)
+
+* **Sprint log:** [docs/sprint-log.md](docs/sprint-log.md)
+
+* **Traceability:** [docs/traceability.md](docs/traceability.md)
+
+* **Process dossier:** [docs/process.md](docs/process.md)
 
 * **Branching:** `feature/<description>` → Open a Pull Request to `main` → Requires at least 1 review/approval before merging.
 
