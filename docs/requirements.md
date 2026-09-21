@@ -189,11 +189,42 @@ As a user, I want to see a portfolio performance chart so I can evaluate my P/L 
 
 ## 6. Screens and flow
 
-<!-- TODO @Long: table Route / Purpose / Access (G, U, A) / Priority for at
-     least 5 screens, plus the flow diagram saved in docs/images/. Every screen
-     must appear in the diagram and be reachable. -->
+### 6.1 Screen table
 
-TBD — @Long.
+| Route | Purpose | Access | Priority | Stories |
+|-------|---------|--------|----------|---------|
+| `/` | Landing page; register or sign in to the simulation | G | P0 | US01, US02 |
+| `/market` | Search a ticker and view its current reference price | U | P0 | US03 |
+| `/trade` | Place buy/sell orders and set stop-loss / take-profit conditions | U | P0 | US04, US05, US07, US10 |
+| `/portfolio` | View holdings, average cost, unrealised P&L and total value | U | P0 | US06 |
+| `/history` | View completed and rejected transaction history | U | P1 | US08 |
+| `/performance` | View portfolio performance chart and compare with VN-Index | U | P2 | US09, US11 |
+| `/leaderboard` | View top players by performance and the current user's rank | U | P2 | US12 |
 
-_Screens referenced by this section's stories so far: `/trade` and
-`/portfolio`, both P0 and user-only._
+**Access:** G = Guest (not signed in) · U = User (signed in)
+
+Every story in Section 4 is reachable from exactly one screen, and every screen
+below appears in the flow diagram with at least one inbound and one outbound edge.
+
+### 6.2 Flow diagram
+
+![Screen flow](images/screens-flow.png)
+
+Text form of the same diagram:
+
+```
+/ (signed out) --[sign in succeeds]---------------> /market
+/market        --[select a ticker]----------------> /trade
+/trade         --[order filled]-------------------> /portfolio
+/trade         --[rejected: insufficient cash]----> /market
+/portfolio     --[place another order]------------> /market
+/portfolio     --[set stop-loss / take-profit]----> /trade
+/portfolio     --[transaction history]------------> /history
+/portfolio     --[performance chart]--------------> /performance
+/performance   --[ranking]------------------------> /leaderboard
+/history       --[back]---------------------------> /portfolio
+/performance   --[back]---------------------------> /portfolio
+/leaderboard   --[back]---------------------------> /portfolio
+/portfolio     --[sign out]-----------------------> /
+```
+
