@@ -4,19 +4,19 @@ Milestone 1 · Sprint 1 deliverable. Six sections, in this order. A requirement
 only counts if it can be checked: every user story below has at least one
 acceptance criterion with a concrete number or an exact expected value.
 
-> **Working draft.** Sections marked `TBD` are owned by another member and are
-> being written on their own branch. The assembly PR puts all six sections
-> together before submission.
+> **Milestone 1 / Sprint 1 specification.** This document records the scope
+> agreed from the two completed interviews and the Sprint 1 backlog.
 
 ---
 
 ## 1. Product vision
 
-<!-- TODO @Thanh (PO): one sentence. Who it is for · what problem it removes ·
-     why not the obvious alternative (managing a practice portfolio in a
-     spreadsheet). Write it after the two interviews are done. -->
-
-TBD - @Thanh.
+For beginners who need a safe way to learn stock trading and investors who
+already manage several positions, the Investment & Portfolio Management
+Simulation provides a realistic paper-trading portfolio with accurate cost
+basis, P&L, transaction history, risk alerts and benchmark comparison, so users
+can test decisions with market-referenced prices without risking real money or
+manually rebuilding their portfolio in a spreadsheet.
 
 ---
 
@@ -43,10 +43,35 @@ can discover features independently, but primarily uses them for transfers.
 
 **Interview note:** thangkaka, interviewed by Vu (SM) on 15/09/2026 at 10:27.
 
-<!-- TODO @Thanh: Persona 2 - someone with more experience (manages several
-     symbols). Same fields, plus the interview note. -->
+#### 2.2 Persona
+**Khánh - 30-year-old investor who manages a concentrated portfolio**
 
-TBD - @Thanh.
+Has invested independently for five years and usually holds 5–7 stock symbols.
+They currently combine a brokerage application with Excel, which means some
+portfolio information and calculations still have to be entered manually.
+They make decisions mainly from company financial reports and domestic and
+global macroeconomic conditions, and they care about whether their portfolio is
+beating the market.
+
+**Goal:** understand the final average cost, quantity and P&L of each position,
+separate cash and margin results when relevant, review the contribution of each
+symbol to NAV, and evaluate portfolio performance against VN-Index over useful
+periods.
+**Blocked by:** manual data entry and the lack of one practical view combining
+technical indicators, foreign net buying, quarterly business results, position
+P&L and a what-if view of selling a position.
+
+**In their words:** *"Một ứng dụng mô phỏng đầu tư/quản lý danh mục lý tưởng
+đối với tôi cần chính xác và hữu dụng trong thực tiễn."*
+
+**Technical skill:** experienced with brokerage and spreadsheet tools and
+comfortable interpreting technical and fundamental information.
+
+**Interview note:** Khánh, interviewed by Thành (PO) on 16/09/2026 at 09:20.
+
+**Research note:** The brief asks for three personas for a five-person team.
+This milestone currently documents two real interviews; a third interview or
+instructor confirmation is still needed before final submission.
 
 ---
 
@@ -70,10 +95,24 @@ TBD - @Thanh.
 8. They check their holdings, average cost, and unrealised profit or loss so
   they can understand what happened.
 
-<!-- TODO @Thanh: Scenario 2 - comparing the performance of several symbols.
-     6–10 numbered steps. No screen names, no button names. -->
+#### 3.2 Scenario
+**Scenario 2 - Khánh reviews and rebalances an existing portfolio**
 
-TBD - @Thanh.
+1. Khánh selects a stock they currently hold and checks its price movement and
+  technical indicators, including MA10, MA20, MA200, RSI and Bollinger Bands.
+2. They check the latest foreign-investor net buying information.
+3. They review quarterly business results to see whether the growth trend is
+  still intact.
+4. If the results remain weak for two consecutive quarters, they mark the
+  symbol for closer monitoring instead of automatically buying more.
+5. They review a portfolio breakdown showing each symbol's P&L and percentage
+  contribution to portfolio NAV.
+6. They write down the positions that need action and decide whether to hold,
+  buy more or sell.
+7. Before committing to a sale, they preview how removing that position would
+  change the stock portfolio's NAV, excluding idle cash from that what-if view.
+8. They review the updated quantity, average cost, realised or unrealised P&L
+  and transaction record after the decision.
 
 ---
 
