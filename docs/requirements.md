@@ -87,9 +87,9 @@ TBD - @Thanh.
 | US04 | Place a market buy order | P0 | 5 |
 | US05 | Place a market sell order | P0 | 5 |
 | US06 | View portfolio holdings with average cost and unrealised P&L | P0 | 3 |
-| US07 | TBD - @Long | | |
-| US08 | TBD - @Long | | |
-| US09 | TBD - @Long | | |
+| US07 | Place a stop-loss / take-profit order | P1 | 5 |
+| US08 | View transaction history | P1 | 2 |
+| US09 | View portfolio performance over time | P2 | 5 |
 | US10 | Receive a warning when an order exceeds available balance | P2 | 2 |
 | US11 | Compare performance against a benchmark index | P2 | 5 |
 | US12 | View a leaderboard of players ranked by performance | P2 | 3 |
@@ -171,6 +171,64 @@ temporary profit or loss so that I can decide whether to hold, buy more or sell.
 - Given my account holds no shares, when the portfolio loads, then it shows
   "No positions yet" and the total equals my cash only.
 
+### US07 - Place a stop-loss / take-profit order · P1 · 5 points · Screen: `/trade`
+
+As a user with an open position, I want to set a stop-loss/take-profit threshold
+so I can limit risk without watching the market constantly.
+
+**Acceptance criteria**
+
+- Given I bought 100 shares of X at a cost basis of 25,000 VND, 
+  when I set a stop-loss at the default 5% below cost (23,750 VND), 
+  then the system saves the stop-loss order attached to that position.
+- Given a stop-loss is set at 23,750 VND,
+  when the market price hits 23,750 VND, 
+  then the system automatically closes the position and sends a notification with the realized loss.
+- Given I set a take-profit at 10% above cost basis, 
+  when the price hits that threshold, 
+  then the system automatically closes the position and sends a notification with the realized gain.
+- Given I hold no position in ticker Y, 
+  when I try to set a stop-loss on Y, 
+  then the system rejects it with the message "No open position to attach a threshold to".
+
+### US08 - View transaction history · P1 · 2 points · Screen: `/history`
+
+As a user, I want to view my transaction history so I can review the orders I've placed.
+
+**Acceptance criteria**
+
+- Given I've made 5 transactions this month, 
+  when I open the transaction history page, 
+  then the system shows all 5 transactions newest-first, each row with ticker, order type, quantity, fill price, and time.
+- Given I have no transactions yet, 
+  when I open the history page, 
+  then the system shows an empty state "No transactions yet".
+- Given the transaction list exceeds 50 rows, 
+  when I open the history page, 
+  then the system shows the 50 most recent transactions with a "Load more" button.
+- Given a position was closed automatically by a stop-loss trigger, 
+  when I open the history page, 
+  then that row is labelled order type "Stop-loss (auto)", distinct from a sell order I placed myself.
+
+### US09 - View portfolio performance over time · P2 · 5 points · Screen: `/performance`
+
+As a user, I want to see a portfolio performance chart so I can evaluate my P/L trend over time.
+
+**Acceptance criteria**
+
+- Given I have transaction history over the past 30 days, 
+  when I open the performance chart page, 
+  then the system plots total portfolio value for each day over that 30-day period.
+- Given I select the "last 7 days" range, 
+  when the chart reloads, 
+  then the time axis shows exactly the last 7 data points.
+- Given I started with 100,000,000 VND and my portfolio is worth 108,000,000 VND after 30 days, 
+  when I open the performance chart page, 
+  then the system displays total growth of +8,000,000 VND (+8%).
+- Given I have just created my account and placed no orders, 
+  when I open the performance chart page, 
+  then the chart shows a flat line at the initial virtual capital of 100,000,000 VND.
+
 ### US10 - Receive a warning when an order exceeds available balance · P2 · 2 points · Screen: `/trade`
 
 As a first-time investor, I want to be warned immediately when an order
@@ -227,7 +285,7 @@ rank against other players.
 | BR1 | An order may not cost more than the available cash balance. | Cash 100,000,000 VND. Buy 1,000 HPG at 28,000 VND = 28,000,000 VND → accepted, cash falls to 72,000,000 VND. Then buy 3,000 FPT at 120,000 VND = 360,000,000 VND → rejected: the order needs 360,000,000 VND but only 72,000,000 VND is available. |
 | BR2 | An account may sell at most the quantity it currently holds. Short selling is not allowed. | Hold 500 HPG. Sell 500 → accepted, holding becomes 0. Sell 800 → rejected: "You hold 500 HPG; the maximum you can sell is 500." |
 | BR3 | A market order is filled at the latest quoted price at the moment the order is submitted. | FPT is quoted at 120,000 VND at 09:15:00; the order is submitted at 09:15:03; the quote moves to 121,500 VND at 09:15:10. Buying 100 FPT costs 12,000,000 VND (filled at 120,000), not 12,150,000 VND. |
-| BR4 | TBD - @Long | TBD |
+| BR4 | A stop-loss order triggers automatically and closes the entire position as soon as the market price reaches or falls below the threshold. A take-profit order triggers the same way once the price reaches or rises above its threshold. Default thresholds are 5% below and 10% above the average cost basis. | Holding 100 shares of X at a cost basis of 25,000 VND. Stop-loss set at 23,750 VND (−5%). Price reaches 23,750 VND → the system sells all 100 shares for 2,375,000 VND, realizing a loss of 125,000 VND. |
 | BR5 | The initial virtual capital is fixed for every new account | Every new account receives exactly 100,000,000 VND. |
 | BR6 | Buying more of a symbol already held recalculates the average cost as a weighted average of every purchase. Selling does not change the average cost. | Buy 100 HPG at 28,000 VND (2,800,000 VND), then 100 HPG at 32,000 VND (3,200,000 VND). Total 200 shares for 6,000,000 VND, so the average cost is 30,000 VND - not 32,000 VND. Selling 100 HPG at 35,000 VND still leaves the average cost of the remaining 100 shares at 30,000 VND. |
 | BR7 | Portfolio and benchmark returns must use the same start and end dates. The comparison period is the most recent 30 calendar days, or the period from account opening when the account is younger than 30 days. | Portfolio: 100,000,000 VND to 108,000,000 VND from 1–31 March = +8.0%. VN-Index: 1,000 to 1,050 from 1–31 March = +5.0%. The displayed gap is +3.0 percentage points. An account opened on 19 March is compared only from 19–31 March and is labelled "Data since account opening". |
@@ -237,11 +295,41 @@ rank against other players.
 
 ## 6. Screens and flow
 
-<!-- TODO @Long: table Route / Purpose / Access (G, U, A) / Priority for at
-     least 5 screens, plus the flow diagram saved in docs/images/. Every screen
-     must appear in the diagram and be reachable. -->
+### 6.1 Screen table
 
-TBD - @Long.
+| Route | Purpose | Access | Priority | Stories |
+|-------|---------|--------|----------|---------|
+| `/` | Landing page; register or sign in to the simulation | G | P0 | US01, US02 |
+| `/market` | Search a ticker and view its current reference price | U | P0 | US03 |
+| `/trade` | Place buy/sell orders and set stop-loss / take-profit conditions | U | P0 | US04, US05, US07, US10 |
+| `/portfolio` | View holdings, average cost, unrealised P&L and total value | U | P0 | US06 |
+| `/history` | View completed and rejected transaction history | U | P1 | US08 |
+| `/performance` | View portfolio performance chart and compare with VN-Index | U | P2 | US09, US11 |
+| `/leaderboard` | View top players by performance and the current user's rank | U | P2 | US12 |
 
-_Screens referenced by this section's stories so far: `/trade` and
-`/portfolio`, both P0 and user-only._
+**Access:** G = Guest (not signed in) · U = User (signed in)
+
+Every story in Section 4 is reachable from exactly one screen, and every screen
+below appears in the flow diagram with at least one inbound and one outbound edge.
+
+### 6.2 Flow diagram
+
+![Screen flow](images/screens-flow.png)
+
+Text form of the same diagram:
+
+```
+/ (signed out) --[sign in succeeds]---------------> /market
+/market        --[select a ticker]----------------> /trade
+/trade         --[order filled]-------------------> /portfolio
+/trade         --[rejected: insufficient cash]----> /market
+/portfolio     --[place another order]------------> /market
+/portfolio     --[set stop-loss / take-profit]----> /trade
+/portfolio     --[transaction history]------------> /history
+/portfolio     --[performance chart]--------------> /performance
+/performance   --[ranking]------------------------> /leaderboard
+/history       --[back]---------------------------> /portfolio
+/performance   --[back]---------------------------> /portfolio
+/leaderboard   --[back]---------------------------> /portfolio
+/portfolio     --[sign out]-----------------------> /
+```
