@@ -53,18 +53,45 @@ TBD — @Thanh.
 
 | ID | Story | Priority | Points |
 |----|-------|----------|--------|
-| US01 | TBD — @Vu | | |
-| US02 | TBD — @Vu | | |
-| US03 | TBD — @Vu | | |
+| US01 | Register / log in to a simulation account | P0 | 3 |
+| US02 | Receive initial virtual capital when creating an account | P0 | 2 |
+| US03 | View the current market price of a ticker |	P0 | 3 |
 | US04 | Place a market buy order | P0 | 5 |
 | US05 | Place a market sell order | P0 | 5 |
 | US06 | View portfolio holdings with average cost and unrealised P&L | P0 | 3 |
 | US07 | Place a stop-loss / take-profit order | P1 | 5 |
 | US08 | View transaction history | P1 | 2 |
 | US09 | View portfolio performance over time | P2 | 5 |
-| US10 | TBD — @Thanh | | |
-| US11 | TBD — @Thanh | | |
-| US12 | TBD — @Thanh | | |
+| US10 | Receive a warning when an order exceeds available balance | P2 | 2 |
+| US11 | Compare performance against a benchmark index | P2 | 5 |
+| US12 | View a leaderboard of players ranked by performance | P2 | 3 |
+
+### US01 - Register / log in to a simulation account · P0 · 3 points
+
+**Acceptance Criteria:**
+
+  - Given the email has never been registered, when I enter a valid email + password (>=8 characters) and click register, then the account is created and I'm taken to the logged-in home page
+  - Given the email already exists in the system, when I try to register again with that email, then the system rejects it with "Email already in use"
+  - Given the account already exists, when I enter the wrong password 5 times in a row, then the account is temporarily locked for 15 minutes
+
+### US02 - Receive initial virtual capital when creating an account · P0 · 2 points
+
+As a newly registered user, I want to receive initial virtual capital so I can start planning and trading immediately.
+
+**Acceptance Criteria:**
+
+  - Given the account was just created successfully, when the system initializes the account, then the virtual balance shows exactly 100,000,000 VND
+  - Given the account has already received its initial capital, when I check the overview page at any later time, then the balance doesn't change on its own outside of transactions I make
+
+### US03 - View the current market price of a ticker · P0 · 3 points
+
+As a user, I want to see a ticker's current price so I can decide whether to buy/sell.
+
+**Acceptance Criteria:**
+
+  - Given ticker X is currently trading, when I search for and open ticker X's detail page, then the system shows the latest matched price, the day's % change, and when the price was last updated
+  - Given the reference price hasn't updated in more than 15 minutes, when I open the detail page, then the system shows a "Price may be delayed" warning
+  - Given the ticker doesn't exist, when I search for it, then the system shows "Ticker not found"
 
 ### US04 — Place a market buy order · P0 · 5 points · Screen: `/trade`
 
@@ -174,6 +201,55 @@ As a user, I want to see a portfolio performance chart so I can evaluate my P/L 
   when I open the performance chart page, 
   then the chart shows a flat line at the initial virtual capital of 100,000,000 VND.
 
+### US10 - Receive a warning when an order exceeds available balance · P2 · 2 points · Screen: `/trade`
+
+As a first-time investor, I want to be warned immediately when an order
+exceeds my balance so I do not misclick.
+
+**Acceptance criteria**
+
+- Given my virtual balance is 500,000 VND, when I enter a buy order worth
+  800,000 VND before confirming, then the form shows the inline warning
+  "Exceeds available balance by 300,000 VND" and disables the confirm button
+  (BR1).
+- Given an over-budget buy order is showing that warning, when I change the
+  quantity so the order total is 500,000 VND or less, then the warning
+  disappears and the confirm button re-enables (BR1).
+
+### US11 - Compare performance against a benchmark index · P2 · 5 points · Screen: `/performance`
+
+As an investor holding shares, I want to compare my portfolio's performance
+against VN-Index so I know whether I am beating or lagging the broader market.
+
+**Acceptance criteria**
+
+- Given my portfolio value changes from 100,000,000 VND to 108,000,000 VND
+  over 30 days and VN-Index changes from 1,000 to 1,050 over those same 30
+  days, when I open the performance comparison page, then it shows two lines
+  over the same timeframe: portfolio +8.0%, VN-Index +5.0%, and a +3.0
+  percentage-point gap (BR7).
+- Given my account was opened 12 days ago and does not yet have 30 days of
+  portfolio data, when I open the performance comparison page, then both lines
+  use those 12 available days and the page shows "Data since account opening"
+  (BR7).
+
+### US12 - View a leaderboard of players ranked by performance · P2 · 3 points · Screen: `/leaderboard`
+
+As an investor holding shares, I want to see a leaderboard so I know where I
+rank against other players.
+
+**Acceptance criteria**
+
+- Given there are 12 active accounts and my account is ranked 11th with +8.0%
+  performance, when I open the leaderboard page, then it shows the 10 highest
+  performing active accounts in descending percentage order and separately
+  shows my rank as #11 (BR8).
+- Given two active accounts both have +12.0% performance, and one first reached
+  +12.0% at 10:00 while the other first reached it at 14:00, when the accounts
+  are ranked, then the 10:00 account is listed first (BR8).
+
+---
+
 ## 5. Business rules
 
 | ID | Rule | Worked example |
@@ -182,7 +258,7 @@ As a user, I want to see a portfolio performance chart so I can evaluate my P/L 
 | BR2 | An account may sell at most the quantity it currently holds. Short selling is not allowed. | Hold 500 HPG. Sell 500 → accepted, holding becomes 0. Sell 800 → rejected: "You hold 500 HPG; the maximum you can sell is 500." |
 | BR3 | A market order is filled at the latest quoted price at the moment the order is submitted. | FPT is quoted at 120,000 VND at 09:15:00; the order is submitted at 09:15:03; the quote moves to 121,500 VND at 09:15:10. Buying 100 FPT costs 12,000,000 VND (filled at 120,000), not 12,150,000 VND. |
 | BR4 | A stop-loss order triggers automatically and closes the entire position as soon as the market price reaches or falls below the threshold. A take-profit order triggers the same way once the price reaches or rises above its threshold. Default thresholds are 5% below and 10% above the average cost basis. | Holding 100 shares of X at a cost basis of 25,000 VND. Stop-loss set at 23,750 VND (−5%). Price reaches 23,750 VND → the system sells all 100 shares for 2,375,000 VND, realizing a loss of 125,000 VND. |
-| BR5 | TBD — @Vu | TBD |
+| BR5 | The initial virtual capital is fixed for every new account | Every new account receives exactly 100,000,000 VND. |
 | BR6 | Buying more of a symbol already held recalculates the average cost as a weighted average of every purchase. Selling does not change the average cost. | Buy 100 HPG at 28,000 VND (2,800,000 VND), then 100 HPG at 32,000 VND (3,200,000 VND). Total 200 shares for 6,000,000 VND, so the average cost is 30,000 VND — not 32,000 VND. Selling 100 HPG at 35,000 VND still leaves the average cost of the remaining 100 shares at 30,000 VND. |
 
 ---
