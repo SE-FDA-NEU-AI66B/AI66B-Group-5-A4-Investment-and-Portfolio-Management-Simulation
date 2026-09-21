@@ -1,0 +1,49 @@
+@startuml
+' Use Case Diagram - Investment & Portfolio Management Simulation
+' Scope: M1 requirements (US01-US12, BR1-BR8). Local draft - NOT committed.
+title Use Case Diagram - Investment & Portfolio Management Simulation
+
+left to right direction
+
+actor Guest as Guest
+actor Investor as Investor
+actor "Market Data Provider" as MarketData
+
+rectangle "Investment & Portfolio\nManagement Simulation" {
+  usecase "Register and Log In\n(US01)" as UC01
+  usecase "Receive Virtual Capital\n(US02)" as UC02
+  usecase "View Market Prices\n(US03)" as UC03
+  usecase "Place Buy Order\n(US04)" as UC04
+  usecase "Place Sell Order\n(US05)" as UC05
+  usecase "View Portfolio\n(US06)" as UC06
+  usecase "Set Stop-Loss / Take-Profit\n(US07)" as UC07
+  usecase "View Transaction History\n(US08)" as UC08
+  usecase "View Performance Chart\n(US09)" as UC09
+  usecase "Warn Insufficient Balance\n(US10)" as UC10
+  usecase "Compare with Benchmark\n(US11)" as UC11
+  usecase "View Leaderboard\n(US12)" as UC12
+}
+
+Guest --> UC01
+Investor --> UC01
+Investor --> UC03
+Investor --> UC04
+Investor --> UC05
+Investor --> UC06
+Investor --> UC07
+Investor --> UC08
+Investor --> UC09
+Investor --> UC11
+Investor --> UC12
+
+UC01 ..> UC02 : <<include>>
+UC04 ..> UC10 : <<extend>>
+
+MarketData --> UC03 : reference prices
+note right of MarketData
+  Order fills (UC04, UC05)
+  use the same feed (BR3)
+end note
+
+footer Scope: M1 (US01-US12, BR1-BR8)
+@enduml

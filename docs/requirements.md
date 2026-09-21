@@ -375,3 +375,7 @@ Text form of the same diagram:
 /leaderboard   --[back]---------------------------> /portfolio
 /portfolio     --[sign out]-----------------------> /
 ```
+
+### 6.3 UML system model
+
+- [Use case diagram source](diagrams/use-case-diagram.puml) and [exported image](diagrams/use-case-diagram.svg)
