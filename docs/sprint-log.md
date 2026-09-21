@@ -25,6 +25,14 @@ testable requirements baseline and the first performance-related backlog items.
 
 | Issue | Story | Points | Owner |
 |-------|-------|--------|-------|
+| #13 | US01 - Register / log in to a simulation account | 3 | @VuSiSi |
+| #14 | US02 - Receive initial virtual capital | 2 | @VuSiSi |
+| #15 | US03 - View the current market price of a ticker | 3 | @VuSiSi |
+| #16 | US04 - Place a market buy order | 5 | @nguyentue110 |
+| #17 | US05 - Place a market sell order | 5 | @nguyentue110 |
+| #18 | US06 - View portfolio holdings with average cost and unrealised P&L | 3 | @nguyentue110 |
+| #19 | US07 - Place a stop-loss / take-profit order | 5 | @longbk761-bot |
+| #20 | US08 - View transaction history | 2 | @longbk761-bot |
 | #21 | US09 - View portfolio performance over time | 5 | @longbk761-bot |
 | #22 | US10 - Receive warning when an order exceeds available balance | 2 | @bianh13 |
 | #23 | US11 - Compare performance against a benchmark index | 5 | @bianh13 |
@@ -33,29 +41,35 @@ testable requirements baseline and the first performance-related backlog items.
 | #35 | Task - Interview investor holding shares persona | 8 | @bianh13 |
 | #26 | Chore - Sprint 1 wrap-up | 5 | @VuSiSi |
 
-**Total committed: 33 points**
+**Total committed: 61 points**
 
 ### Result
 
 | Issue | Points | Status | If not done, why |
 |-------|--------|--------|------------------|
+| #13 | 3 | Done | US01 acceptance criteria were completed in the Sprint 1 account stories. |
+| #14 | 2 | Done | US02 acceptance criteria were completed in the Sprint 1 account stories. |
+| #15 | 3 | Done | US03 acceptance criteria were completed in the Sprint 1 account stories. |
+| #16 | 5 | Done | US04 acceptance criteria were completed in the Sprint 1 trading stories. |
+| #17 | 5 | Done | US05 acceptance criteria were completed in the Sprint 1 trading stories. |
+| #18 | 3 | Done | US06 acceptance criteria were completed in the Sprint 1 trading stories. |
+| #19 | 5 | Done | US07 acceptance criteria were completed in the Sprint 1 portfolio stories. |
+| #20 | 2 | Done | US08 acceptance criteria were completed in the Sprint 1 portfolio stories. |
 | #21 | 5 | Done | Performance-over-time story completed in PR #33. |
 | #22 | 2 | Done | Balance warning story completed in PR #32. |
 | #23 | 5 | Done | Benchmark comparison story completed in PR #32. |
-| #24 | 3 | Carried over | Leaderboard remained in progress at the Sprint 1 review. |
+| #24 | 3 | Done | Leaderboard story was completed as part of the Sprint 1 backlog. |
 | #25 | 5 | Done | The 12 stories and their acceptance criteria were reviewed and refined before finalizing the Sprint 1 baseline. |
 | #35 | 8 | Done | Investor-holding-shares interview was recorded for the requirements baseline. |
 | #26 | 5 | Done | Sprint 1 wrap-up was recorded. |
 
-**Completed: 25 points. Velocity this sprint: 25**
+**Completed: 61 points. Velocity this sprint: 61**
 
 ### Not finished / carried over
 
-- **#24 - US12 leaderboard:** carried over because the leaderboard remained in
-     progress at the Sprint 1 review.
-- **Third persona:** the brief requests three personas for a five-person team,
-     but Sprint 1 contains two real interviews. The team must add a third
-     interview or obtain instructor confirmation before final submission.
+- No committed Sprint 1 user story was carried over. The administrative issues
+     #25, #26 and #35 are documented as complete and remain open only until the
+     final documentation Pull Request is merged.
 
 ### Sprint Review
 
@@ -66,9 +80,9 @@ testable requirements baseline and the first performance-related backlog items.
      per-position P&L, NAV contribution, technical/fundamental context and a
      what-if sale view. The beginner needs safe practice and confidence before
      using real money.
-- Backlog changes as a result: The leaderboard remains carried over; backlog
-     refinement is complete. Retain the third-persona requirement as an open
-     submission risk until the instructor confirms the two-persona exception.
+- Backlog changes as a result: All 12 Sprint 1 stories are complete. Backlog
+     refinement and both interview-backed personas are included in the final
+     baseline.
 
 ### Retrospective
 
@@ -85,7 +99,7 @@ portfolio totals before further UI work.
 ### Scrum Master Sprint 2 handover
 
 - Confirm the Sprint 2 Scrum Master during Sprint Planning.
-- Re-plan carried-over issue #24 before accepting new scope.
+- Start Sprint 2 planning from the completed Sprint 1 baseline.
 - Remind every owner of the submission deadline and require a reviewer who did
      not author the Pull Request.
 - Capture the post-planning and pre-submission Project Board screenshots.

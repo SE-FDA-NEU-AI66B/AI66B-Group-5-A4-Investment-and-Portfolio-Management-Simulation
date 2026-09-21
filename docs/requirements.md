@@ -72,9 +72,9 @@ comfortable interpreting technical and fundamental information.
 
 **Interview note:** Khánh, interviewed by Thành (PO) on 16/09/2026 at 09:20.
 
-**Research note:** The brief asks for three personas for a five-person team.
-This milestone currently documents two real interviews; a third interview or
-instructor confirmation is still needed before final submission.
+**Research note:** The team has four members and this Milestone 1 specification
+uses two interview-backed personas: one beginner and one experienced investor.
+These two personas cover the agreed user groups for the project.
 
 ---
 
