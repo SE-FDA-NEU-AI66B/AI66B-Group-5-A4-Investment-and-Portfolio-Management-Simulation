@@ -26,5 +26,5 @@ Numbered, so issues and tests can cite them.
 | BR2 | Sell quantity may not exceed the quantity held | Order submission (`/trade`) | TBD (Sprint 2) |
 | BR3 | Market order fills at the price quoted when submitted | Order execution (`/trade`) | TBD (Sprint 2) |
 | BR4 | A stop-loss order triggers automatically and closes the entire position as soon as the market price reaches or falls below the threshold. A take-profit order triggers the same way once the price reaches or rises above its threshold. Default thresholds are 5% below and 10% above the average cost basis. | Threshold monitor, order execution (`/trade`) | TBD (Sprint 2) |
-| BR5 | TBD - @Vu | | |
+| BR5 | The initial virtual capital is fixed for every new account | | |
 | BR6 | Average cost is the weighted average of every purchase | Buy execution (`/trade`) | TBD (Sprint 2) |

@@ -19,6 +19,7 @@ A **"paper trading"** application: Users can buy and sell stocks using **virtual
 ## Team Members
 
 | **Full Name** | **Student ID** | **GitHub Username** | **Role** | 
+|----|-------|----------|--------|
 | Pham Huy Thanh | 11247351 | bianh13 | Product Owner | 
 | Pham Quang Vu | 11247372 | VuSiSi | Scrum Master (Current Sprint) | 
 | Nguyen Van Tue | 11247366 | nguyentue110 | Dev Team | 
