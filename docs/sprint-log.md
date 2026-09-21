@@ -104,6 +104,12 @@ portfolio totals before further UI work.
      not author the Pull Request.
 - Capture the post-planning and pre-submission Project Board screenshots.
 
+### Week 6 UML modelling tasks
+
+- #38 - Create UML use-case diagram.
+- #39 - Create UML sequence diagram for the buy-order flow.
+- #40 - Create UML sequence diagram for the sell-order flow.
+
 <!-- A retro that produces no action item is a complaint session.
      Exactly one action, one owner, checked at the next retro. -->
 

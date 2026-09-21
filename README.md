@@ -78,6 +78,8 @@ python app.py
 
 * **Process dossier:** [docs/process.md](docs/process.md)
 
+* **UML diagrams:** [docs/diagrams](docs/diagrams)
+
 * **Branching:** `feature/<description>` → Open a Pull Request to `main` → Requires at least 1 review/approval before merging.
 
 * **Commit Message Convention:** `USxx: brief description` (referencing the corresponding User Story).

@@ -375,3 +375,9 @@ Text form of the same diagram:
 /leaderboard   --[back]---------------------------> /portfolio
 /portfolio     --[sign out]-----------------------> /
 ```
+
+### 6.3 UML system models
+
+- [Use case diagram source](diagrams/use-case-diagram.puml) and [exported image](diagrams/use-case-diagram.svg)
+- [Buy-order sequence source](diagrams/sequence-buy-order.puml) and [exported image](diagrams/sequence-buy-order.svg)
+- [Sell-order sequence source](diagrams/sequence-sell-order.puml) and [exported image](diagrams/sequence-sell-order.svg)
