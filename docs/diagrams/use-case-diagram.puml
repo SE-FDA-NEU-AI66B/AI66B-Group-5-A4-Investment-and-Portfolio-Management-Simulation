@@ -14,12 +14,12 @@ rectangle "Investment & Portfolio\nManagement Simulation" {
   usecase "Receive Virtual Capital\n(US02)" as UC02
   usecase "View Market Prices\n(US03)" as UC03
   usecase "Place Buy Order\n(US04)" as UC04
+  usecase "Warn Insufficient Balance\n(US10)" as UC10
   usecase "Place Sell Order\n(US05)" as UC05
-  usecase "View Portfolio\n(US06)" as UC06
   usecase "Set Stop-Loss / Take-Profit\n(US07)" as UC07
+  usecase "View Portfolio\n(US06)" as UC06
   usecase "View Transaction History\n(US08)" as UC08
   usecase "View Performance Chart\n(US09)" as UC09
-  usecase "Warn Insufficient Balance\n(US10)" as UC10
   usecase "Compare with Benchmark\n(US11)" as UC11
   usecase "View Leaderboard\n(US12)" as UC12
 }
@@ -37,7 +37,7 @@ Investor --> UC11
 Investor --> UC12
 
 UC01 ..> UC02 : <<include>>
-UC04 ..> UC10 : <<extend>>
+UC10 ..> UC04 : <<extend>>
 
 MarketData --> UC03 : reference prices
 note right of MarketData
