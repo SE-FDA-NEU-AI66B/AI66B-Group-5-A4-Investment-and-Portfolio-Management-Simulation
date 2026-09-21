@@ -6,7 +6,7 @@ evidence that the process was real.
 
 ---
 
-## Sprint N - <start date> to <end date>
+## Sprint N - <00:00 13/09/2026> to <00:00 22/09/2026>
 
 <!-- Sprint 1: weeks 5-6 | Sprint 2: 7-8 | Sprint 3: 9-10 | Sprint 4: 11-12 | Sprint 5: 13-14 -->
 
@@ -17,10 +17,12 @@ has no goal and you are just doing tasks.>
 
 ### Hai chore issue bắt buộc
 
-| Issue | Người làm | Đã đóng? |
-|-------|-----------|----------|
-| [Chore] Refine backlog cho Sprint N | @ (PO) | |
-| [Chore] Sprint N wrap-up | @ (SM) | |
+| Issue | Người làm | Đã đóng? | Note |
+|-------|-----------|----------|------|
+| [Chore] Refine backlog cho Sprint N | @ (PO) | | Template |
+| [Chore] Sprint N wrap-up | @ (SM) | | Template |
+| [Chore] Refine backlog cho Sprint 1 | @ (PO) | |
+| [Chore] Sprint 1 wrap-up | @VuSiSi | |
 
 ### Committed
 
