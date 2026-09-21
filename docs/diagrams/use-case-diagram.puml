@@ -1,75 +1,49 @@
 @startuml
 ' Use Case Diagram - Investment & Portfolio Management Simulation
+' Scope: M1 requirements (US01-US12, BR1-BR8). Local draft - NOT committed.
+title Use Case Diagram - Investment & Portfolio Management Simulation
+
 left to right direction
-skinparam packageStyle rectangle
-skinparam shadowing false
 
-title Investment & Portfolio Management Simulation - Use Case Diagram
+actor Guest as Guest
+actor Investor as Investor
+actor "Market Data Provider" as MarketData
 
-actor Investor as investor
-actor "Market Data Provider" as market
-actor "Notification Service" as notify
-
-rectangle "Investment & Portfolio Management Simulation" {
-  usecase "Register / log in" as UC01
-  usecase "Receive initial virtual capital" as UC02
-  usecase "View current market price" as UC03
-  usecase "Place market buy order" as UC04
-  usecase "Place market sell order" as UC05
-  usecase "View portfolio holdings" as UC06
-  usecase "Set stop-loss / take-profit" as UC07
-  usecase "View transaction history" as UC08
-  usecase "View portfolio performance" as UC09
-  usecase "Receive balance warning" as UC10
-  usecase "Compare with benchmark index" as UC11
-  usecase "View performance leaderboard" as UC12
-
-  usecase "Validate available cash" as ValidateCash
-  usecase "Validate held quantity" as ValidateQuantity
-  usecase "Fill order at latest quote" as FillOrder
-  usecase "Update weighted average cost" as UpdateCost
-  usecase "Trigger threshold order" as TriggerThreshold
+rectangle "Investment & Portfolio\nManagement Simulation" {
+  usecase "Register and Log In\n(US01)" as UC01
+  usecase "Receive Virtual Capital\n(US02)" as UC02
+  usecase "View Market Prices\n(US03)" as UC03
+  usecase "Place Buy Order\n(US04)" as UC04
+  usecase "Place Sell Order\n(US05)" as UC05
+  usecase "View Portfolio\n(US06)" as UC06
+  usecase "Set Stop-Loss / Take-Profit\n(US07)" as UC07
+  usecase "View Transaction History\n(US08)" as UC08
+  usecase "View Performance Chart\n(US09)" as UC09
+  usecase "Warn Insufficient Balance\n(US10)" as UC10
+  usecase "Compare with Benchmark\n(US11)" as UC11
+  usecase "View Leaderboard\n(US12)" as UC12
 }
 
-investor --> UC01
-investor --> UC03
-investor --> UC04
-investor --> UC05
-investor --> UC06
-investor --> UC07
-investor --> UC08
-investor --> UC09
-investor --> UC10
-investor --> UC11
-investor --> UC12
+Guest --> UC01
+Investor --> UC01
+Investor --> UC03
+Investor --> UC04
+Investor --> UC05
+Investor --> UC06
+Investor --> UC07
+Investor --> UC08
+Investor --> UC09
+Investor --> UC11
+Investor --> UC12
 
-market --> UC03
-market --> FillOrder
-notify --> UC07
-notify --> UC10
+UC01 ..> UC02 : <<include>>
+UC04 ..> UC10 : <<extend>>
 
-UC04 .> ValidateCash : <<include>>
-UC04 .> FillOrder : <<include>>
-UC04 .> UpdateCost : <<include>>
-UC05 .> ValidateQuantity : <<include>>
-UC05 .> FillOrder : <<include>>
-UC07 .> TriggerThreshold : <<include>>
-UC10 .> ValidateCash : <<extend>>
-UC11 .> UC09 : <<extend>>
-
-note right of UC02
-  Every new account receives
-  exactly 100,000,000 VND (BR5).
+MarketData --> UC03 : reference prices
+note right of MarketData
+  Order fills (UC04, UC05)
+  use the same feed (BR3)
 end note
 
-note bottom of UC04
-  US04, BR1, BR3, BR6
-end note
-note bottom of UC05
-  US05, BR2, BR3
-end note
-note bottom of UC07
-  US07, BR4
-end note
-
+footer Scope: M1 (US01-US12, BR1-BR8)
 @enduml
