@@ -45,7 +45,7 @@ testable requirements baseline and the first performance-related backlog items.
 
 ### Result
 
-| Issue | Points | Status | If not done, why |
+| Issue | Points | Status | Detail |
 |-------|--------|--------|------------------|
 | #13 | 3 | Done | US01 acceptance criteria were completed in the Sprint 1 account stories. |
 | #14 | 2 | Done | US02 acceptance criteria were completed in the Sprint 1 account stories. |
@@ -60,48 +60,39 @@ testable requirements baseline and the first performance-related backlog items.
 | #23 | 5 | Done | Benchmark comparison story completed in PR #32. |
 | #24 | 3 | Done | Leaderboard story was completed as part of the Sprint 1 backlog. |
 | #25 | 5 | Done | The 12 stories and their acceptance criteria were reviewed and refined before finalizing the Sprint 1 baseline. |
-| #35 | 8 | Done | Investor-holding-shares interview was recorded for the requirements baseline. |
 | #26 | 5 | Done | Sprint 1 wrap-up was recorded. |
+| #35 | 8 | Done | Investor-holding-shares interview was recorded for the requirements baseline. |
+
+Supporting tasks completed during the sprint:
+
+- #34 [Task] Interview first-time investor persona — completed as a child task of #22 (US10).
+- #35 [Task] Interview investor holding shares persona — completed as a child task of #23 (US11).
 
 **Completed: 61 points. Velocity this sprint: 61**
 
 ### Not finished / carried over
 
-- No committed Sprint 1 user story was carried over. The administrative issues
-     #25, #26 and #35 are documented as complete and remain open only until the
-     final documentation Pull Request is merged.
+- No committed Sprint 1 user story was carried over. The administrative issues #25, #26 and #35 are documented as complete and remain open only until the final documentation Pull Request is merged.
 
 ### Sprint Review
 
-- What we demonstrated: The requirements baseline, two interview-backed
-     personas, two scenarios, and acceptance criteria for performance, benchmark
-     comparison and balance warnings.
-- Feedback received: The experienced investor needs weighted average cost,
-     per-position P&L, NAV contribution, technical/fundamental context and a
-     what-if sale view. The beginner needs safe practice and confidence before
-     using real money.
-- Backlog changes as a result: All 12 Sprint 1 stories are complete. Backlog
-     refinement and both interview-backed personas are included in the final
-     baseline.
+- What we demonstrated: The requirements baseline, two interview-backed personas, two scenarios, and acceptance criteria for performance, benchmark comparison and balance warnings.
+- Feedback received: The experienced investor needs weighted average cost, per-position P&L, NAV contribution, technical/fundamental context and a what-if sale view. The beginner needs safe practice and confidence before using real money.
+- Backlog changes as a result: All 12 Sprint 1 stories are complete. Backlog refinement and both interview-backed personas are included in the final baseline.
 
 ### Retrospective
 
 | Keep doing | Stop doing | Start doing |
 |------------|------------|-------------|
-| Keep the interview answers close to the acceptance criteria. | Avoid leaving
-     ownership and acceptance checks implicit. | Start validating the money
-     calculations with concrete examples before implementation. |
+| Keep the interview answers close to the acceptance criteria. | Avoid leaving ownership and acceptance checks implicit. | Start validating the money calculations with concrete examples before implementation. |
 
-**One concrete action for the next planning cycle (with an owner):** @longbk761-bot
-will add executable tests for average cost, realised/unrealised P&L and
-portfolio totals before further UI work.
+**One concrete action for the next planning cycle (with an owner):** @longbk761-bot will add executable tests for average cost, realised/unrealised P&L and portfolio totals before further UI work.
 
 ### Scrum Master Sprint 2 handover
 
 - Confirm the Sprint 2 Scrum Master during Sprint Planning.
 - Start Sprint 2 planning from the completed Sprint 1 baseline.
-- Remind every owner of the submission deadline and require a reviewer who did
-     not author the Pull Request.
+- Remind every owner of the submission deadline and require a reviewer who did not author the Pull Request.
 - Capture the post-planning and pre-submission Project Board screenshots.
 
 <!-- A retro that produces no action item is a complaint session.
