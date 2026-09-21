@@ -64,6 +64,9 @@ P&L and a what-if view of selling a position.
 **In their words:** *"Một ứng dụng mô phỏng đầu tư/quản lý danh mục lý tưởng
 đối với tôi cần chính xác và hữu dụng trong thực tiễn."*
 
+**English translation:** *"An ideal investment and portfolio management
+simulation must be accurate and useful in practice."*
+
 **Technical skill:** experienced with brokerage and spreadsheet tools and
 comfortable interpreting technical and fundamental information.
 

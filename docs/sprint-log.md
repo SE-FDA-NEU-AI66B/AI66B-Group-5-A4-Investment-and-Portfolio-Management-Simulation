@@ -14,12 +14,12 @@ Complete the Milestone 1 discovery and specification package for a paper-trading
 simulation, including two real user interviews, personas, scenarios, a
 testable requirements baseline and the first performance-related backlog items.
 
-### Hai chore issue bắt buộc
+### Required chore issues
 
-| Issue | Người làm | Đã đóng? |
+| Issue | Owner | Closed? |
 |-------|-----------|----------|
 | [Chore] Refine backlog cho Sprint 1 (#25) | @bianh13 (PO) | Done |
-| [Chore] Sprint 1 wrap-up (#26) | @bianh13 (SM) | Done |
+| [Chore] Sprint 1 wrap-up (#26) | @VuSiSi (SM) | Done |
 
 ### Committed
 
@@ -30,8 +30,8 @@ testable requirements baseline and the first performance-related backlog items.
 | #23 | US11 - Compare performance against a benchmark index | 5 | @bianh13 |
 | #24 | US12 - View leaderboard ranked by performance | 3 | @bianh13 |
 | #25 | Chore - Refine backlog for Sprint 1 | 5 | @bianh13 |
-| #35 | Task - Interview investor holding shares persona | 8 | @VuSiSi |
-| #26 | Chore - Sprint 1 wrap-up | 5 | @bianh13 |
+| #35 | Task - Interview investor holding shares persona | 8 | @bianh13 |
+| #26 | Chore - Sprint 1 wrap-up | 5 | @VuSiSi |
 
 **Total committed: 33 points**
 
@@ -48,6 +48,14 @@ testable requirements baseline and the first performance-related backlog items.
 | #26 | 5 | Done | Sprint 1 wrap-up was recorded. |
 
 **Completed: 25 points. Velocity this sprint: 25**
+
+### Not finished / carried over
+
+- **#24 - US12 leaderboard:** carried over because the leaderboard remained in
+     progress at the Sprint 1 review.
+- **Third persona:** the brief requests three personas for a five-person team,
+     but Sprint 1 contains two real interviews. The team must add a third
+     interview or obtain instructor confirmation before final submission.
 
 ### Sprint Review
 
@@ -73,6 +81,14 @@ testable requirements baseline and the first performance-related backlog items.
 **One concrete action for the next planning cycle (with an owner):** @longbk761-bot
 will add executable tests for average cost, realised/unrealised P&L and
 portfolio totals before further UI work.
+
+### Scrum Master Sprint 2 handover
+
+- Confirm the Sprint 2 Scrum Master during Sprint Planning.
+- Re-plan carried-over issue #24 before accepting new scope.
+- Remind every owner of the submission deadline and require a reviewer who did
+     not author the Pull Request.
+- Capture the post-planning and pre-submission Project Board screenshots.
 
 <!-- A retro that produces no action item is a complaint session.
      Exactly one action, one owner, checked at the next retro. -->
