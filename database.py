@@ -17,13 +17,15 @@ CREATE TABLE IF NOT EXISTS account (
 CREATE TABLE IF NOT EXISTS instrument (
     id INTEGER PRIMARY KEY,
     symbol TEXT NOT NULL UNIQUE,
-    name TEXT NOT NULL
+    name TEXT NOT NULL,
+    reference_price_vnd INTEGER CHECK(reference_price_vnd > 0),
+    reference_at TEXT
 );
 CREATE TABLE IF NOT EXISTS price_quote (
     id INTEGER PRIMARY KEY,
     instrument_id INTEGER NOT NULL UNIQUE REFERENCES instrument(id),
     price_vnd INTEGER NOT NULL CHECK(price_vnd > 0),
-    previous_close_vnd INTEGER NOT NULL CHECK(previous_close_vnd > 0),
+    previous_close_vnd INTEGER CHECK(previous_close_vnd > 0),
     quoted_at TEXT NOT NULL,
     source TEXT NOT NULL CHECK(source IN ('seed', 'dnse'))
 );
@@ -55,8 +57,10 @@ CREATE TABLE IF NOT EXISTS audit_event (
 );
 """
 
-MARKET_QUERY = """SELECT i.symbol, i.name, q.price_vnd, q.previous_close_vnd,
-       q.quoted_at, q.source
+MARKET_QUERY = """SELECT i.symbol, i.name, q.price_vnd,
+       CASE WHEN q.source = 'seed' THEN q.previous_close_vnd
+            ELSE i.reference_price_vnd END AS previous_close_vnd,
+       i.reference_at, q.quoted_at, q.source
 FROM price_quote AS q
 JOIN instrument AS i ON i.id = q.instrument_id
 ORDER BY i.symbol"""
@@ -70,6 +74,7 @@ def init_database(path):
     with sqlite3.connect(path) as connection:
         connection.execute("PRAGMA foreign_keys = ON")
         connection.executescript(SCHEMA)
+        migrate_market_data(connection)
         for row in seed:
             connection.execute(
                 "INSERT INTO instrument(symbol, name) VALUES (?, ?) "
@@ -93,6 +98,61 @@ def init_database(path):
             )
         count = connection.execute("SELECT COUNT(*) FROM price_quote").fetchone()[0]
     return count
+
+
+def migrate_market_data(connection):
+    """Upgrade the M2 seed schema atomically, preserving IDs and existing rows."""
+    connection.execute("BEGIN IMMEDIATE")
+    columns = {row[1] for row in connection.execute("PRAGMA table_info(instrument)")}
+    if "reference_price_vnd" not in columns:
+        connection.execute(
+            "ALTER TABLE instrument ADD COLUMN reference_price_vnd "
+            "INTEGER CHECK(reference_price_vnd > 0)"
+        )
+    if "reference_at" not in columns:
+        connection.execute("ALTER TABLE instrument ADD COLUMN reference_at TEXT")
+    quote_columns = list(connection.execute("PRAGMA table_info(price_quote)"))
+    if any(row[1] == "previous_close_vnd" and row[3] for row in quote_columns):
+        # No other table references price_quote. Keep its PK, FK, UNIQUE and CHECKs.
+        statement = SCHEMA.split("CREATE TABLE IF NOT EXISTS price_quote (")[1].split(
+            ";"
+        )[0]
+        connection.execute("CREATE TABLE price_quote_upgrade (" + statement)
+        connection.execute("INSERT INTO price_quote_upgrade SELECT * FROM price_quote")
+        connection.execute("DROP TABLE price_quote")
+        connection.execute("ALTER TABLE price_quote_upgrade RENAME TO price_quote")
+
+
+def write_dnse_event(path, event):
+    """Apply one validated event with an atomic newer-only comparison."""
+    with sqlite3.connect(
+        Path(path).resolve().as_uri() + "?mode=rw", uri=True
+    ) as connection:
+        connection.execute("PRAGMA foreign_keys = ON")
+        if event.kind == "sd":
+            result = connection.execute(
+                "UPDATE instrument SET reference_price_vnd = ?, reference_at = ? "
+                "WHERE symbol = ? AND (reference_at IS NULL OR reference_at < ?)",
+                (event.price_vnd, event.quoted_at, event.symbol, event.quoted_at),
+            )
+        else:
+            result = connection.execute(
+                "INSERT INTO price_quote(instrument_id, price_vnd, previous_close_vnd, "
+                "quoted_at, source) SELECT id, ?, NULL, ?, 'dnse' FROM instrument "
+                "WHERE symbol = ? ON CONFLICT(instrument_id) DO UPDATE SET "
+                "price_vnd = excluded.price_vnd, previous_close_vnd = NULL, "
+                "quoted_at = excluded.quoted_at, source = 'dnse' "
+                "WHERE price_quote.source = 'seed' OR price_quote.quoted_at < excluded.quoted_at",
+                (event.price_vnd, event.quoted_at, event.symbol),
+            )
+        return result.rowcount > 0
+
+
+def read_symbols(path):
+    with sqlite3.connect(
+        Path(path).resolve().as_uri() + "?mode=ro", uri=True
+    ) as connection:
+        return {row[0] for row in connection.execute("SELECT symbol FROM instrument")}
 
 
 def read_market(path):

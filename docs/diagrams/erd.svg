@@ -41,19 +41,21 @@
 <text x="778" y="1241" font-family="Arial,sans-serif" font-size="21" fill="#243b44">previous_status: TEXT</text>
 <text x="778" y="1276" font-family="Arial,sans-serif" font-size="21" fill="#243b44">new_status: TEXT</text>
 <text x="778" y="1311" font-family="Arial,sans-serif" font-size="21" fill="#243b44">occurred_at: TEXT</text>
-<rect x="1540" y="160" width="530" height="170" fill="#f4f8fa" stroke="#35566a" stroke-width="2"/>
+<rect x="1540" y="160" width="530" height="240" fill="#f4f8fa" stroke="#35566a" stroke-width="2"/>
 <text x="1560" y="200" font-family="Arial,sans-serif" font-size="28" fill="#243b44">instrument</text>
 <polyline points="1540,215 2070,215" fill="none" stroke="#6c8290" stroke-width="2"/>
 <text x="1558" y="246" font-family="Arial,sans-serif" font-size="21" fill="#243b44">PK id: INTEGER</text>
 <text x="1558" y="281" font-family="Arial,sans-serif" font-size="21" fill="#243b44">UQ symbol: TEXT</text>
 <text x="1558" y="316" font-family="Arial,sans-serif" font-size="21" fill="#243b44">name: TEXT</text>
+<text x="1558" y="351" font-family="Arial,sans-serif" font-size="21" fill="#243b44">reference_price_vnd: INTEGER NULL</text>
+<text x="1558" y="386" font-family="Arial,sans-serif" font-size="21" fill="#243b44">reference_at: TEXT NULL</text>
 <rect x="1540" y="650" width="530" height="275" fill="#f4f8fa" stroke="#35566a" stroke-width="2"/>
 <text x="1560" y="690" font-family="Arial,sans-serif" font-size="28" fill="#243b44">price_quote</text>
 <polyline points="1540,705 2070,705" fill="none" stroke="#6c8290" stroke-width="2"/>
 <text x="1558" y="736" font-family="Arial,sans-serif" font-size="21" fill="#243b44">PK id: INTEGER</text>
 <text x="1558" y="771" font-family="Arial,sans-serif" font-size="21" fill="#243b44">FK UQ instrument_id: INTEGER</text>
 <text x="1558" y="806" font-family="Arial,sans-serif" font-size="21" fill="#243b44">price_vnd: INTEGER</text>
-<text x="1558" y="841" font-family="Arial,sans-serif" font-size="21" fill="#243b44">previous_close_vnd: INTEGER</text>
+<text x="1558" y="841" font-family="Arial,sans-serif" font-size="21" fill="#243b44">previous_close_vnd: INTEGER NULL</text>
 <text x="1558" y="876" font-family="Arial,sans-serif" font-size="21" fill="#243b44">quoted_at: TEXT</text>
 <text x="1558" y="911" font-family="Arial,sans-serif" font-size="21" fill="#243b44">source: TEXT</text>
 <polyline points="590,260 760,260" fill="none" stroke="#6c8290" stroke-width="2"/>
@@ -66,8 +68,8 @@
 <polyline points="1540,300 1420,300 1420,660 1290,660" fill="none" stroke="#6c8290" stroke-width="2"/>
 <text x="1470" y="324" font-family="Arial,sans-serif" font-size="20" fill="#243b44">1</text>
 <text x="1310" y="647" font-family="Arial,sans-serif" font-size="20" fill="#243b44">0..*</text>
-<polyline points="1800,330 1800,650" fill="none" stroke="#6c8290" stroke-width="2"/>
-<text x="1815" y="370" font-family="Arial,sans-serif" font-size="20" fill="#243b44">1</text>
+<polyline points="1800,400 1800,650" fill="none" stroke="#6c8290" stroke-width="2"/>
+<text x="1815" y="434" font-family="Arial,sans-serif" font-size="20" fill="#243b44">1</text>
 <text x="1815" y="627" font-family="Arial,sans-serif" font-size="20" fill="#243b44">0..1</text>
 <text x="1570" y="501" font-family="Arial,sans-serif" font-size="21" fill="#243b44">latest snapshot only</text>
 <polyline points="190,470 190,1125 760,1125" fill="none" stroke="#47786c" stroke-width="2"/>

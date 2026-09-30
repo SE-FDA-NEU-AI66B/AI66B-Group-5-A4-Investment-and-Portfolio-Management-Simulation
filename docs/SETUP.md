@@ -50,7 +50,12 @@ credentials, `.env` or database files; `.gitignore` excludes local state.
 One command, `app.py init-db`, creates six tables and seeds **12 instruments and
 12 price_quote rows**. It prints `Database ready: 12 price_quote rows (12 on a
 fresh database).` The four other tables stay empty. Re-running preserves current
-prices and inserts missing demo entries; it does not reset data or migrate schemas.
+prices and inserts missing demo entries. It also applies an idempotent DNSE schema
+upgrade, preserving existing IDs/data. Stop the app/worker before upgrading a DB.
+
+For optional realtime prices, follow [DNSE setup](DNSE.md) after this demo check
+succeeds. It requires local keys and a second terminal running `python app.py stream`;
+the normal M2 demo still works without a feed.
 
 ## How to know it worked
 

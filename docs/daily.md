@@ -10,6 +10,6 @@ the team worked continuously.
 
 ## 2026-09-30
 
-- @bianh13 — Updated Scenarios and User Stories today, added Admin and DNSE Machine User roles, and labeled/assigned Sprint 2 fields across 10 issues (my scope accounts for 21/40 story points).
-Built the ERD/schema for 6 tables and implemented the market page to read 12 seed rows from SQLite. Verified idempotent seeding, data persistence across restarts, and empty/error states with passing tests.
-Next steps: Collect team reviews so Vu can finalize the architecture/ADRs and diagrams, Long can run independent SETUP/testing, and Tue can test or redraw the ERD and handle the wrap-up; meanwhile, I will pick up the API integration in the next phase ahead of the deadline.
+- @bianh13 — Refined the Sprint 2 stories/roles and schema-backed market demo, corrected priorities and the diagram helper name, and translated all 10 M2 issue descriptions into English.
+Implemented the optional DNSE worker, quote JSON endpoint, automatic page refresh and schema upgrade, with local tests covering protocol/reconnect, validation, ordering and persistence; real-provider verification awaits local keys.
+Next I will verify DNSE access and collect peer review while Vu completes architecture/evidence, Long handles independent setup/tests, and Tue reviews or redraws the ERD and coordinates wrap-up; the original 21/40-point baseline now has a separately estimated 5-point API extension.
