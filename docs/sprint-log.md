@@ -222,6 +222,18 @@ setup verification (#51/#52), final screenshots/PDF (#53), wrap-up (#54) and
 LMS submission remain assigned work. Review/retro results are recorded only
 after those events occur.
 
-DNSE realtime integration will be owned by @bianh13 in a later work session.
-The 3 points in #49 cover API design/P0 traceability only; realtime adapter
-implementation has not started and is not silently included in that estimate.
+### Optional realtime extension — 30 September
+
+The PO requested implementation after translating all M2 issue descriptions to
+English. New #59 (US14, P1, 5 points) belongs to @bianh13, planned reviewer @VuSiSi,
+with the Sprint 2 label/board field and M2 milestone. #49 remains a separate
+3-point API-design task. The original baseline is 40 points (Thanh 21/40 = 52.5%);
+including this explicitly added work gives **45 points, Thanh 26/45 = 57.8%**,
+Vu 6, Long 6 and Tue 7. No other estimates are inflated to maintain the ratio.
+
+The feed worker, migration and refreshing JSON/page are implemented and covered
+by local WebSocket/database tests. Authenticated DNSE verification awaits local
+keys; #59 remains open and earns no completed points before acceptance/review.
+The M2 required artifacts retain priority over this optional extension. Tue's
+#56 review should include the nullable quote reference and the two new instrument
+reference fields. Long's #51/#52 and Vu's #47/#53 handoffs remain assigned.

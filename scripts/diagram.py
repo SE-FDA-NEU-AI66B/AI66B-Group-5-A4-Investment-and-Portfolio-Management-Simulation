@@ -135,7 +135,9 @@ def erd():
         ],
     )
     entity(
-        c, "instrument", 1540, 160, ["PK id: INTEGER", "UQ symbol: TEXT", "name: TEXT"]
+        c, "instrument", 1540, 160,
+        ["PK id: INTEGER", "UQ symbol: TEXT", "name: TEXT",
+         "reference_price_vnd: INTEGER NULL", "reference_at: TEXT NULL"]
     )
     entity(
         c,
@@ -146,7 +148,7 @@ def erd():
             "PK id: INTEGER",
             "FK UQ instrument_id: INTEGER",
             "price_vnd: INTEGER",
-            "previous_close_vnd: INTEGER",
+            "previous_close_vnd: INTEGER NULL",
             "quoted_at: TEXT",
             "source: TEXT",
         ],
@@ -161,8 +163,8 @@ def erd():
     c.line([(1540, 300), (1420, 300), (1420, 660), (1290, 660)])
     c.text(1470, 304, "1", 20)
     c.text(1310, 627, "0..*", 20)
-    c.line([(1800, 330), (1800, 650)])
-    c.text(1815, 350, "1", 20)
+    c.line([(1800, 400), (1800, 650)])
+    c.text(1815, 414, "1", 20)
     c.text(1815, 607, "0..1", 20)
     c.text(1570, 480, "latest snapshot only", 21)
     c.line([(190, 470), (190, 1125), (760, 1125)], "#47786c")

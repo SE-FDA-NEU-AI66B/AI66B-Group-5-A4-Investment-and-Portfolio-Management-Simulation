@@ -12,27 +12,27 @@
     <div class="eyebrow">MARKET OVERVIEW</div>
     <h1>A place to start exploring.</h1>
     <p class="intro">Reference prices for your virtual investment journey.</p>
-    <aside><strong>Demo data</strong> · These are seeded example prices, not live DNSE quotes. No real money or market orders.</aside>
+    <aside id="data-notice">{% if quotes|selectattr('source', 'equalto', 'dnse')|list %}<strong>DNSE market data</strong> · The last received prices are shown below. Check each timestamp and source; some rows may still contain demo data.{% else %}<strong>Demo data</strong> · These are seeded example prices, not live DNSE quotes.{% endif %} No real money or market orders.</aside>
+    <p id="refresh-status" class="intro" role="status">Quotes refresh every 3 seconds. Check each quote's timestamp for freshness.</p>
     {% if error %}
       <section class="empty" role="alert"><h2>Market data is unavailable</h2><p>Please ask the project operator to check the database setup, then reload.</p></section>
     {% else %}
       <section aria-labelledby="quotes-heading">
-        <div class="section-heading"><h2 id="quotes-heading">Market snapshot</h2><span>{{ quotes|length }} symbols · VND</span></div>
-        {% if quotes %}
+        <div class="section-heading"><h2 id="quotes-heading">Market snapshot</h2><span id="symbol-count">{{ quotes|length }} symbols · VND</span></div>
         <div class="table-wrap"><table>
           <thead><tr><th scope="col">Symbol / Company</th><th scope="col" class="number">Price (VND)</th><th scope="col" class="number">Daily change</th><th scope="col">Last quote (UTC)</th><th scope="col">Source / Status</th></tr></thead>
-          <tbody>{% for quote in quotes %}<tr>
+          <tbody id="quote-rows">{% for quote in quotes %}<tr>
             <td><strong>{{ quote.symbol }}</strong><small>{{ quote.name }}</small></td>
             <td class="number price">{{ quote.price_vnd|vnd }}</td>
-            <td class="number {{ 'positive' if quote.change > 0 else 'negative' if quote.change < 0 else 'neutral' }}">{{ '+' if quote.change > 0 else '' }}{{ quote.change }}%</td>
+            <td class="number {{ 'positive' if quote.change is not none and quote.change|float > 0 else 'negative' if quote.change is not none and quote.change|float < 0 else 'neutral' }}">{% if quote.change is none %}—<small>Reference unavailable</small>{% else %}{{ '+' if quote.change|float > 0 else '' }}{{ quote.change }}%{% endif %}</td>
             <td><time datetime="{{ quote.quoted_at }}">{{ quote.quoted_at }}</time></td>
             <td><span class="source">{{ 'Demo / seed' if quote.source == 'seed' else 'DNSE' }}</span>{% if quote.stale %}<small class="delayed">Price may be delayed</small>{% endif %}</td>
-          </tr>{% endfor %}</tbody>
+          </tr>{% else %}<tr><td colspan="5"><h2>No quotes yet</h2><p>Market prices will appear here when data is available.</p></td></tr>{% endfor %}</tbody>
         </table></div>
-        {% else %}<div class="empty"><h2>No quotes yet</h2><p>Market prices will appear here when data is available.</p></div>{% endif %}
       </section>
     {% endif %}
     <footer>VirtuTrade · Team 05 <span>Investment &amp; Portfolio Management Simulation</span></footer>
   </main>
+  <script src="{{ url_for('static', filename='market.js') }}" defer></script>
 </body>
 </html>

@@ -12,8 +12,11 @@ verification, final screenshots, peer review and merge remain pending.
 
 Owner: @VuSiSi, #47. Pending labelled container diagram and deployment detail.
 Implementation: browser → HTTP GET → Flask (`app.py`) → SQL through `database.py`
-→ local SQLite file → rendered HTML. DNSE Machine User/backend adapter are
-design-only; Admin is a separate human role.
+→ local SQLite file → HTML/JSON. The browser polls GET `/api/market/quotes` every
+three seconds. A separate `dnse.py` worker authenticates over WSS, subscribes to
+G1 tick/reference streams and writes validated snapshots to SQLite. It reconnects
+independently of web requests. Real-provider verification is pending; Admin
+remains a separate human role with design-only services.
 
 Current implementation uses Flask 3.1.3 and SQLite bundled with Python, within
 the existing Python stack. Review references: [Flask installation](https://flask.palletsprojects.com/en/stable/installation/)
@@ -33,16 +36,17 @@ All six tables exist after init-db; only instrument and price_quote are seeded.
 Empty account/holding/trade/audit tables do not implement those features. Deferred
 extensions are documented in [traceability](traceability.md).
 
-All columns are NOT NULL except `trade.realised_pnl_vnd`. An INTEGER PRIMARY KEY
+All columns are NOT NULL except `trade.realised_pnl_vnd`, `price_quote.previous_close_vnd`,
+`instrument.reference_price_vnd` and `instrument.reference_at`. An INTEGER PRIMARY KEY
 is the SQLite row identifier. Timestamps are UTC ISO 8601 TEXT, validated by the
-future service. Money is integer VND; services must validate integers because
+DNSE adapter for incoming feed events. Money is integer VND; services must validate integers because
 SQLite type affinity alone is not an input validator.
 
 | Table / purpose | Columns and types | Keys / constraints and rules |
 |-----------------|-------------------|------------------------------|
 | account: identity, role, state, virtual cash | id INTEGER; email TEXT COLLATE NOCASE; password_hash TEXT; role TEXT DEFAULT investor; status TEXT DEFAULT active; cash_vnd INTEGER DEFAULT 100000000; created_at TEXT | PK id; UNIQUE email (US01); role investor/admin and status active/disabled (BR9); cash >=0 (BR1 guard); default capital (BR5). Hashing, single grant and authorization need service code. |
-| instrument: ticker identity | id INTEGER; symbol TEXT; name TEXT | PK id; UNIQUE symbol (US03/BR10). |
-| price_quote: latest snapshot per ticker | id INTEGER; instrument_id INTEGER; price_vnd INTEGER; previous_close_vnd INTEGER; quoted_at TEXT; source TEXT | PK id; UNIQUE FK instrument_id → instrument.id; both prices >0; source seed/dnse (BR10). One snapshot, no tick history; newer-event ordering needs adapter logic. |
+| instrument: identity and provider reference | id INTEGER; symbol TEXT; name TEXT; reference_price_vnd INTEGER NULL; reference_at TEXT NULL | PK id; UNIQUE symbol (US03/BR10). Positive DNSE basicPrice converted to VND; original reference_at timestamp. Newer references only. |
+| price_quote: latest snapshot per ticker | id INTEGER; instrument_id INTEGER; price_vnd INTEGER; previous_close_vnd INTEGER NULL; quoted_at TEXT; source TEXT | PK id; UNIQUE FK instrument_id → instrument.id; prices >0 when present; source seed/dnse (BR10). previous_close_vnd is seed-only; live rows set it NULL and use the instrument reference for the same Vietnam trading date. Atomic newer-event ordering in database.py; no tick history. |
 | holding: shares and remaining cost basis | id INTEGER; account_id INTEGER; instrument_id INTEGER; quantity INTEGER; cost_basis_vnd INTEGER | PK id; FKs account_id → account.id, instrument_id → instrument.id; UNIQUE(account_id, instrument_id); quantity >0, cost_basis_vnd >=0 (BR2/BR6 guards). Remove holding after full sale. |
 | trade: executed fill | id INTEGER; account_id INTEGER; instrument_id INTEGER; side TEXT; quantity INTEGER; fill_price_vnd INTEGER; realised_pnl_vnd INTEGER NULL; executed_at TEXT | PK id; FKs account_id → account.id, instrument_id → instrument.id; side buy/sell; quantity/fill price >0 (BR2/BR3 guards). Realised P&L is set for sales; buys may use NULL. Rejected attempts/conditional metadata require later extension. |
 | audit_event: account-status change | id INTEGER; admin_id INTEGER; target_account_id INTEGER; previous_status TEXT; new_status TEXT; occurred_at TEXT | PK id; both FKs → account.id; both statuses active/disabled (BR9). Future service checks admin role and writes status/audit atomically; FK alone cannot authorize. |
@@ -63,7 +67,10 @@ before trading implementation; the skeleton performs no trades.
 Seed contract: 12 instruments and 12 quote rows; four other tables empty.
 Initialization adds missing demo rows without overwriting prices or duplicating
 identities. Fixed seed timestamps/source remain unchanged. Future schema changes
-require migrations; init-db is not a schema upgrade tool.
+require migrations. init-db includes a transactional upgrade from the original
+M2 schema: add two nullable instrument reference fields and allow NULL quote
+reference. IDs/rows survive repeated upgrades; stop processes before upgrading.
+Tests exercise the original schema and fresh initialization.
 
 ## 3. API design
 
@@ -71,7 +78,12 @@ Owner: @bianh13, #49. Pending >=6 endpoint contracts, >=2 meaningful error
 codes and coverage for all P0 stories. Candidate mapping is in traceability.
 Implemented: GET `/` redirects to `/market`; GET `/market` returns 200 HTML
 (including empty state), or 503 HTML when the database is unavailable. The
-server-rendered slice needs no separate JSON API. Other endpoints are unimplemented.
+page also polls GET `/api/market/quotes`: 200 JSON with a `quotes` array (possibly
+empty), or 503 JSON with error code `MARKET_UNAVAILABLE`, with `Cache-Control: no-store`.
+Each quote includes symbol/name, integer price_vnd, nullable previous_close_vnd,
+nullable reference_at, quoted_at, source, stale and change (two-decimal string or NULL).
+Missing same-day reference means unknown change, not zero. Other endpoint contracts
+remain #49's separate design deliverable. See [DNSE](DNSE.md).
 
 ## 4. Walking skeleton
 
@@ -86,14 +98,19 @@ with VND price, daily change, UTC time and Demo / seed badge. Quotes older than
 Actual query in `database.py::read_market`:
 
 ```sql
-SELECT i.symbol, i.name, q.price_vnd, q.previous_close_vnd,
-       q.quoted_at, q.source
+SELECT i.symbol, i.name, q.price_vnd,
+       CASE WHEN q.source = 'seed' THEN q.previous_close_vnd
+            ELSE i.reference_price_vnd END AS previous_close_vnd,
+       i.reference_at, q.quoted_at, q.source
 FROM price_quote AS q
 JOIN instrument AS i ON i.id = q.instrument_id
 ORDER BY i.symbol
 ```
 
 The route only queries SQLite; init-db alone reads `data/demo-quotes.json`.
+With the optional feed, valid DNSE ticks replace individual seed quotes. Each row
+keeps its actual source. References must match the quote's Vietnam date before
+percentage display; disconnection preserves price/time and the stale indicator.
 Committed `.env.example` documents configuration; real `.env` and database files
 are ignored. Money remains integer VND; percentage display uses Decimal,
 two decimal places and ROUND_HALF_UP.
