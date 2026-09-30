@@ -15,7 +15,6 @@ and independent-machine verification (#52), which remain pending.
 ```powershell
 git clone https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation.git
 cd AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation
-# Before merge only: git switch chore/sprint2-planning
 py -3 -m venv .venv
 Copy-Item .env.example .env
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
@@ -31,7 +30,6 @@ unavailable but `python --version` is 3.10+, use `python -m venv .venv`.
 ```bash
 git clone https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation.git
 cd AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation
-# Before merge only: git switch chore/sprint2-planning
 python3 -m venv .venv
 cp .env.example .env
 .venv/bin/python -m pip install -r requirements.txt

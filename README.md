@@ -54,7 +54,7 @@ cd AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation
 
 Then follow the OS-specific commands in [docs/SETUP.md](docs/SETUP.md) to create
 the virtual environment, install dependencies, copy configuration and initialize
-the database with one command. Before merge, use PR #55's `chore/sprint2-planning` branch.
+the database with one command. The walking skeleton is available on `main`.
 
 ## Running the Application
 

@@ -1,4 +1,4 @@
-"""Rebuild editable SVG and PNG diagrams: pip install Pillow; python scripts/render_diagrams.py."""
+"""Rebuild editable SVG and PNG diagrams: pip install Pillow; python scripts/diagram.py."""
 
 from html import escape
 from pathlib import Path

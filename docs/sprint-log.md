@@ -133,6 +133,13 @@ all those endpoints is not the Milestone 2 walking-skeleton commitment.
 [Milestone and assigned issues](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/milestone/1) · [Group 5 board](https://github.com/orgs/SE-FDA-NEU-AI66B/projects/7).
 Estimates are initial planning values; the SM records any later scope or estimate changes.
 
+**Task priority correction:** P0 = immediate prerequisites for a coherent,
+runnable and reproducible slice (#46, #48, #50, #52); P1 = work to finish alongside
+or after that baseline (#47, #49, #51, #53, #54, #56). All ten tasks remain in M2;
+P1 does not waive a submission requirement. These task labels describe execution
+order and do not change the product-story priorities in requirements.md. No
+current committed task is classified P2. Owners and estimates are unchanged.
+
 | Issue | Deliverable | Points | Owner | Planned reviewer | Internal due (UTC+7) |
 |-------|-------------|--------|-------|------------------|---------------------|
 | #46 | [Chore] Refine backlog for Sprint 2: scenarios, stories, Admin, DNSE Machine User | 5 | @bianh13 | @nguyentue110 | 01 Oct |
