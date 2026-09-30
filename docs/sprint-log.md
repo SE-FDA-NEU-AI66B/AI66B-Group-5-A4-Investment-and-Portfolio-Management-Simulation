@@ -138,16 +138,17 @@ Estimates are initial planning values; the SM records any later scope or estimat
 | #46 | [Chore] Refine backlog for Sprint 2: scenarios, stories, Admin, DNSE Machine User | 5 | @bianh13 | @nguyentue110 | 01 Oct |
 | #47 | Architecture, system boundary and two ADRs; design sections 1 and 5 | 3 | @VuSiSi | @bianh13 | 01 Oct |
 | #48 | ERD, data dictionary and business-rule constraints; section 2 | 5 | @bianh13 | @VuSiSi | 02 Oct |
-| #49 | API contract and P0 traceability; section 3 | 3 | @nguyentue110 | @VuSiSi | 02 Oct |
+| #49 | API contract and P0 traceability; section 3 | 3 | @bianh13 | @VuSiSi | 02 Oct |
 | #50 | Implement `/market`, real DB, repeatable seed, config and section 4 | 8 | @bianh13 | @longbk761-bot | 03 Oct |
 | #51 | Database-backed integration tests and applicable money regression cases | 3 | @longbk761-bot | @bianh13 | 03 Oct |
 | #52 | SETUP, README setup link and independent clean-machine verification | 3 | @longbk761-bot | @VuSiSi | 04 Oct |
 | #53 | Readable document/board/app screenshots and final PDF package | 3 | @VuSiSi | @nguyentue110 | 04 Oct |
 | #54 | [Chore] Sprint 2 wrap-up and contribution evidence | 2 | @nguyentue110 | @longbk761-bot | 04 Oct |
+| #56 | Independently review/test ERD; redraw and synchronize if needed | 5 | @nguyentue110 | @bianh13 | 02 Oct |
 
-**Workload revision (30 September, PO request):** @bianh13 owns #46/#48/#50 = **18/35 points (51.4%)**; @VuSiSi owns #47/#53 = 6; @longbk761-bot owns #51/#52 = 6; @nguyentue110 owns #49/#54 = 5. Estimates remain unchanged; ownership moved to give the PO roughly half the work.
+**Latest workload revision (30 September, PO request):** @bianh13 owns #46/#48/#49/#50 = **21/40 points (52.5%)**; @VuSiSi owns #47/#53 = 6; @longbk761-bot owns #51/#52 = 6; @nguyentue110 owns #56/#54 = 7. API contract #49 moved to the PO; new #56 adds 5 points for independent ERD testing and possible redesign. Existing estimates remain unchanged; this supersedes the previous 18/35 split.
 
-**Initial committed: 35 points. Completed: 0 points. Velocity to date: 0.**
+**Initial committed: 35 points; added ERD review: 5; current planned scope: 40 points. Completed: 0 points. Velocity to date: 0.**
 No implementation or final deliverable is claimed complete at planning time.
 Sprint 1 story closures recorded specification work; they do not prove that the
 features run. Historical UML tasks #38–#40 are not counted again in this baseline.
@@ -161,7 +162,8 @@ features run. Historical UML tasks #38–#40 are not counted again in this basel
   external Machine User. Mark each feature as designed, implemented or verified;
   seeded prices must not be described as live DNSE data.
 - @bianh13 creates the six-section design outline and owns sections 2, 4 and 6.
-  @VuSiSi completes sections 1 and 5. @nguyentue110 owns section 3. Rebase and
+  @VuSiSi completes sections 1 and 5. @bianh13 now owns section 3;
+  @nguyentue110 independently reviews/tests section 2 and may redraw the ERD (#56). Rebase and
   edit the assigned sections to avoid overwriting teammates' work.
 - Architecture/schema contracts unblock the skeleton. Long may prepare tests
   and SETUP early, but verifies final commands against the working code. Vu or a
@@ -173,7 +175,7 @@ features run. Historical UML tasks #38–#40 are not counted again in this basel
   browser address bar on page 3. PO submits the reviewed package to LMS.
 
 The board's existing iteration named “Sprint 2” starts on 16 September and
-contains older UML work. All nine new issues now have label `sprint-2`, the
+contains older UML work. All ten M2 issues now have label `sprint-2`, the
 actual board field **Sprint = Sprint 2**, and the M2 milestone, as requested by
 the PO. Historical iteration dates are preserved; the M2 milestone and dates
 above determine the submission deadline, not that old iteration date range.
@@ -208,7 +210,11 @@ constraints. The setup draft is implementation handoff for Long to verify.
 
 These items remain open pending peer review, merge and remaining screenshot
 evidence; **completed points and velocity remain 0** under the team's DoD.
-Architecture/ADRs (#47), final API contracts (#49), Long's tests/independent
+Architecture/ADRs (#47), PO-owned final API contracts (#49), Tuệ's ERD review/redesign (#56), Long's tests/independent
 setup verification (#51/#52), final screenshots/PDF (#53), wrap-up (#54) and
 LMS submission remain assigned work. Review/retro results are recorded only
 after those events occur.
+
+DNSE realtime integration will be owned by @bianh13 in a later work session.
+The 3 points in #49 cover API design/P0 traceability only; realtime adapter
+implementation has not started and is not silently included in that estimate.

@@ -5,7 +5,7 @@ PO / lead developer: @bianh13. Scrum Master: @nguyentue110.
 
 **Working document, not final submission.** Sections 2, 4 and 6 have an
 implementation-backed draft from #46/#48/#50. @VuSiSi completes architecture and
-ADRs (#47); @nguyentue110 completes the API contract (#49). Independent setup
+ADRs (#47); @bianh13 owns the API contract (#49). Independent setup
 verification, final screenshots, peer review and merge remain pending.
 
 ## 1. Architecture
@@ -22,7 +22,9 @@ Vu records alternatives and change conditions in section 5 before finalization.
 
 ## 2. Data model
 
-Owner: @bianh13, #48. Source of truth: `database.py::SCHEMA`.
+Baseline owner: @bianh13, #48. Independent ERD review/testing: @nguyentue110,
+#56; Tuệ may redraw the model if it is unsuitable, keeping schema/dictionary in sync.
+Source of truth: `database.py::SCHEMA`.
 
 ![ERD with keys and multiplicities](images/erd.png)
 
@@ -65,7 +67,7 @@ require migrations; init-db is not a schema upgrade tool.
 
 ## 3. API design
 
-Owner: @nguyentue110, #49. Pending >=6 endpoint contracts, >=2 meaningful error
+Owner: @bianh13, #49. Pending >=6 endpoint contracts, >=2 meaningful error
 codes and coverage for all P0 stories. Candidate mapping is in traceability.
 Implemented: GET `/` redirects to `/market`; GET `/market` returns 200 HTML
 (including empty state), or 503 HTML when the database is unavailable. The

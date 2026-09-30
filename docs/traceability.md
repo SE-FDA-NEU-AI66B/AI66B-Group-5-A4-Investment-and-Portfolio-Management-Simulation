@@ -2,7 +2,7 @@
 
 Updated 30 September 2026 for #46/#48/#50. Sprint 1 closures record specification
 history, not implementation. Proposed endpoint names below are handoff input for
-@nguyentue110's API contract (#49), not claims of existing routes.
+@bianh13's API contract (#49), not claims of existing routes.
 
 | Story | Scenario steps | Acceptance checks | Screen / entry | Endpoint (proposed unless stated) | Tables | Work / history | Implementation / verification |
 |-------|----------------|-------------------|----------------|----------------------------------|--------|----------------|-------------------------------|
