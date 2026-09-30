@@ -1,13 +1,14 @@
 @startuml
 ' Use Case Diagram - Investment & Portfolio Management Simulation
-' Scope: M1 requirements (US01-US12, BR1-BR8). Local draft - NOT committed.
+' Refined 30 September 2026; companion SVG/PNG rendered by scripts/render_diagrams.py.
 title Use Case Diagram - Investment & Portfolio Management Simulation
 
 left to right direction
 
 actor Guest as Guest
 actor Investor as Investor
-actor "Market Data Provider" as MarketData
+actor Admin as Admin
+actor "DNSE Websocket API" as MarketData <<Machine User>>
 
 rectangle "Investment & Portfolio\nManagement Simulation" {
   usecase "Register and Log In\n(US01)" as UC01
@@ -22,9 +23,12 @@ rectangle "Investment & Portfolio\nManagement Simulation" {
   usecase "View Performance Chart\n(US09)" as UC09
   usecase "Compare with Benchmark\n(US11)" as UC11
   usecase "View Leaderboard\n(US12)" as UC12
+  usecase "Manage Account Status\n(US13)" as UC13
+  usecase "Ingest Validated Quotes\n(US14)" as UC14
 }
 
 Guest --> UC01
+Guest --> UC03
 Investor --> UC01
 Investor --> UC03
 Investor --> UC04
@@ -35,15 +39,16 @@ Investor --> UC08
 Investor --> UC09
 Investor --> UC11
 Investor --> UC12
+Admin --> UC13
 
-UC01 ..> UC02 : <<include>>
-UC10 ..> UC04 : <<extend>>
+UC01 ..> UC02 : <<include>> (registration only)
 
-MarketData --> UC03 : reference prices
+MarketData --> UC14 : quote events
 note right of MarketData
-  Order fills (UC04, UC05)
-  use the same feed (BR3)
+  External machine actor; no app login.
+  Adapter validates and persists latest quote.
+  Live integration remains backlog in M2.
 end note
 
-footer Scope: M1 (US01-US12, BR1-BR8)
+footer Scope: US01-US14, BR1-BR10; only market snapshot implemented in M2
 @enduml

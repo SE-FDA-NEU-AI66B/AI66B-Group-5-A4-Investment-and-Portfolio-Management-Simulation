@@ -1,35 +1,45 @@
 # Traceability
 
-Every screen traces back to a feature and forward to the issue that built it.
-This table is the single source of truth for Milestone 1 section 6 and for the
-Milestone 4 report. Keep it current - a PR that adds a route and does not
-update this file should not be approved.
+Updated 30 September 2026 for #46/#48/#50. Sprint 1 closures record specification
+history, not implementation. Proposed endpoint names below are handoff input for
+@nguyentue110's API contract (#49), not claims of existing routes.
 
-| Route | Purpose | Access | Priority | Feature | Story issue | PR | Status |
-|-------|---------|--------|----------|---------|-------------|-----|--------|
-| `/` | Landing page; register or sign in to the simulation | G | P0 | F1 | #3, US01, US02 | #14 | Done |
-| `/market` | Search a ticker and view its current reference price | U | P0 | F2 | US03 | | Not started |
-| `/trade` | Place buy/sell orders and set stop-loss / take-profit conditions | U | P0 | F3 | #16, #17, US04, US05, US07, US10 | | Not started |
-| `/portfolio` | Holdings with quantity, average cost, unrealised P&L and total value | U | P0 | F4 | #18, US06 | | Not started |
-| `/history` | View completed and rejected transaction history | U | P1 | F5 | US08 | | Not started |
-| `/performance` | View portfolio performance and compare with VN-Index | U | P2 | F6 | US09, US11 | | Not started |
-| `/leaderboard` | View top players by performance and the current user's rank | U | P2 | F7 | US12 | | Not started |
+| Story | Scenario steps | Acceptance checks | Screen / entry | Endpoint (proposed unless stated) | Tables | Work / history | Implementation / verification |
+|-------|----------------|-------------------|----------------|----------------------------------|--------|----------------|-------------------------------|
+| US01 P0 | S1.1 | Register, login, duplicate email, lockout | `/` | POST `/api/accounts`, POST `/api/sessions` | account | #46; history #13 | Specified; not implemented |
+| US02 P0 | S1.1 | 100,000,000 VND once | `/` registration | POST `/api/accounts` | account | #46; history #14 | Schema default only; registration not implemented |
+| US03 P0 | S1.2, S2.1, S6.3 | Price, daily change, timestamp, delayed/unknown ticker | `/market` | GET `/market` **implemented**; ticker API pending #49 | instrument, price_quote | #50; history #15 | Snapshot subset implemented and locally tested; search/detail and live feed pending |
+| US04 P0 | S1.3–S1.4 | Preview, valid fill, insufficient cash, invalid quantity | `/trade` | POST `/api/orders/buy` | account, holding, trade, price_quote | #46/#49; history #16 | Specified; not implemented |
+| US05 P0 | S2.2–S2.3 | Fill, realised result, oversell, quote time | `/trade` | POST `/api/orders/sell` | account, holding, trade, price_quote | #46/#49; history #17 | Specified; not implemented |
+| US06 P0 | S1.5, S2.1, S2.3 | Quantity, cost, P&L, NAV, empty portfolio | `/portfolio` | GET `/api/portfolio` | account, holding, instrument, price_quote | #46/#49; history #18 | Specified; not implemented |
+| US10 P0 | S1.3 | Inline warning, disable/re-enable confirmation | `/trade` | Form preview; buy endpoint independently enforces BR1 | account, price_quote | #46/#49; history #22 | Specified; not implemented |
+| US07 P1 | S3.1–S3.2 | Threshold trigger, no holding, single auto-close | `/trade` | Deferred | Future conditional-order storage; holding, trade | history #19 | Backlog; schema extension needed |
+| US08 P1 | S2.4, S3.2 | Newest first, empty state, paging, auto-order label | `/history` | Deferred | trade; rejected-attempt/trigger metadata needs extension | history #20 | Backlog; current trade table stores fills only |
+| US09 P2 | S4.1 | Time series, seven points, return, initial flat line | `/performance` | Deferred | Future daily valuation snapshots | history #21 | Backlog |
+| US11 P2 | S4.2 | Matched dates, shorter history, percentage-point gap | `/performance` | Deferred | Future benchmark and valuation snapshots | history #23 | Backlog |
+| US12 P2 | S4.3 | Top 10, own rank, timestamp tie-break | `/leaderboard` | Deferred | account; future performance-achievement timestamps | history #24 | Backlog |
+| US13 P1 | S5.1–S5.3 | Admin-only, disabled-account denial, audit, no regrant | `/admin/accounts` | Deferred admin status endpoint | account, audit_event | #46/#48 | Specified; schema present, service not implemented |
+| US14 P1 | S6.1–S6.3 | Valid/newer event only, deduplication, disconnect | DNSE adapter; external Machine User | Provider integration, not an app HTTP route | instrument, price_quote | #46/#48 | Specified; live adapter not implemented |
 
-**Access codes:** G = guest (not logged in) · U = authenticated user · A = admin
+Access: market snapshot G/U (public read-only), trading/personal screens U,
+administration A, quote ingestion M. Future authentication gates are server-side.
 
-**Status:** Not started / In progress / Done
+## Business rules and enforcement boundaries
 
-## Business rules
+| Rule | Enforcement design | Evidence today |
+|------|--------------------|----------------|
+| BR1 | Atomic buy transaction rechecks cash; nonnegative cash CHECK is a second guard | Schema only; no buy service |
+| BR2 | Atomic sell transaction rechecks held quantity | Schema guards only; no sell service |
+| BR3 | Capture accepted quote inside the order transaction | Snapshot schema only |
+| BR4 | Conditional-order monitor with idempotent execution | Deferred |
+| BR5 | Account creation grants 100,000,000 VND once; login/enable never grants again | Default only; service pending |
+| BR6 | Exact cost basis / quantity and Decimal arithmetic | Integer cost-basis storage; service pending |
+| BR7 | Benchmark/performance service compares matching dates | Deferred |
+| BR8 | Ranking uses achievement timestamps to break ties | Deferred |
+| BR9 | Role check and atomic status-change/audit write | CHECKs/FKs only; service pending |
+| BR10 | Adapter validates then updates only newer events | UNIQUE snapshot and positive-price/source CHECKs; adapter pending |
 
-Numbered, so issues and tests can cite them.
-
-| # | Rule | Enforced where | Tested by |
-|---|------|----------------|-----------|
-| BR1 | Order cost may not exceed the available cash balance | Order submission (`/trade`) | US04, US10 |
-| BR2 | Sell quantity may not exceed the quantity held | Order submission (`/trade`) | US05 |
-| BR3 | Market order fills at the price quoted when submitted | Order execution (`/trade`) | US04, US05 |
-| BR4 | A stop-loss order triggers automatically and closes the entire position as soon as the market price reaches or falls below the threshold. A take-profit order triggers the same way once the price reaches or rises above its threshold. Default thresholds are 5% below and 10% above the average cost basis. | Threshold monitor, order execution (`/trade`) | US07 |
-| BR5 | The initial virtual capital is fixed for every new account | Account initialization | US02 |
-| BR6 | Average cost is the weighted average of every purchase | Buy execution (`/trade`) | US06 |
-| BR7 | Portfolio and benchmark returns use the same start and end dates | Performance calculation (`/performance`) | US09, US11 |
-| BR8 | The leaderboard includes active accounts and sorts by current percentage performance, with earliest achievement breaking ties | Ranking calculation (`/leaderboard`) | US12 |
+`tests/test_market.py` verifies seed idempotence, persistence through app restart,
+DB-backed rendering, seed/stale indicators, empty/error states and basic quote
+constraints. Long owns independent verification and expanded regression coverage
+in #51/#52; no peer work is recorded as completed on their behalf.

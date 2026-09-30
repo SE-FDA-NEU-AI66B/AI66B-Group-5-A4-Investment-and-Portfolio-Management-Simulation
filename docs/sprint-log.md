@@ -137,13 +137,15 @@ Estimates are initial planning values; the SM records any later scope or estimat
 |-------|-------------|--------|-------|------------------|---------------------|
 | #46 | [Chore] Refine backlog for Sprint 2: scenarios, stories, Admin, DNSE Machine User | 5 | @bianh13 | @nguyentue110 | 01 Oct |
 | #47 | Architecture, system boundary and two ADRs; design sections 1 and 5 | 3 | @VuSiSi | @bianh13 | 01 Oct |
-| #48 | ERD, data dictionary and business-rule constraints; section 2 | 5 | @VuSiSi | @longbk761-bot | 02 Oct |
+| #48 | ERD, data dictionary and business-rule constraints; section 2 | 5 | @bianh13 | @VuSiSi | 02 Oct |
 | #49 | API contract and P0 traceability; section 3 | 3 | @nguyentue110 | @VuSiSi | 02 Oct |
 | #50 | Implement `/market`, real DB, repeatable seed, config and section 4 | 8 | @bianh13 | @longbk761-bot | 03 Oct |
 | #51 | Database-backed integration tests and applicable money regression cases | 3 | @longbk761-bot | @bianh13 | 03 Oct |
 | #52 | SETUP, README setup link and independent clean-machine verification | 3 | @longbk761-bot | @VuSiSi | 04 Oct |
-| #53 | Readable document/board/app screenshots and final PDF package | 3 | @nguyentue110 | @VuSiSi | 04 Oct |
+| #53 | Readable document/board/app screenshots and final PDF package | 3 | @VuSiSi | @nguyentue110 | 04 Oct |
 | #54 | [Chore] Sprint 2 wrap-up and contribution evidence | 2 | @nguyentue110 | @longbk761-bot | 04 Oct |
+
+**Workload revision (30 September, PO request):** @bianh13 owns #46/#48/#50 = **18/35 points (51.4%)**; @VuSiSi owns #47/#53 = 6; @longbk761-bot owns #51/#52 = 6; @nguyentue110 owns #49/#54 = 5. Estimates remain unchanged; ownership moved to give the PO roughly half the work.
 
 **Initial committed: 35 points. Completed: 0 points. Velocity to date: 0.**
 No implementation or final deliverable is claimed complete at planning time.
@@ -158,22 +160,23 @@ features run. Historical UML tasks #38–#40 are not counted again in this basel
 - Add Admin as a human system-management actor and DNSE Websocket API as an
   external Machine User. Mark each feature as designed, implemented or verified;
   seeded prices must not be described as live DNSE data.
-- @VuSiSi creates the six-section design outline early, then owns sections 1, 2
-  and 5. @nguyentue110 owns section 3; @bianh13 owns sections 4 and 6. Rebase and
+- @bianh13 creates the six-section design outline and owns sections 2, 4 and 6.
+  @VuSiSi completes sections 1 and 5. @nguyentue110 owns section 3. Rebase and
   edit the assigned sections to avoid overwriting teammates' work.
 - Architecture/schema contracts unblock the skeleton. Long may prepare tests
   and SETUP early, but verifies final commands against the working code. Vu or a
   volunteer from another team tests on a different machine; record who, date,
   OS, tested commit, elapsed time and result only after the actual run.
-- Tuệ captures the board immediately after planning and again on submission day,
+- Vũ captures the board immediately after planning and again on submission day,
   plus readable document screenshots. The final PDF uses merged `design.md`, a
   complete cover, two board screenshots on page 2, and the running skeleton with
   browser address bar on page 3. PO submits the reviewed package to LMS.
 
 The board's existing iteration named “Sprint 2” starts on 16 September and
-contains older UML work. New work is grouped by the M2 milestone; the SM must
-reconcile iteration dates without rewriting historical assignments. Until then,
-use the milestone filter and the dates above, not that old iteration's dates.
+contains older UML work. All nine new issues now have label `sprint-2`, the
+actual board field **Sprint = Sprint 2**, and the M2 milestone, as requested by
+the PO. Historical iteration dates are preserved; the M2 milestone and dates
+above determine the submission deadline, not that old iteration date range.
 
 ### Completion and review evidence
 
@@ -195,6 +198,17 @@ sprint, records unfinished work and review feedback, and closes #54 through the
 final reviewed wrap-up PR. Daily entries are three truthful sentences per member
 and committed on the day written; do not write a week's entries in one commit.
 
-**Current blockers / pending evidence:** requirements refinement, runnable app,
-independent SETUP test, screenshots, peer-reviewed merges and LMS submission
-remain pending. Review/retro outcomes will be recorded after those events occur.
+### Implementation update — 30 September
+
+The PO's #46/#48/#50 work now includes refined requirements/traceability,
+Admin and DNSE Machine User modelling, an ERD matching six created tables,
+and a Flask `/market` route reading 12 seeded quotes from SQLite. Local tests
+pass for seed idempotence, persistence, rendering, empty/error states and quote
+constraints. The setup draft is implementation handoff for Long to verify.
+
+These items remain open pending peer review, merge and remaining screenshot
+evidence; **completed points and velocity remain 0** under the team's DoD.
+Architecture/ADRs (#47), final API contracts (#49), Long's tests/independent
+setup verification (#51/#52), final screenshots/PDF (#53), wrap-up (#54) and
+LMS submission remain assigned work. Review/retro results are recorded only
+after those events occur.
