@@ -4,6 +4,8 @@
 
 A **"paper trading"** application: Users can buy and sell stocks using **virtual money** based on real-world reference prices. The system automatically tracks the profit and loss (PnL) of each investment portfolio.
 
+**Sprint 2 / Milestone 2:** [Assigned issues](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/milestone/1) · [Sprint plan](docs/sprint-log.md#sprint-2---milestone-2). Submission deadline: **5 October 2026, 00:00 (UTC+7)**.
+
 **Key Features**
 
 * Update stock reference prices.
@@ -20,9 +22,9 @@ A **"paper trading"** application: Users can buy and sell stocks using **virtual
 
 | **Full Name** | **Student ID** | **GitHub Username** | **Role** | 
 |----|-------|----------|--------|
-| Pham Huy Thanh | 11247351 | bianh13 | Product Owner | 
-| Pham Quang Vu | 11247372 | VuSiSi | Scrum Master (Current Sprint) | 
-| Nguyen Van Tue | 11247366 | nguyentue110 | Dev Team | 
+| Pham Huy Thanh | 11247351 | bianh13 | Product Owner / Lead Developer (Sprint 2) |
+| Pham Quang Vu | 11247372 | VuSiSi | Dev Team |
+| Nguyen Van Tue | 11247366 | nguyentue110 | Scrum Master (Sprint 2 - Milestone 2) |
 | Bui Khang Long | 11247312 | longbk761-bot | Dev Team | 
 
 > *Note: The Scrum Master role rotates every sprint. Each member will take on this role at least once during the semester.*
@@ -62,11 +64,11 @@ python app.py
 
 ## Team Workflow
 
-* **Backlog & Board:** [Project Board](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/projects)
+* **Backlog & Board:** [Group 5 - VirtuTrade Board](https://github.com/orgs/SE-FDA-NEU-AI66B/projects/7)
 
 * **Product Owner:** [bianh13](https://github.com/bianh13)
 
-* **Scrum Master for Sprint 1:** [VuSiSi](https://github.com/VuSiSi)
+* **Scrum Master for Sprint 2 (current):** [nguyentue110](https://github.com/nguyentue110). Previous Sprint 1 Scrum Master: [VuSiSi](https://github.com/VuSiSi).
 
 * **Definition of Done:** [docs/definition-of-done.md](docs/definition-of-done.md)
 

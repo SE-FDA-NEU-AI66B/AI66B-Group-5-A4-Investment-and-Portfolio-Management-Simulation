@@ -8,15 +8,8 @@ the team worked continuously.
 
 ---
 
-## 2026-09-15
+## 2026-09-30
 
-- @linh — Yesterday: picked up #12 and split the checklist. Today: build the
-  upload form. Blocker: the sample file location is not confirmed.
-- @tuan — Yesterday: scaffolded the project. Today: write parser tests.
-  Blocker: none.
-- @thao — Yesterday: read the user-story documents. Today: revise US03 and
-  US05. Blocker: waiting for @linh to confirm US05 acceptance criteria.
-
-## <next date>
-
-- @ —
+- @bianh13 — Hôm nay đã đối chiếu yêu cầu Milestone 2 với repo và ghi nhận các việc cần sửa: khớp User Stories với Scenarios, bổ sung Admin và xác định DNSE Websocket API là Machine User.
+  Đã tạo issues Sprint 2 cho cả bốn thành viên, nhận phần dev chính và cập nhật README với Scrum Master mới là @nguyentue110.
+  Bước tiếp theo là chốt phạm vi User Stories và thiết kế database trước khi làm walking skeleton, vì hiện app chưa có luồng chạy qua database thật.
