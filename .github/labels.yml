@@ -45,6 +45,9 @@
   color: "bfd4f2"
 
 # --- Process ---
+- name: "sprint-2"
+  color: "5319e7"
+  description: "Sprint 2 / Milestone 2 work"
 - name: blocked
   color: "000000"
   description: "Cannot proceed. Say why in a comment and raise it at stand-up."

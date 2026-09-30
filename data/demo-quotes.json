@@ -1,0 +1,14 @@
+[
+  {"symbol":"ACB","name":"Asia Commercial Bank","price_vnd":25000,"previous_close_vnd":24500,"quoted_at":"2026-09-30T02:00:00Z"},
+  {"symbol":"BID","name":"BIDV","price_vnd":46000,"previous_close_vnd":46500,"quoted_at":"2026-09-30T02:00:00Z"},
+  {"symbol":"FPT","name":"FPT Corporation","price_vnd":120000,"previous_close_vnd":118000,"quoted_at":"2026-09-30T02:00:00Z"},
+  {"symbol":"GAS","name":"PetroVietnam Gas","price_vnd":70000,"previous_close_vnd":70000,"quoted_at":"2026-09-30T02:00:00Z"},
+  {"symbol":"HPG","name":"Hoa Phat Group","price_vnd":28000,"previous_close_vnd":27500,"quoted_at":"2026-09-30T02:00:00Z"},
+  {"symbol":"MBB","name":"Military Bank","price_vnd":24000,"previous_close_vnd":24200,"quoted_at":"2026-09-30T02:00:00Z"},
+  {"symbol":"MSN","name":"Masan Group","price_vnd":75000,"previous_close_vnd":74000,"quoted_at":"2026-09-30T02:00:00Z"},
+  {"symbol":"MWG","name":"Mobile World","price_vnd":60000,"previous_close_vnd":61000,"quoted_at":"2026-09-30T02:00:00Z"},
+  {"symbol":"SSI","name":"SSI Securities","price_vnd":32000,"previous_close_vnd":31500,"quoted_at":"2026-09-30T02:00:00Z"},
+  {"symbol":"TCB","name":"Techcombank","price_vnd":35000,"previous_close_vnd":35000,"quoted_at":"2026-09-30T02:00:00Z"},
+  {"symbol":"VCB","name":"Vietcombank","price_vnd":90000,"previous_close_vnd":89000,"quoted_at":"2026-09-30T02:00:00Z"},
+  {"symbol":"VNM","name":"Vinamilk","price_vnd":68000,"previous_close_vnd":69000,"quoted_at":"2026-09-30T02:00:00Z"}
+]

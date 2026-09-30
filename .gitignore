@@ -35,3 +35,7 @@ npm-debug.log*
 .idea/
 .DS_Store
 Thumbs.db
+
+# M2 runtime and local tooling
+instance/
+.ruff_cache/

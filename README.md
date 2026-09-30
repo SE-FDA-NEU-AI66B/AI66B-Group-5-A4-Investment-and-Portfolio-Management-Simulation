@@ -4,6 +4,10 @@
 
 A **"paper trading"** application: Users can buy and sell stocks using **virtual money** based on real-world reference prices. The system automatically tracks the profit and loss (PnL) of each investment portfolio.
 
+**Sprint 2 / Milestone 2:** [Assigned issues](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/milestone/1) · [Sprint plan](docs/sprint-log.md#sprint-2---milestone-2). Submission deadline: **5 October 2026, 00:00 (UTC+7)**.
+
+**Run the M2 walking skeleton:** [New-machine setup guide](docs/SETUP.md). `/market` reads 12 demo quotes from SQLite; live DNSE integration and trading are backlog work. [Design draft](docs/design.md).
+
 **Key Features**
 
 * Update stock reference prices.
@@ -20,9 +24,9 @@ A **"paper trading"** application: Users can buy and sell stocks using **virtual
 
 | **Full Name** | **Student ID** | **GitHub Username** | **Role** | 
 |----|-------|----------|--------|
-| Pham Huy Thanh | 11247351 | bianh13 | Product Owner | 
-| Pham Quang Vu | 11247372 | VuSiSi | Scrum Master (Current Sprint) | 
-| Nguyen Van Tue | 11247366 | nguyentue110 | Dev Team | 
+| Pham Huy Thanh | 11247351 | bianh13 | Product Owner / Lead Developer (Sprint 2) |
+| Pham Quang Vu | 11247372 | VuSiSi | Dev Team |
+| Nguyen Van Tue | 11247366 | nguyentue110 | Scrum Master (Sprint 2 - Milestone 2) |
 | Bui Khang Long | 11247312 | longbk761-bot | Dev Team | 
 
 > *Note: The Scrum Master role rotates every sprint. Each member will take on this role at least once during the semester.*
@@ -35,38 +39,40 @@ If a team member is unresponsive for 48 hours without prior notice, the Scrum Ma
 
 * **Language:** Python 3.10+
 
-* **Backend / UI:** Python application; implementation details are documented in the source tree.
+* **Backend / UI:** Flask 3.1.3 with server-rendered HTML.
 
-* **Database:** No persistent database is required for the Sprint 1 specification.
+* **Database:** SQLite; six tables, 12 seeded instruments and 12 quote rows for M2.
 
-* **Version Control & CI:** Git & GitHub · CI pipeline will be set up using GitHub Actions (from Sprint 5).
+* **Version Control & CI:** Git, GitHub and GitHub Actions; Python integration tests run on PRs.
 
 ## Installation
 
-```
+```bash
 git clone https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation.git
 cd AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation
-
-python -m venv venv
-source venv/bin/activate      # For Windows: venv\Scripts\activate
-pip install -r requirements.txt   # Dependencies will be added here
-
 ```
+
+Then follow the OS-specific commands in [docs/SETUP.md](docs/SETUP.md) to create
+the virtual environment, install dependencies, copy configuration and initialize
+the database with one command. Before merge, use PR #55's `chore/sprint2-planning` branch.
 
 ## Running the Application
 
-```
+```bash
+python app.py init-db
 python app.py
-
 ```
+
+Run with the configured virtual environment's Python. Open
+http://127.0.0.1:5000/market; expect 12 symbols with a **Demo / seed** label.
 
 ## Team Workflow
 
-* **Backlog & Board:** [Project Board](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/projects)
+* **Backlog & Board:** [Group 5 - VirtuTrade Board](https://github.com/orgs/SE-FDA-NEU-AI66B/projects/7)
 
 * **Product Owner:** [bianh13](https://github.com/bianh13)
 
-* **Scrum Master for Sprint 1:** [VuSiSi](https://github.com/VuSiSi)
+* **Scrum Master for Sprint 2 (current):** [nguyentue110](https://github.com/nguyentue110). Previous Sprint 1 Scrum Master: [VuSiSi](https://github.com/VuSiSi).
 
 * **Definition of Done:** [docs/definition-of-done.md](docs/definition-of-done.md)
 
