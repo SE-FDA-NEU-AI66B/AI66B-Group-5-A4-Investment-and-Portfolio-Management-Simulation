@@ -10,6 +10,6 @@ the team worked continuously.
 
 ## 2026-09-30
 
-- @bianh13 — Hôm nay đã sửa Scenarios/User Stories, thêm Admin và DNSE Machine User, đồng thời gắn nhãn và trường Sprint 2 cho mười issues với phần việc của mình chiếm 21/40 điểm.
-  Đã dựng ERD/schema sáu bảng và trang market đọc 12 dòng seed từ SQLite, kiểm tra seed lặp lại, dữ liệu tồn tại sau khi khởi động lại và trạng thái lỗi/rỗng bằng các test đã pass.
-  Bước tiếp theo là nhận review từ nhóm, để Vũ hoàn thiện architecture/ADR và ảnh, Long kiểm thử độc lập/SETUP, Tuệ kiểm thử hoặc vẽ lại ERD và làm wrap-up, còn mình nhận API ở bước tiếp theo trước hạn nộp.
+- @bianh13 — Updated Scenarios and User Stories today, added Admin and DNSE Machine User roles, and labeled/assigned Sprint 2 fields across 10 issues (my scope accounts for 21/40 story points).
+Built the ERD/schema for 6 tables and implemented the market page to read 12 seed rows from SQLite. Verified idempotent seeding, data persistence across restarts, and empty/error states with passing tests.
+Next steps: Collect team reviews so Vu can finalize the architecture/ADRs and diagrams, Long can run independent SETUP/testing, and Tue can test or redraw the ERD and handle the wrap-up; meanwhile, I will pick up the API integration in the next phase ahead of the deadline.
