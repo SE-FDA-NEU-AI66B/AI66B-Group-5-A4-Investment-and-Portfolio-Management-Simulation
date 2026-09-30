@@ -28,7 +28,7 @@ Source of truth: `database.py::SCHEMA`.
 
 ![ERD with keys and multiplicities](images/erd.png)
 
-[Editable SVG](diagrams/erd.svg) · [Editing and export notes](diagrams/README.md).
+[Editable SVG](diagrams/erd.svg) · [Diagram script](../scripts/diagram.py) · [Editing and export notes](diagrams/README.md).
 All six tables exist after init-db; only instrument and price_quote are seeded.
 Empty account/holding/trade/audit tables do not implement those features. Deferred
 extensions are documented in [traceability](traceability.md).

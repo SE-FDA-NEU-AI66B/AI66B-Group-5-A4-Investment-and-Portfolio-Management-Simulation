@@ -1,6 +1,6 @@
 @startuml
 ' Use Case Diagram - Investment & Portfolio Management Simulation
-' Refined 30 September 2026; keep the companion SVG/PNG consistent with this model.
+' Refined 30 September 2026; companion SVG/PNG produced by scripts/diagram.py.
 title Use Case Diagram - Investment & Portfolio Management Simulation
 
 left to right direction

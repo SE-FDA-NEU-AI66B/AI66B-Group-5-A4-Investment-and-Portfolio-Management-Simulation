@@ -7,6 +7,18 @@
 | Buy sequence | [PlantUML](sequence-buy-order.puml) | [PNG](sequence-buy-order.png) |
 | Sell sequence | [PlantUML](sequence-sell-order.puml) | [PNG](sequence-sell-order.png) |
 
+The [diagram script](../../scripts/diagram.py) recreates the ERD and use-case
+SVG/PNG files from its layout definitions. From the repository root:
+
+```bash
+python -m pip install Pillow
+python scripts/diagram.py
+```
+
+Running it overwrites those diagram files. After manually editing an SVG or
+replacing the ERD in #56, update the script to match before running it again,
+or export directly from the replacement source instead.
+
 Edit the ERD SVG in a vector editor and export the updated PNG to
 `docs/images/erd.png`. Check that text, primary/foreign keys and relationship
 multiplicities remain readable. Keep the model consistent with `database.py`
