@@ -18,4 +18,4 @@ Next steps: Collect team reviews so Vu can finalize the architecture/ADRs and di
 
 ## 2026-10-01
 
-- @nguyentue110 — Hôm nay: rà soát toàn bộ milestone 2 và issues nhóm, kiểm tra PR #60 (DNSE draft) của Thành. Kết quả: lập xong bảng theo dõi SM (daily/PR/review/issue), xác định phần schema #60 thuộc phạm vi review #56 của mình. Vướng: PR #60 kẹt credentials nên chưa review xong được; chờ Long/Vũ báo tiến độ #51/#52/#47/#53.
+- @nguyentue110 — Today: reviewed the full Milestone 2 scope and team issues, and checked Thanh's PR #60 (DNSE draft). Result: finished the SM tracking table (daily/PR/review/issue) and confirmed the PR #60 schema falls under my #56 review scope. Blocked: PR #60 is stuck on credentials so the review cannot finish yet; waiting on Long/Vu for progress on #51/#52/#47/#53.
