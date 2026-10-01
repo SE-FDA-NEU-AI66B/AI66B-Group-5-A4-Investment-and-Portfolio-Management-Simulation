@@ -155,7 +155,7 @@ current committed task is classified P2. Owners and estimates are unchanged.
 
 **Latest workload revision (30 September, PO request):** @bianh13 owns #46/#48/#49/#50 = **21/40 points (52.5%)**; @VuSiSi owns #47/#53 = 6; @longbk761-bot owns #51/#52 = 6; @nguyentue110 owns #56/#54 = 7. API contract #49 moved to the PO; new #56 adds 5 points for independent ERD testing and possible redesign. Existing estimates remain unchanged; this supersedes the previous 18/35 split.
 
-**Initial committed: 35 points; added ERD review: 5; current planned scope: 40 points. Completed: 0 points. Velocity to date: 0.**
+**Initial committed: 35 points; added ERD review: 5; current planned scope: 40 points. Completed to date: 5 points (#56, merged PR #61 on 30 Sept, reviewed by @bianh13). Velocity to date: 5.**
 No implementation or final deliverable is claimed complete at planning time.
 Sprint 1 story closures recorded specification work; they do not prove that the
 features run. Historical UML tasks #38–#40 are not counted again in this baseline.
@@ -199,8 +199,17 @@ comment. Planned reviewers above are assignments, not evidence of reviews given.
 |--------|-----------|--------------|--------------|
 | @bianh13 | Pending | Pending | Pending |
 | @VuSiSi | Pending | Pending | Pending |
-| @nguyentue110 | Pending | Pending | Pending |
+| @nguyentue110 | #61 (docs/erd-review.md + 26 constraint tests, merged 30 Sept) | APPROVED on #55, #57, #58 via Review changes (30 Sept) | #56 (closed 30 Sept) |
 | @longbk761-bot | Pending | Pending | Pending |
+
+**Evidence update — 1 October (SM):** @nguyentue110's row above is verified —
+PR [#61](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/pull/61)
+merged 30 Sept with APPROVED review by @bianh13; reviews given on
+[#55](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/pull/55),
+[#57](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/pull/57) and
+[#58](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/pull/58);
+issue [#56](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/56)
+closed 30 Sept. Other members' rows stay Pending until their DoD evidence lands.
 
 The SM updates completed points and velocity from actual DoD evidence during the
 sprint, records unfinished work and review feedback, and closes #54 through the
