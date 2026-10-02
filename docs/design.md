@@ -10,10 +10,19 @@ verification, final screenshots, peer review and merge remain pending.
 
 ## 1. Architecture
 
-Owner: @VuSiSi, #47. Pending labelled container diagram and deployment detail.
-Implementation: browser → HTTP GET → Flask (`app.py`) → SQL through `database.py`
-→ local SQLite file → rendered HTML. DNSE Machine User/backend adapter are
-design-only; Admin is a separate human role.
+![Container diagram](images/architecture.png)
+
+Solid lines show what runs in M2; dashed lines show the target design.
+
+**Actors.** Guest and Investor use the browser; Admin is a human who manages
+account status; the DNSE Websocket API is an external Machine User (no login).
+
+**M2 (implemented).** Browser → Flask → SQLite. `/market` reads 12 rows.
+Prices are **demo/seed data, not live DNSE prices**.
+
+**Target.** A DNSE adapter validates each event and writes only newer quotes
+into price_quote. If the feed disconnects, the last quote keeps its original
+timestamp and the page shows "Price may be delayed" after 15 minutes.
 
 Current implementation uses Flask 3.1.3 and SQLite bundled with Python, within
 the existing Python stack. Review references: [Flask installation](https://flask.palletsprojects.com/en/stable/installation/)
@@ -114,9 +123,104 @@ Vu supplies the final address-bar capture for the submission package.
 
 ## 5. Design decisions
 
-Owner: @VuSiSi, #47. Pending two reviewed ADRs, each with alternatives, choice,
-rationale and conditions for changing it. Assess Flask/SQLite against alternatives
-and confirm or revise the implementation choices with the PO.
+Both decisions describe the M2 implementation and the target design. The
+DNSE adapter in ADR-2 is target design only and is not implemented in M2.
+
+### ADR-1: SQLite instead of PostgreSQL
+
+**Options considered**
+
+1. SQLite file (Python standard library).
+2. PostgreSQL in Docker.
+3. JSON/CSV files read at startup.
+
+**Decision:** SQLite, in the file `instance/virtutrade.db`.
+
+**Why**
+
+- The instructor must clone and run the project on a machine we have never
+  seen. SQLite needs no database server and no Docker, so SETUP.md stays
+  short and `python app.py init-db` creates and seeds the database in one
+  command.
+- It still enforces the rules the product depends on at database level:
+  UNIQUE email (US01), `cash_vnd >= 0` (BR1 guard), UNIQUE
+  (account_id, instrument_id) so buys aggregate into one holding (BR6),
+  role/status/source CHECKs (BR9, BR10) and foreign keys. Our independent ERD
+  review checks these with 26 constraint tests.
+- A JSON/CSV file cannot enforce these constraints or give atomic updates of
+  cash, holding and trade (BR1, BR2), which is the main risk of this product
+  (a wrong P&L).
+- Our data is tiny: 12 instruments, 12 quotes, and a few hundred rows per
+  user at most.
+
+**Trade-offs we accept**
+
+- SQLite allows one writer at a time.
+- Foreign keys are off by default, so every write connection must run
+  `PRAGMA foreign_keys = ON`, as `init_database` does.
+- There is no schema migration tool; `init-db` does not upgrade schemas.
+
+**What would change our mind**
+
+- Testing shows write-lock errors (`database is locked`) when the DNSE
+  adapter writes quotes while users place orders, and enabling WAL mode and a
+  busy timeout does not fix it.
+- The app must be deployed for many concurrent users, or run on more than one
+  machine.
+- Moving to PostgreSQL would then be a Sprint 4 task. The schema uses plain
+  SQL types, so the tables would carry over.
+
+### ADR-2: Server-rendered Flask app with a separate DNSE adapter process
+
+**Options considered**
+
+1. **Flask monolith + separate adapter process.** Flask renders HTML and
+   serves the JSON endpoints used for actions (buy, sell, status change). A
+   separate process runs the DNSE adapter and writes quotes to the same
+   database.
+2. **Adapter as a background thread inside the Flask process.**
+3. **Single-page app (SPA) with a separate REST API backend.**
+
+**Decision:** option 1.
+
+**Why**
+
+- The adapter holds a long-lived websocket connection and needs its own
+  reconnect loop. If it crashes or disconnects, `/market` must keep working
+  and show the last stored quote with its original timestamp and a
+  "Price may be delayed" warning (US03, US14, BR10). A separate process
+  isolates that failure from the web app.
+- A thread inside Flask would be duplicated if the app ever runs with more
+  than one worker, which would open several feeds and cause duplicate
+  writes.
+- Keeping the adapter separate means M2 needs no credentials and no feed:
+  the instructor runs only the web app and the seeded database (SETUP.md
+  stays unchanged).
+- Option 3 adds Node and a build step, which the SETUP prerequisites exclude,
+  and it gives the team two codebases to keep in sync when the real risk is
+  correctness of the money calculations, not UI richness.
+- The browser never talks to DNSE. Only the adapter holds provider
+  credentials, so no secret reaches the browser.
+- All writes go through one set of validated functions in `database.py`, so
+  the "newer events only" rule (BR10) lives in one place.
+
+**Trade-offs we accept**
+
+- The web app and the adapter are two processes to start, and both open the
+  same SQLite file (see ADR-1).
+- Prices only refresh when the page is reloaded; the browser does not receive
+  pushed updates.
+
+**What would change our mind**
+
+- Users need prices to update on screen without reloading: add
+  Server-Sent Events from Flask to the browser (the adapter and database
+  stay as they are).
+- Starting two processes proves too error-prone for the team or the
+  instructor: run the adapter as a thread, accepting the single-worker
+  limit.
+- The team grows or the UI becomes complex enough that a separate front end
+  pays off: move to option 3.
 
 ## 6. What changed since M1
 
