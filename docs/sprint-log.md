@@ -128,7 +128,30 @@ backend and database, seeded with at least 10 rows, with a guide verified on
 another person's machine. The API design covers all P0 stories; implementing
 all those endpoints is not the Milestone 2 walking-skeleton commitment.
 
-### Committed work / initial planning baseline
+### Required chore issues
+
+| Issue | Owner | Closed? |
+|-------|-------|---------|
+| [Chore] Refine backlog for Sprint 2 (#46) | @bianh13 (PO) | Open |
+| [Chore] Sprint 2 wrap-up (#54) | @nguyentue110 (SM) | Open |
+
+### Committed
+
+| Issue | Story / Task | Points | Owner |
+|-------|--------------|--------|-------|
+| #46 | Chore - Refine backlog for Sprint 2 | 5 | @bianh13 |
+| #47 | Task - Architecture, Admin/Machine User boundary and two ADRs | 3 | @VuSiSi |
+| #48 | Task - ERD and data dictionary with business-rule constraints | 5 | @bianh13 |
+| #49 | Task - API contract and P0 traceability | 3 | @bianh13 |
+| #50 | Task - Build /market walking skeleton with real seeded database | 8 | @bianh13 |
+| #51 | Task - Verify database-backed skeleton and regression cases | 3 | @longbk761-bot |
+| #52 | Task - SETUP guide and independent clean-machine verification | 3 | @longbk761-bot |
+| #53 | Task - Readable screenshots and Team05_M2.pdf submission package | 3 | @VuSiSi |
+| #54 | Chore - Sprint 2 wrap-up | 2 | @nguyentue110 |
+| #56 | Task - Review and test ERD; redesign if needed | 5 | @nguyentue110 |
+| #59 | Story - Integrate DNSE realtime stock quotes (US14, added scope mid-sprint) | 5 | @bianh13 |
+
+**Total committed: 45 points** (planning baseline 40 + mid-sprint addition #59 worth 5).
 
 [Milestone and assigned issues](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/milestone/1) · [Group 5 board](https://github.com/orgs/SE-FDA-NEU-AI66B/projects/7).
 Estimates are initial planning values; the SM records any later scope or estimate changes.
@@ -140,22 +163,11 @@ P1 does not waive a submission requirement. These task labels describe execution
 order and do not change the product-story priorities in requirements.md. No
 current committed task is classified P2. Owners and estimates are unchanged.
 
-| Issue | Deliverable | Points | Owner | Planned reviewer | Internal due (UTC+7) |
-|-------|-------------|--------|-------|------------------|---------------------|
-| #46 | [Chore] Refine backlog for Sprint 2: scenarios, stories, Admin, DNSE Machine User | 5 | @bianh13 | @nguyentue110 | 01 Oct |
-| #47 | Architecture, system boundary and two ADRs; design sections 1 and 5 | 3 | @VuSiSi | @bianh13 | 01 Oct |
-| #48 | ERD, data dictionary and business-rule constraints; section 2 | 5 | @bianh13 | @VuSiSi | 02 Oct |
-| #49 | API contract and P0 traceability; section 3 | 3 | @bianh13 | @VuSiSi | 02 Oct |
-| #50 | Implement `/market`, real DB, repeatable seed, config and section 4 | 8 | @bianh13 | @longbk761-bot | 03 Oct |
-| #51 | Database-backed integration tests and applicable money regression cases | 3 | @longbk761-bot | @bianh13 | 03 Oct |
-| #52 | SETUP, README setup link and independent clean-machine verification | 3 | @longbk761-bot | @VuSiSi | 04 Oct |
-| #53 | Readable document/board/app screenshots and final PDF package | 3 | @VuSiSi | @nguyentue110 | 04 Oct |
-| #54 | [Chore] Sprint 2 wrap-up and contribution evidence | 2 | @nguyentue110 | @longbk761-bot | 04 Oct |
-| #56 | Independently review/test ERD; redraw and synchronize if needed | 5 | @nguyentue110 | @bianh13 | 02 Oct |
+Planned reviewers and internal dues (UTC+7): #46→@nguyentue110/01 Oct; #47→@bianh13/01 Oct; #48→@VuSiSi/02 Oct; #49→@VuSiSi/02 Oct; #50→@longbk761-bot/03 Oct; #51→@bianh13/03 Oct; #52→@VuSiSi/04 Oct; #53→@nguyentue110/04 Oct; #54→@longbk761-bot/04 Oct; #56→@bianh13/02 Oct; #59→reviewer TBD (PR #60 draft).
 
 **Latest workload revision (30 September, PO request):** @bianh13 owns #46/#48/#49/#50 = **21/40 points (52.5%)**; @VuSiSi owns #47/#53 = 6; @longbk761-bot owns #51/#52 = 6; @nguyentue110 owns #56/#54 = 7. API contract #49 moved to the PO; new #56 adds 5 points for independent ERD testing and possible redesign. Existing estimates remain unchanged; this supersedes the previous 18/35 split.
 
-**Initial committed: 35 points; added ERD review: 5; current planned scope: 40 points. Completed: 0 points. Velocity to date: 0.**
+**Initial committed: 35 points; added ERD review: 5; planning baseline: 40 points; mid-sprint addition #59: 5 points; current planned scope: 45 points. Completed and velocity live in Result below.**
 No implementation or final deliverable is claimed complete at planning time.
 Sprint 1 story closures recorded specification work; they do not prove that the
 features run. Historical UML tasks #38–#40 are not counted again in this baseline.
@@ -187,6 +199,38 @@ actual board field **Sprint = Sprint 2**, and the M2 milestone, as requested by
 the PO. Historical iteration dates are preserved; the M2 milestone and dates
 above determine the submission deadline, not that old iteration date range.
 
+### Result
+
+| Issue | Points | Status | Detail |
+|-------|--------|--------|--------|
+| #46 | 5 | Open | Refinement PR #55 merged 30 Sept; issue open pending final evidence |
+| #47 | 3 | Open | No merged PR yet |
+| #48 | 5 | Open | ERD/dictionary on main; issue open pending close with evidence |
+| #49 | 3 | Open | API design in progress |
+| #50 | 8 | Open | Skeleton code on main; awaiting verification (#51) and close |
+| #51 | 3 | Open | No merged PR yet |
+| #52 | 3 | Open | SETUP draft on main; independent Tested-by pending |
+| #53 | 3 | Open | Screenshots/PDF at submission time |
+| #54 | 2 | Open | Wrap-up in progress; closes last |
+| #56 | 5 | Done | Merged PR #61 on 30 Sept, reviewed by @bianh13; closed 30 Sept |
+| #59 | 5 | Open | PR #60 draft, blocked on live DNSE credentials (added scope mid-sprint) |
+
+**Completed to date: 5 points (#56). Velocity to date: 5.**
+
+### Not finished / carried over
+
+To be finalized at sprint end. Watch item: #59 / PR #60 (draft, blocked on live DNSE credentials) is the carry-over candidate if credentials do not arrive before 04 Oct.
+
+### Sprint Review
+
+- What we demonstrated: Pending — recorded after the Sprint Review.
+- Feedback received: Pending.
+- Backlog changes as a result: Pending.
+
+### Retrospective
+
+Pending — recorded after the retrospective. Required: one concrete action with one owner.
+
 ### Completion and review evidence
 
 Required before wrap-up: at least **4 merged PRs**, each reviewed by another
@@ -199,8 +243,17 @@ comment. Planned reviewers above are assignments, not evidence of reviews given.
 |--------|-----------|--------------|--------------|
 | @bianh13 | Pending | Pending | Pending |
 | @VuSiSi | Pending | Pending | Pending |
-| @nguyentue110 | Pending | Pending | Pending |
+| @nguyentue110 | #61 (docs/erd-review.md + 26 constraint tests, merged 30 Sept) | APPROVED on #55, #57, #58 via Review changes (30 Sept) | #56 (closed 30 Sept) |
 | @longbk761-bot | Pending | Pending | Pending |
+
+**Evidence update — 1 October (SM):** @nguyentue110's row above is verified —
+PR [#61](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/pull/61)
+merged 30 Sept with APPROVED review by @bianh13; reviews given on
+[#55](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/pull/55),
+[#57](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/pull/57) and
+[#58](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/pull/58);
+issue [#56](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/56)
+closed 30 Sept. Other members' rows stay Pending until their DoD evidence lands.
 
 The SM updates completed points and velocity from actual DoD evidence during the
 sprint, records unfinished work and review feedback, and closes #54 through the
@@ -225,3 +278,12 @@ after those events occur.
 DNSE realtime integration will be owned by @bianh13 in a later work session.
 The 3 points in #49 cover API design/P0 traceability only; realtime adapter
 implementation has not started and is not silently included in that estimate.
+
+### Attendance
+
+| Member | Planning | Review | Retro |
+|--------|----------|--------|-------|
+| @bianh13 | TBD — SM to confirm | Pending | Pending |
+| @VuSiSi | TBD — SM to confirm | Pending | Pending |
+| @nguyentue110 | TBD — SM to confirm | Pending | Pending |
+| @longbk761-bot | TBD — SM to confirm | Pending | Pending |
