@@ -6,7 +6,12 @@ A **"paper trading"** application: Users can buy and sell stocks using **virtual
 
 **Sprint 2 / Milestone 2:** [Assigned issues](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/milestone/1) · [Sprint plan](docs/sprint-log.md#sprint-2---milestone-2). Submission deadline: **5 October 2026, 00:00 (UTC+7)**.
 
-**Run the M2 walking skeleton:** [New-machine setup guide](docs/SETUP.md). `/market` reads 12 demo quotes from SQLite; live DNSE integration and trading are backlog work. [Design draft](docs/design.md).
+**Run the M2 walking skeleton:** [New-machine setup guide](docs/SETUP.md). `/market` reads 12 demo quotes from SQLite; live DNSE integration and trading are backlog work. [Design draft](docs/design.md) · [API contract](docs/api-contract.md).
+
+**Code modules:** The market page's routes, service, query, HTML and CSS live in
+`virtutrade/market/`; shared schema/seed code lives in `virtutrade/database/`.
+See the [folder map and maintenance guide](docs/code-structure.md). `app.py`
+remains the entry point for the commands below.
 
 **Key Features**
 
