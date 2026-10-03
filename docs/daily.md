@@ -19,3 +19,11 @@ Next steps: Collect team reviews so Vu can finalize the architecture/ADRs and di
 ## 2026-10-01
 
 - @nguyentue110 — Today: reviewed the full Milestone 2 scope and team issues, and checked Thanh's PR #60 (DNSE draft). Result: finished the SM tracking table (daily/PR/review/issue) and confirmed the PR #60 schema falls under my #56 review scope. Blocked: PR #60 is stuck on credentials so the review cannot finish yet; waiting on Long/Vu for progress on #51/#52/#47/#53.
+
+---
+
+## 2026-10-03
+
+- @bianh13 — Completed the P0 API contract and scenario-to-endpoint traceability, including access rules, request/response examples and trade rejection cases.
+Resolved the ERD review's cost-allocation question with an exact whole-VND rounding/remainder decision and checked the seed-backed app from a separate clean clone on my machine.
+Next I need peer approval, Long's independent-machine verification and the address-bar screenshot; DNSE issue #59 remains waiting for local credentials.

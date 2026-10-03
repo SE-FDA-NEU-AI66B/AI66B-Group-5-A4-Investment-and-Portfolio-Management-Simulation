@@ -79,3 +79,8 @@ change the running demo's data.
 OS/Python, commit SHA, elapsed minutes and result after a non-author follows
 these steps on another machine. Local author tests do not meet that condition;
 macOS/Linux commands remain unverified until actually run.
+
+**PO local clean-clone check, 3 October:** Windows/Python 3.10.11, main commit
+`b5fdb0f`; fresh venv and database, repeated init-db, 31 tests and lint passed.
+See [handoff evidence](m2-po-handoff.md). This does not fill the independent-machine
+field above.

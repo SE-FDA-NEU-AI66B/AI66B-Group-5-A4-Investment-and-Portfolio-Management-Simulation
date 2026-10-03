@@ -1,12 +1,13 @@
 # Milestone 2 — VirtuTrade design
 
-Team 05 · Topic A4 · Updated 30 September 2026.
+Team 05 · Topic A4 · Updated 3 October 2026.
 PO / lead developer: @bianh13. Scrum Master: @nguyentue110.
 
-**Working document, not final submission.** Sections 2, 4 and 6 have an
-implementation-backed draft from #46/#48/#50. @VuSiSi completes architecture and
-ADRs (#47); @bianh13 owns the API contract (#49). Independent setup
-verification, final screenshots, peer review and merge remain pending.
+**Working document, not final submission.** Architecture/ADRs (#47) and the
+independent ERD review (#56) have merged. The PO's API contract (#49) and exact
+cost-allocation decision (#48) are ready for peer review. Independent-machine
+setup (#52), address-bar screenshot/final package (#53) and wrap-up (#54) remain
+pending; optional live DNSE verification (#59) is waiting for local keys.
 
 ## 1. Architecture
 
@@ -27,12 +28,14 @@ timestamp and the page shows "Price may be delayed" after 15 minutes.
 Current implementation uses Flask 3.1.3 and SQLite bundled with Python, within
 the existing Python stack. Review references: [Flask installation](https://flask.palletsprojects.com/en/stable/installation/)
 and [SQLite integration](https://flask.palletsprojects.com/en/stable/patterns/sqlite3/).
-Vu records alternatives and change conditions in section 5 before finalization.
+Vu recorded alternatives and change conditions in section 5 (merged PR #63).
 
 ## 2. Data model
 
 Baseline owner: @bianh13, #48. Independent ERD review/testing: @nguyentue110,
-#56; Tuệ may redraw the model if it is unsuitable, keeping schema/dictionary in sync.
+#56 completed in PR #61 with 26 constraint tests and a keep-model decision.
+See [independent review](erd-review.md); the PO response to its rounding and
+future-storage findings is in [money rules](money-rules.md).
 Source of truth: `database.py::SCHEMA`.
 
 ![ERD with keys and multiplicities](images/erd.png)
@@ -66,8 +69,11 @@ Future buy/sell services must acquire a write transaction, re-read cash/quantity
 and quote, validate BR1/BR2, and update cash, holding and trade atomically.
 CHECK cannot enforce cross-table affordability or prevent overselling. Average
 cost is cost basis / quantity using Decimal; display rounding must never feed
-back into storage. Partial-sale allocation/rounding needs agreement and tests
-before trading implementation; the skeleton performs no trades.
+back into storage. The [cost-allocation decision](money-rules.md) specifies
+whole-VND ROUND_HALF_UP of total cost times sold/held quantity, exact remainder
+retention and full residual allocation on final sale. It also fixes one-time
+capital-grant behavior and worked examples. This is a design for peer approval;
+the skeleton performs no trades.
 
 Seed contract: 12 instruments and 12 quote rows; four other tables empty.
 Initialization adds missing demo rows without overwriting prices or duplicating
@@ -76,11 +82,37 @@ require migrations; init-db is not a schema upgrade tool.
 
 ## 3. API design
 
-Owner: @bianh13, #49. Pending >=6 endpoint contracts, >=2 meaningful error
-codes and coverage for all P0 stories. Candidate mapping is in traceability.
-Implemented: GET `/` redirects to `/market`; GET `/market` returns 200 HTML
-(including empty state), or 503 HTML when the database is unavailable. The
-server-rendered slice needs no separate JSON API. Other endpoints are unimplemented.
+Owner: @bianh13, #49. Contract completed for review on 3 October 2026.
+The table covers all seven P0 stories (US01-US06 and US10), with an optional
+P1 Admin endpoint. [Full API contract](api-contract.md) includes JSON examples,
+authentication/authorization, validation, errors, transaction boundaries and
+the external DNSE protocol boundary. [Traceability](traceability.md) maps each
+story to its scenario, screen, endpoint, tables and implementation status.
+
+Only GET `/` (302 redirect) and GET `/market` run on main. The quote JSON
+endpoint is in draft PR #60; all account/trade/portfolio/Admin APIs are designed,
+not implemented. M2 requires these contracts, not a complete trading engine.
+
+| Method | Path | Access / story | Input | Success output | Error codes | Status |
+|--------|------|----------------|-------|----------------|-------------|--------|
+| POST | `/api/accounts` | G; US01/US02 | email, password | 201 account id/email, cash_vnd=100000000; session cookie; Location `/api/portfolio` | 409 EMAIL_IN_USE; 422 VALIDATION_ERROR | Designed |
+| POST | `/api/sessions` | G; US01 | email, password | 200 account id/role; session cookie | 401 INVALID_CREDENTIALS; 429 LOGIN_LOCKED; 403 ACCOUNT_DISABLED | Designed |
+| DELETE | `/api/sessions/current` | U/A; US01 support | CSRF header; no body | 204; cookie expired, server session revoked | 401 AUTH_REQUIRED; 403 CSRF_FAILED | Designed |
+| GET | `/market` | G/U; US03 | none | 200 HTML with quotes, including empty state | 503 HTML unavailable page | Implemented on main |
+| GET | `/api/market/quotes` | G/U; US03 | no parameters | 200 quotes array; price/reference/time/source/stale/change | 503 MARKET_UNAVAILABLE | Implemented only in draft #60 |
+| GET | `/api/market/quotes/{symbol}` | G/U; US03 | ticker path parameter | 200 one quote object; stale prices remain viewable | 404 TICKER_NOT_FOUND; 503 QUOTE_UNAVAILABLE | Designed |
+| POST | `/api/orders/preview` | U; US04/US05/US10 | side=buy/sell, symbol, quantity | 200 estimate_vnd, available quantity/cash, shortfall, can_submit, warning and quote time/source; no writes | 422 INVALID_QUANTITY/VALIDATION_ERROR; 404 TICKER_NOT_FOUND; 409 QUOTE_STALE; 503 QUOTE_UNAVAILABLE | Designed |
+| POST | `/api/orders/buy` | U; US04/US10 | symbol, quantity, expected_quote_at | 201 trade, cash and updated holding | 409 INSUFFICIENT_CASH/QUOTE_CHANGED/QUOTE_STALE; 422 INVALID_QUANTITY; 404 TICKER_NOT_FOUND; 503 QUOTE_UNAVAILABLE | Designed |
+| POST | `/api/orders/sell` | U; US05 | symbol, quantity, expected_quote_at | 201 trade with realised_pnl_vnd, cash and remaining holding or null | 409 INSUFFICIENT_SHARES/QUOTE_CHANGED/QUOTE_STALE; 422 INVALID_QUANTITY; 404 TICKER_NOT_FOUND; 503 QUOTE_UNAVAILABLE | Designed |
+| GET | `/api/portfolio` | U; US06/US10 | none; session owner only | 200 cash_vnd, holdings, total_value_vnd and valuation status | 401 AUTH_REQUIRED; 403 ACCOUNT_DISABLED | Designed |
+| PATCH | `/api/admin/accounts/{id}/status` | A; US13 P1 | status=active/disabled | 200 id/status; audit entry for an actual transition | 403 ADMIN_REQUIRED; 404 ACCOUNT_NOT_FOUND; 409 SELF_DISABLE; 422 VALIDATION_ERROR | Designed, optional beyond P0 |
+
+Shared private-route errors: 401 AUTH_REQUIRED, 403 ACCOUNT_DISABLED and,
+for state-changing requests, 403 CSRF_FAILED. API errors contain code, message
+and details. Buy/sell reject cash/share shortages, stale/changed quotes and
+invalid quantities without partial writes. US10 preview does not replace
+the backend's atomic BR1 validation. Refer to the full contract for exact
+messages, example balances, initial grant and partial-sale allocation.
 
 ## 4. Walking skeleton
 

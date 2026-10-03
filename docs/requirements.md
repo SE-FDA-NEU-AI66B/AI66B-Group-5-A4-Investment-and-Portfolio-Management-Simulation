@@ -416,6 +416,11 @@ and credentials must be confirmed from official documentation before coding.
 
 ## 5. Business rules
 
+Implementation handoff: [API contract](api-contract.md) specifies all P0
+operations and errors; [money rules](money-rules.md) fixes exact cost allocation
+and rounding for BR6. These documents do not mark trading/auth services implemented.
+
+
 | ID | Rule | Worked example |
 |----|------|----------------|
 | BR1 | An order may not cost more than the available cash balance. | Cash 100,000,000 VND. Buy 1,000 HPG at 28,000 VND = 28,000,000 VND → accepted, cash falls to 72,000,000 VND. Then buy 3,000 FPT at 120,000 VND = 360,000,000 VND → rejected: the order needs 360,000,000 VND but only 72,000,000 VND is available. |
