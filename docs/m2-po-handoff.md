@@ -8,8 +8,8 @@ replace reviewer acceptance, independent-machine evidence or the team's DoD.
 | #46 backlog refinement | requirements.md, scenario/story mapping in traceability.md, Admin/US13, DNSE/US14, use-case source/export, design section 6 and SM name; merged PRs #55/#58 | Reviewer acceptance of the final package and applicable clean-machine DoD evidence; remains open |
 | #48 ERD/dictionary | design section 2 and schema/ERD in #55; independent keep-model review and 26 constraint tests in #61; money-rules.md resolves F10 and records F1/F2 boundaries | Peer approval/merge of the rounding decision and final acceptance |
 | #49 API/P0 mapping | design section 3 inventory of 11 endpoints; api-contract.md examples/access/errors; seven P0 traceability rows | Peer approval/merge; no implementation of all endpoints is claimed |
-| #50 walking skeleton | main's Flask/SQLite route, repeatable 12-row seed, real query, config/ignore rules, five integration tests plus 26 ERD tests; SETUP handoff and local clean-clone check below | Actual browser-address-bar screenshot at docs/images/walking-skeleton.png (#53), Long's independent setup verification (#52), final acceptance |
-| #59 optional live DNSE | Draft PR #60 contains the worker, JSON/refresh UI, migration and local tests | PO explicitly left this waiting for keys on 3 October; live-provider comparison, integration/conflict resolution and peer review remain pending |
+| #50 walking skeleton | main's Flask/SQLite route, repeatable 12-row seed, real query and config/ignore rules; PR #64 adds feature modules with 34 passing tests; SETUP handoff and checks below | Actual browser-address-bar screenshot at docs/images/walking-skeleton.png (#53), Long's independent setup verification (#52), final acceptance |
+| #59 optional live DNSE | Draft PR #60 contains the worker, JSON/refresh UI, migration and local tests; Python SDK fork reviewed | PO reports having a key but prioritizes required M2 scope; no live verification was attempted, and provider comparison, integration/conflict resolution and peer review remain pending |
 
 ## Clean-clone evidence (same machine, not independent)
 
@@ -21,8 +21,26 @@ replace reviewer acceptance, independent-machine evidence or the team's DoD.
   each time. GET `/market` returned 200 with 12 symbols and HPG at 28,000 VND.
 - `python -m pytest -q`: **31 passed** (0.73 s); `python -m ruff check .`: passed.
   Clone, fresh venv/package install and checks took 33 seconds on this machine.
-- The current documentation branch also passed the same 31 tests and lint.
+- Before the module refactor, the documentation branch also passed the same 31 tests and lint.
   This is PO-assisted local verification, not a non-author or different-machine run.
+
+## Module refactor checks - 3 October 2026
+
+PR #64 now also addresses the instructor's folder/module feedback. The market
+feature owns its route, service, SQLite query, template and CSS; shared schema
+and seed code are packaged separately. CLI commands and `/market` behavior are
+preserved. [Code structure](code-structure.md) maps symptoms to source files and
+records the DNSE SDK reference without making a live connection.
+
+- Windows/Python 3.10.11: `python -m pytest -q` **34 passed**; Ruff passed.
+- The 31 existing route/ERD tests still pass unchanged. Three new regressions
+  exercise seeding and page/CSS loading from another working directory,
+  isolation of two app instances with different databases, and repository-relative
+  configuration. All use temporary databases.
+- Root `database.py` preserves compatibility imports; the schema and seed data
+  are unchanged. No DNSE SDK dependency or broker operation is introduced.
+- This is local author verification of the new package layout; independent
+  review/setup and the address-bar screenshot remain open.
 
 ## Reviewer walkthrough
 
@@ -36,8 +54,8 @@ replace reviewer acceptance, independent-machine evidence or the team's DoD.
 4. For #50/#53, open the running `/market` in a normal browser and capture its
    actual address bar and table. Existing headless page images lack browser
    chrome; do not draw or composite an address bar onto them.
-5. Approve/merge only the accepted deliverables. Keep #59 pending until credentials
-   and live verification are available; keep API designs distinct from running code.
+5. Approve/merge only the accepted deliverables. Keep #59 deferred until the PO
+   resumes optional live-feed work; keep API designs distinct from running code.
 
 The current session had no callable Windows computer-use runtime, so it could
 not capture the required normal-browser window. That evidence is explicitly open.

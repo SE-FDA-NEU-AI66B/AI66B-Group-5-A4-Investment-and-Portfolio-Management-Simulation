@@ -7,7 +7,8 @@ PO / lead developer: @bianh13. Scrum Master: @nguyentue110.
 independent ERD review (#56) have merged. The PO's API contract (#49) and exact
 cost-allocation decision (#48) are ready for peer review. Independent-machine
 setup (#52), address-bar screenshot/final package (#53) and wrap-up (#54) remain
-pending; optional live DNSE verification (#59) is waiting for local keys.
+pending; optional live DNSE verification (#59) is deferred while required M2
+deliverables are completed.
 
 ## 1. Architecture
 
@@ -30,13 +31,22 @@ the existing Python stack. Review references: [Flask installation](https://flask
 and [SQLite integration](https://flask.palletsprojects.com/en/stable/patterns/sqlite3/).
 Vu recorded alternatives and change conditions in section 5 (merged PR #63).
 
+**Module packaging.** The application factory registers the market Blueprint.
+`virtutrade/market/` owns its routes, service, read-only SQL repository, template
+and stylesheet; `virtutrade/database/` owns shared schema and seeding. `app.py`
+only starts the app or initializes the database. This implements the instructor's
+request to locate page-specific changes in one folder. See the
+[code structure and request flow](code-structure.md); external page URLs and
+setup commands are unchanged.
+
 ## 2. Data model
 
 Baseline owner: @bianh13, #48. Independent ERD review/testing: @nguyentue110,
 #56 completed in PR #61 with 26 constraint tests and a keep-model decision.
 See [independent review](erd-review.md); the PO response to its rounding and
 future-storage findings is in [money rules](money-rules.md).
-Source of truth: `database.py::SCHEMA`.
+Source of truth: `virtutrade/database/schema.py::SCHEMA`, also re-exported by
+root `database.py` for existing callers and the original ERD image reference.
 
 ![ERD with keys and multiplicities](images/erd.png)
 
@@ -124,7 +134,7 @@ The page lists ACB, BID, FPT, GAS, HPG, MBB, MSN, MWG, SSI, TCB, VCB and VNM,
 with VND price, daily change, UTC time and Demo / seed badge. Quotes older than
 15 minutes show a warning. Sample prices are illustrative, not live DNSE data.
 
-Actual query in `database.py::read_market`:
+Actual query in `virtutrade/market/repository.py::read_market`:
 
 ```sql
 SELECT i.symbol, i.name, q.price_vnd, q.previous_close_vnd,
@@ -233,8 +243,10 @@ DNSE adapter in ADR-2 is target design only and is not implemented in M2.
   correctness of the money calculations, not UI richness.
 - The browser never talks to DNSE. Only the adapter holds provider
   credentials, so no secret reaches the browser.
-- All writes go through one set of validated functions in `database.py`, so
-  the "newer events only" rule (BR10) lives in one place.
+- The future adapter's writes will use validated functions in the market
+  repository, so the "newer events only" rule (BR10) lives in one place.
+  The current M2 repository only reads; shared initialization lives in
+  `virtutrade/database/`.
 
 **Trade-offs we accept**
 

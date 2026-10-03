@@ -25,5 +25,5 @@ Next steps: Collect team reviews so Vu can finalize the architecture/ADRs and di
 ## 2026-10-03
 
 - @bianh13 — Completed the P0 API contract and scenario-to-endpoint traceability, including access rules, request/response examples and trade rejection cases.
-Resolved the ERD review's cost-allocation question with an exact whole-VND rounding/remainder decision and checked the seed-backed app from a separate clean clone on my machine.
-Next I need peer approval, Long's independent-machine verification and the address-bar screenshot; DNSE issue #59 remains waiting for local credentials.
+Resolved the ERD cost-allocation question, checked a separate clean clone, and packaged the market page into route/service/repository/template/style modules with 34 tests and lint passing.
+Next I need peer approval, Long's independent-machine verification and the address-bar screenshot; I reviewed the DNSE Python SDK, but optional live-feed issue #59 stays deferred while required M2 deliverables take priority.

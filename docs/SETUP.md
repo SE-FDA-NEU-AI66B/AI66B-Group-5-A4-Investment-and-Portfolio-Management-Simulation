@@ -52,6 +52,11 @@ One command, `app.py init-db`, creates six tables and seeds **12 instruments and
 fresh database).` The four other tables stay empty. Re-running preserves current
 prices and inserts missing demo entries; it does not reset data or migrate schemas.
 
+Page-specific code is grouped under `virtutrade/market/`; schema and initialization
+are under `virtutrade/database/`. See [code structure](code-structure.md) for the
+file to open when debugging a route, calculation, query, template or stylesheet.
+This packaging does not change the commands above.
+
 ## How to know it worked
 
 Open **http://127.0.0.1:5000/market**. The page says “Market snapshot” and “12

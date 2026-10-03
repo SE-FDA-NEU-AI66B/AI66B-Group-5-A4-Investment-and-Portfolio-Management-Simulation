@@ -8,6 +8,11 @@ A **"paper trading"** application: Users can buy and sell stocks using **virtual
 
 **Run the M2 walking skeleton:** [New-machine setup guide](docs/SETUP.md). `/market` reads 12 demo quotes from SQLite; live DNSE integration and trading are backlog work. [Design draft](docs/design.md) · [API contract](docs/api-contract.md).
 
+**Code modules:** The market page's routes, service, query, HTML and CSS live in
+`virtutrade/market/`; shared schema/seed code lives in `virtutrade/database/`.
+See the [folder map and maintenance guide](docs/code-structure.md). `app.py`
+remains the entry point for the commands below.
+
 **Key Features**
 
 * Update stock reference prices.
