@@ -4,6 +4,7 @@ from flask import Flask, redirect, url_for
 
 from virtutrade.config import load_config
 from virtutrade.market import blueprint as market_blueprint
+from virtutrade.market.repository import SQLiteQuoteRepository
 
 
 def create_app(config=None):
@@ -11,6 +12,8 @@ def create_app(config=None):
     app.config.update(load_config())
     if config:
         app.config.update(config)
+    # Compose infrastructure here; controllers/services do not select a database.
+    app.extensions['market_reader_factory'] = lambda: SQLiteQuoteRepository(app.config['DATABASE'])
     app.register_blueprint(market_blueprint, url_prefix='/market')
 
     @app.get('/')
