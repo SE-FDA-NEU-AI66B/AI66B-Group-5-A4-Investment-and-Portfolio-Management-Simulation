@@ -1,8 +1,5 @@
 # Run VirtuTrade on a new machine
 
-Implementation handoff from @bianh13 (#50). @longbk761-bot owns final guide review
-and independent-machine verification (#52), which remain pending.
-
 ## Prerequisites
 
 - Git 2.30+ (`git --version`).
@@ -74,18 +71,48 @@ prices are not live DNSE data. Restarting preserves the DB; Ctrl+C stops the app
 | Linux cannot create venv | Install the OS's matching venv support (Debian/Ubuntu: python3-venv), then repeat creation. |
 | No quotes yet | DB exists but has no quotes; run init-db and reload. |
 
-## Tests and independent verification
+## Tests
 
-Install `pytest` using the same venv Python, then run `python -m pytest -q`
-(substitute the full venv Python path above). Tests use temporary DBs and do not
-change the running demo's data.
+`pytest` is a development-only dependency and is deliberately not in
+`requirements.txt`. Install it with the same venv Python, then run the suite
+from the repository root.
 
-**Tested by (independent machine): Pending — #52.** Record actual person, date,
-OS/Python, commit SHA, elapsed minutes and result after a non-author follows
-these steps on another machine. Local author tests do not meet that condition;
-macOS/Linux commands remain unverified until actually run.
+PowerShell:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install pytest
+.\.venv\Scripts\python.exe -m pytest -q
+```
+
+macOS / Linux:
+
+```bash
+.venv/bin/python -m pip install pytest
+.venv/bin/python -m pytest -q
+```
+
+Expected: `34 passed`. Tests use temporary databases and do not change the
+running demo's data. CI installs `pytest`, `pytest-cov` and `ruff` separately
+and runs on Python 3.12.
+
+## Independent verification
+
+A non-author following this guide on a different machine from a clean clone.
+
+| Field | Value |
+|-------|-------|
+| Tested by | TESTER_NAME |
+| Date | TESTER_DATE |
+| OS | TESTER_OS |
+| Python | TESTER_PY |
+| Git | TESTER_GIT |
+| Commit SHA | TESTER_SHA |
+| Elapsed (clone to page loaded) | TESTER_MIN minutes |
+| Tests | TESTER_TESTS |
+| Result | TESTER_RESULT |
+| Notes | TESTER_NOTES |
 
 **PO local clean-clone check, 3 October:** Windows/Python 3.10.11, main commit
-`b5fdb0f`; fresh venv and database, repeated init-db, 31 tests and lint passed.
-See [handoff evidence](m2-po-handoff.md). This does not fill the independent-machine
-field above.
+`b5fdb0f`; fresh venv and database, repeated init-db, tests and lint passed.
+See [handoff evidence](m2-po-handoff.md). A local author check does not satisfy
+the independent-machine condition above.
