@@ -39,6 +39,14 @@ request to locate page-specific changes in one folder. See the
 [code structure and request flow](code-structure.md); external page URLs and
 setup commands are unchanged.
 
+The factory selects a `SQLiteQuoteRepository`; the market service depends only
+on the `QuoteReader` interface and immutable quote models. The controller handles
+HTTP and rendering, the service calculates percentage/staleness rules, and the
+repository executes SQL and translates database errors. SQL table constraints
+remain in the shared schema. A market storage failure becomes a local 503;
+this does not claim isolation from process-wide or shared-database failures.
+Service tests use an in-memory reader without a Flask context or database.
+
 ## 2. Data model
 
 Baseline owner: @bianh13, #48. Independent ERD review/testing: @nguyentue110,

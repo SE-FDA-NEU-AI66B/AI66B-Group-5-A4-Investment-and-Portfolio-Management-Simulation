@@ -13,6 +13,10 @@ A **"paper trading"** application: Users can buy and sell stocks using **virtual
 See the [folder map and maintenance guide](docs/code-structure.md). `app.py`
 remains the entry point for the commands below.
 
+Within each feature, routes/controllers handle HTTP, services handle rules,
+repositories handle SQL, and models carry data. The market service accepts a
+reader interface so its rules can be tested without a server or database.
+
 **Key Features**
 
 * Update stock reference prices.
