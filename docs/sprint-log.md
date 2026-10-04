@@ -163,8 +163,9 @@ it as completed merely because its board iteration changed.
 
 The live issue is Open, labelled `sprint-3` and `carried-over`, assigned to the
 existing Sprint 3 board iteration and removed from the M2 milestone. There is
-no Sprint 3 milestone/deadline yet. PR #60 remains Draft, deferred to Sprint 3;
-its code and unchecked acceptance/DoD requirements are retained. Required M2
+no Sprint 3 milestone/deadline yet. At the PO's follow-up request, PR #60 is
+temporarily closed without merging; its branch `feature/dnse-market-data`, code
+and unchecked acceptance/DoD requirements are retained for reopening in Sprint 3. Required M2
 setup, independent verification and submission work continue in Sprint 2.
 
 [Milestone and assigned issues](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/milestone/1) · [Group 5 board](https://github.com/orgs/SE-FDA-NEU-AI66B/projects/7).
@@ -236,7 +237,7 @@ updated here immediately; it does not certify completion of other open work.
 | #53 | 3 | Open | Screenshots/PDF at submission time |
 | #54 | 2 | Open | Wrap-up in progress; closes last |
 | #56 | 5 | Done | Merged PR #61 on 30 Sept, reviewed by @bianh13; closed 30 Sept |
-| #59 | 5 | Carried over to Sprint 3 | PO decision, 4 Oct: Open; PR #60 remains Draft; live verification/integration/review unfinished; 0 completed points in Sprint 2 |
+| #59 | 5 | Carried over to Sprint 3 | PO decision, 4 Oct: issue Open; PR #60 temporarily closed, branch retained; live verification/integration/review unfinished; 0 completed points in Sprint 2 |
 
 **Previous SM snapshot: completed 5 points (#56), velocity 5. Final totals pending #54 reconciliation; #59 contributes zero.**
 

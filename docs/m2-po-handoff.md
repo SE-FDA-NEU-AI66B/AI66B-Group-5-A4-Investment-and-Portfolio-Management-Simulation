@@ -11,8 +11,8 @@ Issue closure alone does not fill missing independent-SETUP or screenshot
 evidence still tracked in #52/#53.
 
 The PO has moved #59 to Sprint 3 with its 5 points and all acceptance criteria
-unchanged. It remains Open; PR #60 remains Draft and explicitly deferred to
-Sprint 3. Sprint 2 retains its historical 45-point commitment and records #59
+unchanged. The issue remains Open; PR #60 is temporarily closed without
+merging, with its branch/code retained for reopening in Sprint 3. Sprint 2 retains its historical 45-point commitment and records #59
 as zero completed points and 5 points carried over. No live-provider acceptance
 or Definition of Done requirement is removed.
 

@@ -32,6 +32,6 @@ Next I need peer approval, Long's independent-machine verification and the addre
 
 ## 2026-10-04
 
-- @bianh13 — Moved unfinished DNSE issue #59 to Sprint 3 and retained draft PR #60, its five-point estimate and all acceptance/DoD requirements.
+- @bianh13 — Moved unfinished DNSE issue #59 to Sprint 3 and temporarily closed PR #60 while retaining its branch/code, five-point estimate and all acceptance/DoD requirements.
 Recorded the carry-over without rewriting Sprint 2's 45-point historical commitment or adding unfinished work to completed points, and synchronized the agreed review rotation.
 Prepared the final #46 refinement handoff for Tue's review while independent SETUP evidence, submission packaging and the SM wrap-up remain tracked separately.
