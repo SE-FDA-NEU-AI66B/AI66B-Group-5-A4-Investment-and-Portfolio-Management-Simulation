@@ -255,7 +255,7 @@ updated here immediately; it does not certify completion of other open work.
 ### Sprint Review
 
 - What we demonstrated: Pending — recorded after the Sprint Review.
-- Feedback received: Pending as a meeting record. PR-level review record (verifiable now): 10 merged Sprint-2 PRs each carry a non-author APPROVED review via Review changes; substantive comment threads on #66/#67 (schema/module feedback) and #60 (schema scope Q&A).
+- Feedback received: Pending as a meeting record. PR-level review record (verifiable now): 10 merged Sprint-2 PRs each carry a non-author APPROVED review via Review changes, with substantive comment threads on #66/#67 (schema/module feedback). PR #60 has 0 reviews and 0 comments; its schema Q&A never happened because the draft stalled on credentials.
 - Backlog changes as a result: Pending.
 
 ### Retrospective
