@@ -9,6 +9,10 @@
 
 ## Windows PowerShell
 
+First check which launcher you have: run `py -3 --version`. If it errors with
+"py is not recognized", replace `py -3` with `python` everywhere in the block
+below and confirm `python --version` reports 3.10 or newer.
+
 ```powershell
 git clone https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation.git
 cd AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation
@@ -19,8 +23,9 @@ Copy-Item .env.example .env
 .\.venv\Scripts\python.exe app.py
 ```
 
-Using the venv Python directly avoids activation-policy problems. If `py` is
-unavailable but `python --version` is 3.10+, use `python -m venv .venv`.
+Using the venv Python directly avoids activation-policy problems. Both `py -3`
+and `python` are only needed to create the virtual environment; every command
+after that uses the venv's own Python by full path.
 
 ## macOS / Linux
 
