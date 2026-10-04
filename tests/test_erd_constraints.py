@@ -1,6 +1,6 @@
 """Independent ERD/schema constraint review for #56.
 
-Builds a throwaway database from database.py::SCHEMA for every test
+Builds a throwaway database from virtutrade.database.schema.SCHEMA for every test
 (pytest tmp_path) and checks that the constraints needed by BR1/BR2/BR5/BR6/
 BR9/BR10 and US01-US06 really hold at the database level -- and records exactly
 which rules still need service code. Never touches a developer's working DB.
@@ -10,7 +10,7 @@ from decimal import Decimal
 
 import pytest
 
-from database import SCHEMA
+from virtutrade.database import SCHEMA
 
 ACCOUNT_COLUMNS = {"id", "email", "password_hash", "role", "status", "cash_vnd",
                    "created_at"}
@@ -357,7 +357,7 @@ def test_foreign_keys_need_pragma(tmp_path):
     """SQLite disables FK checks by default: without PRAGMA foreign_keys = ON
     an orphan fill is accepted. Every writer must enable it, as init-db does.
     Documents a limit, not a defect."""
-    from database import SCHEMA as schema
+    from virtutrade.database import SCHEMA as schema
 
     path = tmp_path / "nopragma.db"
     plain = sqlite3.connect(path)

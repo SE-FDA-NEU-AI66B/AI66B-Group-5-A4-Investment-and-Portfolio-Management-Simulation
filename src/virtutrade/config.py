@@ -5,7 +5,8 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-ROOT = Path(__file__).resolve().parents[1]
+# SETUP installs this checkout in editable mode; data and .env remain at its root.
+ROOT = Path(__file__).resolve().parents[2]
 
 
 def load_config():

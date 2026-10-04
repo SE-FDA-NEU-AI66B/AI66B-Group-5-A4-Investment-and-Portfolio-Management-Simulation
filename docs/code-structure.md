@@ -1,47 +1,44 @@
 # Code structure
 
 The application uses business modules with separate presentation, service and
-data-access files inside each module. `virtutrade/` is the Python source package
-(the role played by `src/` in the instructor's example); `market/` is the first
+data-access files inside each module. `src/` contains the `virtutrade` Python
+package; the repository root holds configuration and project assets. `market/` is the first
 implemented business module. Small layers are single files, as allowed in the
 slides. Flask's Blueprint combines routing and controller responsibilities.
 
 ```text
-README.md                      Entry point with SETUP link
-requirements.txt               Versioned runtime dependency
+README.md                      GitHub entry point, SETUP link and source shortcuts
+pyproject.toml                 Package installation and src discovery
+requirements.txt               Pinned runtime dependency (single version source)
 .env.example                   Safe configuration, committed
-.gitignore                     The single effective ignore file
-data/demo-quotes.json           Initial data, committed
-app.py                         Thin CLI: run / init-db
-database.py                    Compatibility exports, no SQL implementation
-virtutrade/
-  __init__.py                  Application factory, dependency wiring and registration
-  config.py                    Local configuration and repository-relative paths
-  database/
-    schema.py                  Shared six-table schema
-    seed.py                    Repeatable initialization from data/demo-quotes.json
-  market/
-    __init__.py                Exports the market Blueprint
-    routes.py                  URL/controller, HTML response and HTTP status
-    service.py                 Percentage/staleness rules and QuoteReader interface
-    repository.py              SQLite query, row mapping and storage error translation
-    models.py                  Immutable quote data and display results
-    errors.py                  Market failure shared between repository/controller
-    templates/market/index.html
-    static/market.css
-tests/
-  test_market.py               Snapshot behavior and persistence
-  test_erd_constraints.py      Independent ERD constraint checks
-  test_modules.py              Asset/path relocation and application isolation
-  test_market_layers.py        Service rules and request failure/recovery boundaries
+.gitignore                     Ignore local .env, venv, database and build output
+data/demo-quotes.json           Committed seed data
+src/
+  virtutrade/
+    __init__.py                Public package export
+    __main__.py                python -m virtutrade [run|init-db]
+    app.py                     Application factory and dependency wiring
+    config.py                  Configuration anchored to this checkout
+    database/
+      schema.py                Shared six-table schema
+      seed.py                  Repeatable initialization
+    market/
+      routes.py                URL/controller, HTML response and HTTP status
+      service.py               Business rules and QuoteReader interface
+      repository.py            SQLite query and storage error translation
+      models.py                Immutable quote data and display results
+      errors.py                Market-specific failures
+      templates/market/index.html
+      static/market.css
+tests/                         Service, route, ERD and installed CLI checks
 docs/                          Design, SETUP, process evidence and images
 scripts/diagram.py             Diagram maintenance, outside application runtime
 ```
 
 Request flow: browser → market route → service → repository → SQLite, then
 the route renders the market template. Its stylesheet is served at
-`/market/static/market.css`. `/` still redirects to `/market`; setup and CLI
-commands are unchanged. Internal Python calls connect these layers; no extra
+`/market/static/market.css`. `/` still redirects to `/market`. Install the
+checkout with `python -m pip install -e .` and use `python -m virtutrade`. Internal Python calls connect these layers; no extra
 HTTP server is needed between folders.
 
 ## Layer responsibilities
@@ -54,7 +51,7 @@ HTTP server is needed between folders.
 | Models | Describe immutable quote inputs and service output | Read HTTP, execute queries or apply business rules |
 | Application factory | Select the concrete repository and register modules | Query the database during app creation |
 
-The SQL schema in `virtutrade/database/schema.py` remains the single definition
+The SQL schema in `src/virtutrade/database/schema.py` remains the single definition
 of all six tables and their constraints. `Quote` is the joined read projection
 of instrument/price_quote, and `MarketQuote` adds the service's display result;
 they are not ORM tables or duplicated schema definitions. No ORM is needed for
@@ -83,29 +80,33 @@ outside the web server.
 
 | Problem | Start here |
 |---------|------------|
-| Page layout or text | `virtutrade/market/templates/market/index.html` |
-| Styling | `virtutrade/market/static/market.css` |
-| URL, response status or error page | `virtutrade/market/routes.py` |
-| Change percentage or delayed-price warning | `virtutrade/market/service.py` |
-| Rows, joins or database reads | `virtutrade/market/repository.py` |
-| Tables, constraints or initial demo rows | `virtutrade/database/` |
-| Database location or module registration | `virtutrade/config.py`, `virtutrade/__init__.py` |
+| Page layout or text | `src/virtutrade/market/templates/market/index.html` |
+| Styling | `src/virtutrade/market/static/market.css` |
+| URL, response status or error page | `src/virtutrade/market/routes.py` |
+| Change percentage or delayed-price warning | `src/virtutrade/market/service.py` |
+| Rows, joins or database reads | `src/virtutrade/market/repository.py` |
+| Tables, constraints or initial demo rows | `src/virtutrade/database/` |
+| Database location or module registration | `src/virtutrade/config.py`, `src/virtutrade/app.py` |
 
 Future account, order, portfolio and Admin features should follow the same
 feature-folder pattern and register their Blueprints in the factory. They are
 API designs for M2, not implemented features or empty placeholder modules.
 Add authentication/permission middleware when those private routes are built;
 keep shared helpers in `utils` only when they have no business-specific rules.
-Root `database.py` re-exports the existing API so the independent ERD tests and
-existing callers still work; new code imports the package directly. Existing
-ERD images citing `database.py::SCHEMA` refer to that compatibility export; the
-canonical definition is now `virtutrade/database/schema.py`.
+The old root `app.py` and `database.py` wrappers have been removed. Application
+code lives under `src/virtutrade/`; tests import the installed package. SETUP and
+CI install it in editable mode, and pytest no longer adds the repository root
+to Python's import path. This tests the same import mechanism used to run the app.
 
-Root `app.py` is retained so SETUP's `python app.py init-db` and `python app.py`
-commands keep working. The old file named `gitignore` was consolidated into
-`.gitignore`; only the latter controls Git's ignore rules. Runtime `.env` and
-SQLite files are local and ignored. Schema, seed data and initialization code
-are committed so every machine can create its own database with one command.
+The supported M2 workflow is a cloned checkout with `pip install -e .`: imports
+point to its src directory, while local .env/database paths and the committed
+seed file resolve from the checkout root, independently of the shell directory.
+Runtime state stays ignored. The seed is not duplicated in the package; keep
+the checkout in place when running this repository application.
+
+The old file named `gitignore` was consolidated into `.gitignore`. All schema,
+seed data and initialization code are committed so each machine can create its
+own database with `python -m virtutrade init-db`.
 
 ## DNSE SDK reference and M2 scope
 

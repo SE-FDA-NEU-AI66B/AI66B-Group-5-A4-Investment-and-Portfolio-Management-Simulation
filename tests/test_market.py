@@ -2,8 +2,8 @@ import sqlite3
 
 import pytest
 
-from app import create_app
-from database import init_database
+from virtutrade.app import create_app
+from virtutrade.database import init_database
 
 
 @pytest.fixture

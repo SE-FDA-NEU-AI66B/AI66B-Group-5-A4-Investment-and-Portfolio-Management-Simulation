@@ -9,9 +9,18 @@ A **"paper trading"** application: Users can buy and sell stocks using **virtual
 **Run the M2 walking skeleton:** [New-machine setup guide](docs/SETUP.md). `/market` reads 12 demo quotes from SQLite; live DNSE integration and trading are backlog work. [Design draft](docs/design.md) · [API contract](docs/api-contract.md).
 
 **Code modules:** The market page's routes, service, query, HTML and CSS live in
-`virtutrade/market/`; shared schema/seed code lives in `virtutrade/database/`.
-See the [folder map and maintenance guide](docs/code-structure.md). `app.py`
-remains the entry point for the commands below.
+[src/virtutrade/market/](src/virtutrade/market/); shared schema/seed code lives in
+[src/virtutrade/database/](src/virtutrade/database/). The application factory is
+[src/virtutrade/app.py](src/virtutrade/app.py). See the
+[folder map and maintenance guide](docs/code-structure.md).
+
+```text
+src/virtutrade/  Application code, grouped by business module
+data/           Committed seed data
+tests/          Automated checks
+docs/           Design, SETUP and submission evidence
+scripts/        Diagram maintenance
+```
 
 Within each feature, routes/controllers handle HTTP, services handle rules,
 repositories handle SQL, and models carry data. The market service accepts a
@@ -68,11 +77,12 @@ the database with one command. The walking skeleton is available on `main`.
 ## Running the Application
 
 ```bash
-python app.py init-db
-python app.py
+python -m virtutrade init-db
+python -m virtutrade run
 ```
 
-Run with the configured virtual environment's Python. Open
+After installing the checkout with `python -m pip install -e .` as shown in
+SETUP, run with the configured virtual environment's Python. Open
 http://127.0.0.1:5000/market; expect 12 symbols with a **Demo / seed** label.
 
 ## Team Workflow
