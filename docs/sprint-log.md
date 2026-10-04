@@ -132,8 +132,8 @@ all those endpoints is not the Milestone 2 walking-skeleton commitment.
 
 | Issue | Owner | Closed? |
 |-------|-------|---------|
-| [Chore] Refine backlog for Sprint 2 (#46) | @bianh13 (PO) | Open |
-| [Chore] Sprint 2 wrap-up (#54) | @nguyentue110 (SM) | Open |
+| [Chore] Refine backlog for Sprint 2 (#46) | @bianh13 (PO) | Done (closed 04 Oct) |
+| [Chore] Sprint 2 wrap-up (#54) | @nguyentue110 (SM) | Open (closes with this wrap-up PR) |
 
 ### Committed
 
@@ -227,19 +227,19 @@ updated here immediately; it does not certify completion of other open work.
 
 | Issue | Points | Status | Detail |
 |-------|--------|--------|--------|
-| #46 | 5 | Open | Refinement PR #55 merged 30 Sept; issue open pending final evidence |
-| #47 | 3 | Open | No merged PR yet |
-| #48 | 5 | Open | ERD/dictionary on main; issue open pending close with evidence |
-| #49 | 3 | Open | API design in progress |
-| #50 | 8 | Open | Skeleton code on main; awaiting verification (#51) and close |
-| #51 | 3 | Open | No merged PR yet |
-| #52 | 3 | Open | SETUP draft on main; independent Tested-by pending |
-| #53 | 3 | Open | Screenshots/PDF at submission time |
-| #54 | 2 | Open | Wrap-up in progress; closes last |
+| #46 | 5 | Done | Closed 04 Oct; PR #55 merged 30 Sept + reviewed; refinement on main |
+| #47 | 3 | Done | Closed 03 Oct; PR #63 merged + APPROVED by @bianh13 |
+| #48 | 5 | Done | Closed 03 Oct; ERD/dictionary on main + #56 review found model suitable |
+| #49 | 3 | Done | Closed 03 Oct; PR #64 merged 04 Oct + APPROVED via Review changes |
+| #50 | 8 | Done | Closed 03 Oct; skeleton on main (PR #55/#67) + reviews; verification limits noted under #51 |
+| #51 | 3 | Closed 04 Oct WITHOUT full AC evidence | Regression tests live in OPEN PR #68 (unreviewed, unmerged); all AC boxes unchecked — NOT counted; SM recommends reopening until #68 merges |
+| #52 | 3 | Closed 04 Oct WITHOUT full AC evidence | SETUP Tested-by still placeholder — NOT counted; SM recommends reopening until a real run is recorded |
+| #53 | 3 | Open | PDF submission unconfirmed at wrap-up time |
+| #54 | 2 | Open | Closes with this wrap-up PR; counts on merge |
 | #56 | 5 | Done | Merged PR #61 on 30 Sept, reviewed by @bianh13; closed 30 Sept |
-| #59 | 5 | Carried over to Sprint 3 | PO decision, 4 Oct: issue Open; PR #60 temporarily closed, branch retained; live verification/integration/review unfinished; 0 completed points in Sprint 2 |
+| #59 | 5 | Carried over to Sprint 3 | PO decision, 4 Oct; 0 completed points in Sprint 2 |
 
-**Previous SM snapshot: completed 5 points (#56), velocity 5. Final totals pending #54 reconciliation; #59 contributes zero.**
+**Completed to date (SM proposed, pending PO confirmation in review): 29 points (#46, #47, #48, #49, #50, #56) + 2 (#54 on merge of this PR) = 31. Velocity: 31 proposed. Excluded: #51, #52 (AC evidence incomplete — see flags above), #53 (PDF unconfirmed), #59 (carried, 0).**
 
 ### Not finished / carried over
 
@@ -249,16 +249,18 @@ updated here immediately; it does not certify completion of other open work.
   verification, integration with main's modules and independent review remain
   unfinished. Keep all acceptance criteria and the Definition of Done.
 - The SM finalizes any other unfinished work at sprint end using actual evidence.
+- **Open follow-up #68** (Long, money regression tests, PR #68 open unreviewed): merges after M2 only if time permits, else Sprint 3; it does not retroactively complete #51.
+- **#53 PDF package**: if the PDF is not confirmed submitted, it becomes the top carry-over concern for the PO; SM does not mark it complete without LMS confirmation.
 
 ### Sprint Review
 
 - What we demonstrated: Pending — recorded after the Sprint Review.
-- Feedback received: Pending.
+- Feedback received: Pending as a meeting record. PR-level review record (verifiable now): 10 merged Sprint-2 PRs each carry a non-author APPROVED review via Review changes, with substantive comment threads on #66/#67 (schema/module feedback). PR #60 has 0 reviews and 0 comments; its schema Q&A never happened because the draft stalled on credentials.
 - Backlog changes as a result: Pending.
 
 ### Retrospective
 
-Pending — recorded after the retrospective. Required: one concrete action with one owner.
+Pending — recorded after the retrospective. Required: one concrete action with one owner. (If no retro is held, the SM records that explicitly instead of inventing one.)
 
 ### Completion and review evidence
 
@@ -270,10 +272,10 @@ comment. Planned reviewers above are assignments, not evidence of reviews given.
 
 | Member | Merged PR | Review given | Closed issue |
 |--------|-----------|--------------|--------------|
-| @bianh13 | Pending | Pending | Pending |
-| @VuSiSi | Pending | Pending | Pending |
-| @nguyentue110 | #61 (docs/erd-review.md + 26 constraint tests, merged 30 Sept) | APPROVED on #55, #57, #58 via Review changes (30 Sept) | #56 (closed 30 Sept) |
-| @longbk761-bot | Pending | Pending | Pending |
+| @bianh13 | #55, #57, #58, #64, #66, #67 (all reviewed + merged) | APPROVED on #61, #63 via Review changes | #47 (closed 03 Oct; note: assigned to @VuSiSi) |
+| @VuSiSi | #63 (architecture + ADRs, merged) | APPROVED on #65 via Review changes | None — closes #53 when the PDF package lands |
+| @nguyentue110 | #61 (erd-review + 26 tests), #62 (sprint-log evidence), both merged | APPROVED on #55, #57, #58, #64; COMMENTED + APPROVED on #66, #67, all via Review changes | #46, #48, #49, #50, #56 (closed after verification) |
+| @longbk761-bot | #65 (SETUP verification, merged) | APPROVED on #62 via Review changes | #51, #52 (closed 04 Oct — AC evidence incomplete, see flags in Result) |
 
 **Evidence update — 1 October (SM):** @nguyentue110's row above is verified —
 PR [#61](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/pull/61)
@@ -283,6 +285,22 @@ merged 30 Sept with APPROVED review by @bianh13; reviews given on
 [#58](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/pull/58);
 issue [#56](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/56)
 closed 30 Sept. Other members' rows stay Pending until their DoD evidence lands.
+
+**Evidence update — 4 October, final reconciliation (SM):** verified on GitHub:
+merged Sprint-2 PRs #55, #57, #58, #61, #62, #63, #64, #65, #66, #67 (10 total,
+each with a non-author APPROVED review via Review changes; #66/#67 also carry
+substantive COMMENT threads); closed issues #46, #47, #48, #49, #50, #51, #52,
+#56 with closers/closures recorded above. Gaps flagged, not hidden: #51 closed
+with all AC boxes unchecked while its regression tests sit in open PR #68
+(0 reviews); #52 closed while SETUP Tested-by is still a placeholder; #53 open
+with PDF submission unconfirmed; @VuSiSi has no issue closure yet (needs #53).
+PR #60 (draft) was closed unmerged as part of the #59 carry-over. Review links:
+[#62](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/pull/62),
+[#63](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/pull/63),
+[#64](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/pull/64),
+[#65](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/pull/65),
+[#66](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/pull/66),
+[#67](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/pull/67).
 
 The SM updates completed points and velocity from actual DoD evidence during the
 sprint, records unfinished work and review feedback, and closes #54 through the
