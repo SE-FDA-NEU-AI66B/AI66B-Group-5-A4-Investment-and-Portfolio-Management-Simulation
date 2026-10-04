@@ -176,7 +176,7 @@ def erd():
     c.text(
         60,
         1390,
-        "Source: database.py::SCHEMA. Only instrument and price_quote are seeded; other services are not implemented.",
+        "Schema: src/virtutrade/database/schema.py. Seed: instrument + price_quote; other services remain unimplemented.",
         22,
     )
     c.save("erd")

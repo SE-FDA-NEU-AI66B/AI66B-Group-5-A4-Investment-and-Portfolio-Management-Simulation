@@ -21,7 +21,7 @@ or export directly from the replacement source instead.
 
 Edit the ERD SVG in a vector editor and export the updated PNG to
 `docs/images/erd.png`. Check that text, primary/foreign keys and relationship
-multiplicities remain readable. Keep the model consistent with `database.py`
+multiplicities remain readable. Keep the model consistent with `src/virtutrade/database/schema.py`
 and the data dictionary in `docs/design.md`.
 
 For the use-case diagram, the PlantUML file describes the model and the SVG

@@ -1,6 +1,6 @@
 # Milestone 2 — VirtuTrade design
 
-Team 05 · Topic A4 · Updated 3 October 2026.
+Team 05 · Topic A4 · Updated 4 October 2026.
 PO / lead developer: @bianh13. Scrum Master: @nguyentue110.
 
 **Working document, not final submission.** Architecture/ADRs (#47) and the
@@ -32,12 +32,14 @@ and [SQLite integration](https://flask.palletsprojects.com/en/stable/patterns/sq
 Vu recorded alternatives and change conditions in section 5 (merged PR #63).
 
 **Module packaging.** The application factory registers the market Blueprint.
-`virtutrade/market/` owns its routes, service, read-only SQL repository, template
-and stylesheet; `virtutrade/database/` owns shared schema and seeding. `app.py`
-only starts the app or initializes the database. This implements the instructor's
+`src/virtutrade/market/` owns its routes, service, read-only SQL repository, template
+and stylesheet; `src/virtutrade/database/` owns shared schema and seeding.
+`src/virtutrade/app.py` defines the factory and `src/virtutrade/__main__.py`
+provides the `python -m virtutrade` run/init-db commands. This implements the instructor's
 request to locate page-specific changes in one folder. See the
-[code structure and request flow](code-structure.md); external page URLs and
-setup commands are unchanged.
+[code structure and request flow](code-structure.md); external page URLs
+are unchanged. SETUP now installs the checkout with `pip install -e .` and
+starts it with `python -m virtutrade run`.
 
 The factory selects a `SQLiteQuoteRepository`; the market service depends only
 on the `QuoteReader` interface and immutable quote models. The controller handles
@@ -53,8 +55,9 @@ Baseline owner: @bianh13, #48. Independent ERD review/testing: @nguyentue110,
 #56 completed in PR #61 with 26 constraint tests and a keep-model decision.
 See [independent review](erd-review.md); the PO response to its rounding and
 future-storage findings is in [money rules](money-rules.md).
-Source of truth: `virtutrade/database/schema.py::SCHEMA`, also re-exported by
-root `database.py` for existing callers and the original ERD image reference.
+Source of truth: `src/virtutrade/database/schema.py::SCHEMA`. Tests import
+the installed `virtutrade.database` package; the old root compatibility file
+has been removed. The schema contents and constraints are unchanged.
 
 ![ERD with keys and multiplicities](images/erd.png)
 
@@ -142,7 +145,7 @@ The page lists ACB, BID, FPT, GAS, HPG, MBB, MSN, MWG, SSI, TCB, VCB and VNM,
 with VND price, daily change, UTC time and Demo / seed badge. Quotes older than
 15 minutes show a warning. Sample prices are illustrative, not live DNSE data.
 
-Actual query in `virtutrade/market/repository.py::read_market`:
+Actual query in `src/virtutrade/market/repository.py::read_market`:
 
 ```sql
 SELECT i.symbol, i.name, q.price_vnd, q.previous_close_vnd,
@@ -190,7 +193,7 @@ DNSE adapter in ADR-2 is target design only and is not implemented in M2.
 
 - The instructor must clone and run the project on a machine we have never
   seen. SQLite needs no database server and no Docker, so SETUP.md stays
-  short and `python app.py init-db` creates and seeds the database in one
+  short and `python -m virtutrade init-db` creates and seeds the database in one
   command.
 - It still enforces the rules the product depends on at database level:
   UNIQUE email (US01), `cash_vnd >= 0` (BR1 guard), UNIQUE
@@ -254,7 +257,7 @@ DNSE adapter in ADR-2 is target design only and is not implemented in M2.
 - The future adapter's writes will use validated functions in the market
   repository, so the "newer events only" rule (BR10) lives in one place.
   The current M2 repository only reads; shared initialization lives in
-  `virtutrade/database/`.
+  `src/virtutrade/database/`.
 
 **Trade-offs we accept**
 

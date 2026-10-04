@@ -78,5 +78,5 @@
 <text x="417" y="507" font-family="Arial,sans-serif" font-size="20" fill="#243b44">1</text>
 <text x="696" y="1180" font-family="Arial,sans-serif" font-size="20" fill="#243b44">0..*</text>
 <text x="440" y="1227" font-family="Arial,sans-serif" font-size="20" fill="#243b44">target_account_id</text>
-<text x="60" y="1412" font-family="Arial,sans-serif" font-size="22" fill="#243b44">Source: database.py::SCHEMA. Only instrument and price_quote are seeded; other services are not implemented.</text>
+<text x="60" y="1412" font-family="Arial,sans-serif" font-size="22" fill="#243b44">Schema: src/virtutrade/database/schema.py. Seed: instrument + price_quote; other services remain unimplemented.</text>
 </svg>

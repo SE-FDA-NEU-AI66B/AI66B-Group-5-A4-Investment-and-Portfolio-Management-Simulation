@@ -18,9 +18,9 @@ git clone https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Po
 cd AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation
 py -3 -m venv .venv
 Copy-Item .env.example .env
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
-.\.venv\Scripts\python.exe app.py init-db
-.\.venv\Scripts\python.exe app.py
+.\.venv\Scripts\python.exe -m pip install -e .
+.\.venv\Scripts\python.exe -m virtutrade init-db
+.\.venv\Scripts\python.exe -m virtutrade run
 ```
 
 Using the venv Python directly avoids activation-policy problems. Both `py -3`
@@ -34,9 +34,9 @@ git clone https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Po
 cd AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation
 python3 -m venv .venv
 cp .env.example .env
-.venv/bin/python -m pip install -r requirements.txt
-.venv/bin/python app.py init-db
-.venv/bin/python app.py
+.venv/bin/python -m pip install -e .
+.venv/bin/python -m virtutrade init-db
+.venv/bin/python -m virtutrade run
 ```
 
 ## Configuration and database
@@ -49,15 +49,19 @@ cp .env.example .env
 
 Defaults work unchanged. Environment variables override `.env`. Never commit
 credentials, `.env` or database files; `.gitignore` excludes local state.
-One command, `app.py init-db`, creates six tables and seeds **12 instruments and
+One command, `python -m virtutrade init-db`, creates six tables and seeds **12 instruments and
 12 price_quote rows**. It prints `Database ready: 12 price_quote rows (12 on a
 fresh database).` The four other tables stay empty. Re-running preserves current
 prices and inserts missing demo entries; it does not reset data or migrate schemas.
 
-Page-specific code is grouped under `virtutrade/market/`; schema and initialization
-are under `virtutrade/database/`. See [code structure](code-structure.md) for the
+Page-specific code is grouped under `src/virtutrade/market/`; schema and initialization
+are under `src/virtutrade/database/`. See [code structure](code-structure.md) for the
 file to open when debugging a route, calculation, query, template or stylesheet.
-This packaging does not change the commands above.
+The editable install registers this checkout as a Python package and reads
+the pinned runtime dependency from requirements.txt via pyproject.toml. Keep
+the checkout in place: .env and data/demo-quotes.json resolve from its root.
+The previous root app.py command is replaced by python -m virtutrade; after
+updating an old checkout, rerun the install command in its virtual environment.
 
 ## How to know it worked
 
@@ -70,6 +74,7 @@ prices are not live DNSE data. Restarting preserves the DB; Ctrl+C stops the app
 
 | Symptom | Fix |
 |---------|-----|
+| No module named virtutrade | From the cloned repo root, rerun the venv Python with `-m pip install -e .`; run the app using that same Python. |
 | No module named flask/dotenv | Run pip and app with the same venv Python shown above; reinstall requirements. |
 | Address/port already in use | Set PORT=5001 in `.env`, restart and open http://127.0.0.1:5001/market. |
 | Market data is unavailable (503) | Check DATABASE_PATH/permissions, then run init-db with the server's environment; inspect terminal logs for the actual DB error. |
@@ -96,13 +101,16 @@ macOS / Linux:
 .venv/bin/python -m pytest -q
 ```
 
-Expected: `34 passed`. Tests use temporary databases and do not change the
+Expected on this src-layout revision: `43 passed` (the suite may grow in later PRs). Tests use temporary databases and do not change the
 running demo's data. CI installs `pytest`, `pytest-cov` and `ruff` separately
 and runs on Python 3.12.
 
 ## Independent verification
 
-A non-author following this guide on a different machine from a clean clone.
+A non-author must follow these updated module-install/run commands on a
+different machine from a clean clone and record the exact tested commit.
+Earlier runs using root app.py do not verify this src-layout revision.
+The placeholders below remain pending until the actual run is recorded.
 
 | Field | Value |
 |-------|-------|

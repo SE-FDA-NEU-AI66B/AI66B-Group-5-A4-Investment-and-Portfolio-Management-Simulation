@@ -1,13 +1,15 @@
-"""Command-line entry point; feature implementation lives in virtutrade/."""
+"""Run with python -m virtutrade [run|init-db] after installing the checkout."""
 
 import argparse
 import os
 
-from virtutrade import create_app
+from virtutrade.app import create_app
 from virtutrade.database import init_database
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='VirtuTrade M2 walking skeleton')
+
+def main():
+    parser = argparse.ArgumentParser(prog='python -m virtutrade',
+                                     description='VirtuTrade M2 walking skeleton')
     parser.add_argument('command', nargs='?', choices=['run', 'init-db'], default='run')
     args = parser.parse_args()
     application = create_app()
@@ -17,3 +19,7 @@ if __name__ == '__main__':
     else:
         application.run(host=os.environ.get('HOST', '127.0.0.1'),
                         port=int(os.environ.get('PORT', '5000')), debug=False)
+
+
+if __name__ == '__main__':
+    main()
