@@ -3,6 +3,26 @@
 Owner: @bianh13. This records artifact delivery and actual checks; it does not
 replace reviewer acceptance, independent-machine evidence or the team's DoD.
 
+## Status update - 4 October 2026
+
+The delivery table below is the original 3 October handoff. Since then, PR #64
+was approved by @nguyentue110 and merged; #48/#49/#50 are closed on GitHub.
+Issue closure alone does not fill missing independent-SETUP or screenshot
+evidence still tracked in #52/#53.
+
+The PO has moved #59 to Sprint 3 with its 5 points and all acceptance criteria
+unchanged. It remains Open; PR #60 remains Draft and explicitly deferred to
+Sprint 3. Sprint 2 retains its historical 45-point commitment and records #59
+as zero completed points and 5 points carried over. No live-provider acceptance
+or Definition of Done requirement is removed.
+
+#46 remains a Sprint 2 PO chore. Its refinement artifacts were delivered through
+merged PRs #55/#58/#64; this scope/review-rotation update is submitted for Tue's
+final acceptance before closing #46. This does not close #52/#53/#54 or claim
+the final submission is complete. See the updated [sprint log](sprint-log.md).
+
+## Original delivery record - 3 October
+
 | Issue | Delivered evidence | Remaining closure evidence |
 |-------|--------------------|----------------------------|
 | #46 backlog refinement | requirements.md, scenario/story mapping in traceability.md, Admin/US13, DNSE/US14, use-case source/export, design section 6 and SM name; merged PRs #55/#58 | Reviewer acceptance of the final package and applicable clean-machine DoD evidence; remains open |

@@ -153,6 +153,20 @@ all those endpoints is not the Milestone 2 walking-skeleton commitment.
 
 **Total committed: 45 points** (planning baseline 40 + mid-sprint addition #59 worth 5).
 
+**Scope decision - 4 October 2026 (PO):** #59 is unfinished and carried over to
+Sprint 3, retaining its 5-point estimate, owner @bianh13, acceptance criteria
+and Definition of Done. Historical Sprint 2 commitment remains **45 points**;
+the remaining M2 delivery scope is the **40-point baseline**. #59 contributes
+**0 completed points / 0 velocity points to Sprint 2**, with **5 points carried
+over**. Do not remove it from the historical committed table above or count
+it as completed merely because its board iteration changed.
+
+The live issue is Open, labelled `sprint-3` and `carried-over`, assigned to the
+existing Sprint 3 board iteration and removed from the M2 milestone. There is
+no Sprint 3 milestone/deadline yet. PR #60 remains Draft, deferred to Sprint 3;
+its code and unchecked acceptance/DoD requirements are retained. Required M2
+setup, independent verification and submission work continue in Sprint 2.
+
 [Milestone and assigned issues](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/milestone/1) · [Group 5 board](https://github.com/orgs/SE-FDA-NEU-AI66B/projects/7).
 Estimates are initial planning values; the SM records any later scope or estimate changes.
 
@@ -163,11 +177,16 @@ P1 does not waive a submission requirement. These task labels describe execution
 order and do not change the product-story priorities in requirements.md. No
 current committed task is classified P2. Owners and estimates are unchanged.
 
-Planned reviewers and internal dues (UTC+7): #46→@nguyentue110/01 Oct; #47→@bianh13/01 Oct; #48→@VuSiSi/02 Oct; #49→@VuSiSi/02 Oct; #50→@longbk761-bot/03 Oct; #51→@bianh13/03 Oct; #52→@VuSiSi/04 Oct; #53→@nguyentue110/04 Oct; #54→@longbk761-bot/04 Oct; #56→@bianh13/02 Oct; #59→reviewer TBD (PR #60 draft).
+Original planned reviewers and internal dues (UTC+7): #46→@nguyentue110/01 Oct; #47→@bianh13/01 Oct; #48→@VuSiSi/02 Oct; #49→@VuSiSi/02 Oct; #50→@longbk761-bot/03 Oct; #51→@bianh13/03 Oct; #52→@VuSiSi/04 Oct; #53→@nguyentue110/04 Oct; #54→@longbk761-bot/04 Oct; #56→@bianh13/02 Oct; #59→reviewer TBD (PR #60 draft).
+
+**Current review rotation (PO confirmation, 4 October):** Long reviews Tue;
+Tue reviews Thanh; Thanh reviews Vu; Vu reviews Long. Apply this to remaining
+PRs: #46 and the eventual #59/PR #60 review go to Tue, #51/#52 to Vu, #53 to
+Thanh, and #54 to Long. Existing completed reviews remain valid historical evidence.
 
 **Latest workload revision (30 September, PO request):** @bianh13 owns #46/#48/#49/#50 = **21/40 points (52.5%)**; @VuSiSi owns #47/#53 = 6; @longbk761-bot owns #51/#52 = 6; @nguyentue110 owns #56/#54 = 7. API contract #49 moved to the PO; new #56 adds 5 points for independent ERD testing and possible redesign. Existing estimates remain unchanged; this supersedes the previous 18/35 split.
 
-**Initial committed: 35 points; added ERD review: 5; planning baseline: 40 points; mid-sprint addition #59: 5 points; current planned scope: 45 points. Completed and velocity live in Result below.**
+**Initial committed: 35 points; added ERD review: 5; planning baseline: 40 points; mid-sprint addition #59: 5 points; historical committed scope: 45 points; 4 October carry-over to Sprint 3: 5 points. Completed and velocity live in Result below.**
 No implementation or final deliverable is claimed complete at planning time.
 Sprint 1 story closures recorded specification work; they do not prove that the
 features run. Historical UML tasks #38–#40 are not counted again in this baseline.
@@ -201,6 +220,10 @@ above determine the submission deadline, not that old iteration date range.
 
 ### Result
 
+The completion figures and other issue rows below are the previous SM snapshot,
+pending final reconciliation in #54. The 4 October #59 carry-over decision is
+updated here immediately; it does not certify completion of other open work.
+
 | Issue | Points | Status | Detail |
 |-------|--------|--------|--------|
 | #46 | 5 | Open | Refinement PR #55 merged 30 Sept; issue open pending final evidence |
@@ -213,13 +236,18 @@ above determine the submission deadline, not that old iteration date range.
 | #53 | 3 | Open | Screenshots/PDF at submission time |
 | #54 | 2 | Open | Wrap-up in progress; closes last |
 | #56 | 5 | Done | Merged PR #61 on 30 Sept, reviewed by @bianh13; closed 30 Sept |
-| #59 | 5 | Open | PR #60 draft, blocked on live DNSE credentials (added scope mid-sprint) |
+| #59 | 5 | Carried over to Sprint 3 | PO decision, 4 Oct: Open; PR #60 remains Draft; live verification/integration/review unfinished; 0 completed points in Sprint 2 |
 
-**Completed to date: 5 points (#56). Velocity to date: 5.**
+**Previous SM snapshot: completed 5 points (#56), velocity 5. Final totals pending #54 reconciliation; #59 contributes zero.**
 
 ### Not finished / carried over
 
-To be finalized at sprint end. Watch item: #59 / PR #60 (draft, blocked on live DNSE credentials) is the carry-over candidate if credentials do not arrive before 04 Oct.
+- **Confirmed carry-over, 4 October:** #59 / PR #60 moves to Sprint 3, 5 points,
+  owner @bianh13. The PO reports having a key; the reason for deferral is to
+  prioritize required M2 delivery, not waiting for key issuance. Live DNSE
+  verification, integration with main's modules and independent review remain
+  unfinished. Keep all acceptance criteria and the Definition of Done.
+- The SM finalizes any other unfinished work at sprint end using actual evidence.
 
 ### Sprint Review
 
