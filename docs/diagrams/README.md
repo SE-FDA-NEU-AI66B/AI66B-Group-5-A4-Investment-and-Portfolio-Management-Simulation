@@ -6,6 +6,7 @@
 | Use cases | [PlantUML model](use-case-diagram.puml) and [SVG layout](use-case-diagram.svg) | [Use-case PNG](use-case-diagram.png) |
 | Buy sequence | [PlantUML](sequence-buy-order.puml) | [PNG](sequence-buy-order.png) |
 | Sell sequence | [PlantUML](sequence-sell-order.puml) | [PNG](sequence-sell-order.png) |
+| Architecture | [architecture_diagram.py](../../scripts/architecture_diagram.py) | [PNG](../images/architecture.png) |
 
 The [diagram script](../../scripts/diagram.py) recreates the ERD and use-case
 SVG/PNG files from its layout definitions. From the repository root:
