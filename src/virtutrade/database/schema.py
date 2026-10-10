@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS price_quote (
     price_vnd INTEGER NOT NULL CHECK(price_vnd > 0),
     previous_close_vnd INTEGER CHECK(previous_close_vnd > 0),
     quoted_at TEXT NOT NULL,
-    source TEXT NOT NULL CHECK(source IN ('seed', 'dnse'))
+    source TEXT NOT NULL CHECK(source IN ('seed', 'dnse', 'simulation'))
 );
 CREATE TABLE IF NOT EXISTS holding (
     id INTEGER PRIMARY KEY,

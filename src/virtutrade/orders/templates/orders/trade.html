@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="csrf-token" content="{{ csrf_token }}"><title>Buy shares · VirtuTrade</title>
+<link rel="stylesheet" href="{{ url_for('market.static', filename='market.css') }}"></head>
+<body><header><a class="brand" href="/market">VirtuTrade</a><span class="badge">PAPER TRADING</span></header>
+<main><nav aria-label="Main"><a href="/market">Market</a></nav>
+<h1>Buy shares</h1><p>Preview the price and cost before confirming. All balances and orders are virtual.</p>
+{% if not auth_ready %}<aside>Trading is temporarily unavailable. Please try again later.</aside>{% endif %}
+<form id="buy-form"><p><label for="symbol">Stock symbol</label><br>
+<input id="symbol" name="symbol" value="{{ symbol }}" required maxlength="10" autocomplete="off"></p>
+<p><label for="quantity">Number of shares</label><br><input id="quantity" name="quantity" type="number" min="1" step="1" required></p>
+<button id="preview-button" type="submit" {% if not auth_ready %}disabled{% endif %}>Preview order</button>
+<button id="confirm-button" type="button" disabled>Confirm buy</button></form>
+<p id="order-status" role="status" aria-live="polite">Enter a stock and quantity to preview.</p>
+<section id="estimate" aria-label="Order preview" hidden></section>
+<p id="order-error" role="alert"></p>
+<p id="result"></p>
+<section id="demo-actions" {% if not simulation %}hidden{% endif %}>
+<p>Simulation mode: generate a new demo observation when prices are stale. This is not live DNSE data.</p>
+<button id="generate-quotes" type="button" {% if not auth_ready %}disabled{% endif %}>Generate demo quotes</button></section>
+</main><script src="{{ url_for('orders.static', filename='trade.js') }}" defer></script></body></html>
