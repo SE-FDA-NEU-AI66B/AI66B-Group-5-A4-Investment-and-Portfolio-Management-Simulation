@@ -11,6 +11,11 @@ def write_dnse_event(path, event):
         Path(path).resolve().as_uri() + "?mode=rw", uri=True
     )) as connection, connection:
         connection.execute("PRAGMA foreign_keys = ON")
+        connection.execute("BEGIN IMMEDIATE")
+        if connection.execute(
+            "SELECT 1 FROM price_quote WHERE source NOT IN ('seed', 'dnse') LIMIT 1"
+        ).fetchone():
+            raise sqlite3.IntegrityError("DNSE worker cannot write a simulation database")
         if event.kind == "sd":
             result = connection.execute(
                 "UPDATE instrument SET reference_price_vnd = ?, reference_at = ? "
@@ -35,5 +40,3 @@ def read_symbols(path):
         Path(path).resolve().as_uri() + "?mode=ro", uri=True
     )) as connection, connection:
         return {row[0] for row in connection.execute("SELECT symbol FROM instrument")}
-
-

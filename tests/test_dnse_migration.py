@@ -45,3 +45,19 @@ def test_initial_error_page_keeps_refresh_target_for_recovery(tmp_path):
     assert b'id="quote-rows"' in response.data
     assert b'id="market-error"' in response.data
     assert client.get('/market/static/market.js').status_code == 200
+
+
+def test_worker_cannot_overwrite_a_future_simulation_database(tmp_path):
+    from virtutrade.dnse.repository import write_dnse_event
+    from virtutrade.dnse.worker import Event
+    path = tmp_path / 'simulation.db'
+    init_database(path)
+    with closing(sqlite3.connect(path)) as connection, connection:
+        # Stand in for the source enum migration proposed in #75.
+        connection.execute('PRAGMA ignore_check_constraints = ON')
+        connection.execute("UPDATE price_quote SET source='simulation'")
+    with pytest.raises(sqlite3.IntegrityError, match='simulation'):
+        write_dnse_event(path, Event('sd', 'HPG', 100, '2099-01-01T00:00:00.000000000Z'))
+    with closing(sqlite3.connect(path)) as connection:
+        assert connection.execute('SELECT reference_at FROM instrument WHERE symbol=?', ('HPG',)).fetchone()[0] is None
+        assert connection.execute("SELECT COUNT(*) FROM price_quote WHERE source='simulation'").fetchone()[0] == 12

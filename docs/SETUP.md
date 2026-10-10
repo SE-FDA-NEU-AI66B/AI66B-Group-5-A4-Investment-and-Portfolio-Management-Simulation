@@ -108,7 +108,7 @@ macOS / Linux:
 .venv/bin/python -m pytest -q
 ```
 
-Expected on the resumed DNSE revision: `94 passed, 5 skipped` (the skips are existing unimplemented trading integration checks; the suite may grow). Tests use temporary databases and do not change the
+Expected on the resumed DNSE revision: `95 passed, 5 skipped` (the skips are existing unimplemented trading integration checks; the suite may grow). Tests use temporary databases and do not change the
 running demo's data. CI installs `pytest`, `pytest-cov` and `ruff` separately
 and runs on Python 3.12.
 
