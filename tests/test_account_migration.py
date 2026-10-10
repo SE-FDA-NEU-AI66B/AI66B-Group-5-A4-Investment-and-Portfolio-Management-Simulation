@@ -56,21 +56,40 @@ def schema_version(connection):
     return connection.execute("PRAGMA user_version").fetchone()[0]
 
 
-def apply_account_state_upgrade(connection):
+def pending_statements(connection):
+    """Statements still missing, so reruns and previously interrupted
+    upgrades apply only what is absent. CREATE TABLE carries its own
+    IF NOT EXISTS guard."""
+    columns = set(table_columns(connection, "account"))
+    statements = []
+    if "failed_attempts" not in columns:
+        statements.append(ADD_FAILED_ATTEMPTS)
+    if "locked_until" not in columns:
+        statements.append(ADD_LOCKED_UNTIL)
+    statements.append(CREATE_AUTH_SESSION)
+    return statements
+
+
+def apply_account_state_upgrade(connection, statements=None):
     """Idempotent applier contract for #77: returns True when it changed
-    anything, False when the database was already upgraded. Rolls back
-    partial work on failure so reruns stay safe."""
+    anything, False when the database was already upgraded.
+
+    Opens one explicit transaction because Python's sqlite3 auto-begins only
+    before INSERT/UPDATE/DELETE, never DDL: without it every statement
+    autocommits and rollback() could undo nothing. Rolls back partial work on
+    failure so reruns stay safe. Call with no pending writes. The statements
+    parameter exists only so tests can inject a failure; #77 implements the
+    fixed list from pending_statements().
+    """
     if schema_version(connection) >= TARGET_SCHEMA_VERSION:
         return False
+    connection.execute("BEGIN IMMEDIATE")
     try:
-        columns = set(table_columns(connection, "account"))
-        if "failed_attempts" not in columns:
-            connection.execute(ADD_FAILED_ATTEMPTS)
-        if "locked_until" not in columns:
-            connection.execute(ADD_LOCKED_UNTIL)
-        connection.execute(CREATE_AUTH_SESSION)
-        connection.execute(
-            f"PRAGMA user_version = {TARGET_SCHEMA_VERSION}")
+        if statements is None:
+            statements = pending_statements(connection)
+        for statement in statements:
+            connection.execute(statement)
+        connection.execute(f"PRAGMA user_version = {TARGET_SCHEMA_VERSION}")
         connection.commit()
         return True
     except Exception:
@@ -202,6 +221,34 @@ def test_migration_rerun_is_noop(tmp_path):
         assert schema_version(second) == TARGET_SCHEMA_VERSION
     finally:
         second.close()
+
+
+def test_failed_migration_rolls_back(tmp_path):
+    """A mid-migration failure leaves zero partial state behind: no new
+    columns, no table, version unchanged — so the next rerun starts clean.
+    Guards against the autocommit-DDL trap where rollback() alone undoes
+    nothing (caught in review on PR #90)."""
+    path = tmp_path / "fail.db"
+    build_m2_fixture(path).close()
+    connection = sqlite3.connect(path)
+    connection.execute("PRAGMA foreign_keys = ON")
+    with pytest.raises(sqlite3.OperationalError):
+        apply_account_state_upgrade(
+            connection, statements=[ADD_FAILED_ATTEMPTS, "THIS IS NOT SQL"])
+    try:
+        columns = set(table_columns(connection, "account"))
+        assert "failed_attempts" not in columns
+        tables = {
+            row[0]
+            for row in connection.execute(
+                "SELECT name FROM sqlite_master WHERE type = 'table'")
+        }
+        assert "auth_session" not in tables
+        assert schema_version(connection) == 0
+        assert apply_account_state_upgrade(connection) is True
+        assert schema_version(connection) == TARGET_SCHEMA_VERSION
+    finally:
+        connection.close()
 
 
 def test_original_copy_untouched(tmp_path):

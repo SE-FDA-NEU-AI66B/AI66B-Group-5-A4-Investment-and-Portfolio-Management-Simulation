@@ -61,6 +61,11 @@ Store only the token hash, never the token. A session is active when
   `PRAGMA table_info` before each `ADD COLUMN`, run inside one transaction
   with rollback on failure. The reference applier in
   `tests/test_account_migration.py` demonstrates the contract.
+- Open that transaction explicitly (`BEGIN IMMEDIATE`): Python's sqlite3
+  auto-begins only before INSERT/UPDATE/DELETE, never DDL, so without it every
+  statement autocommits and a later failure cannot roll back — review on
+  PR #90 proved it with columns surviving at version 0. Call the applier with
+  no pending writes.
 - SQLite ignores foreign keys declared by `ADD COLUMN`, so new FKs must arrive
   via new tables (as `auth_session` does), never via altered columns.
 - Upgrade rule: **copy the database file first, migrate the copy, verify
