@@ -4,8 +4,8 @@ Owner: @bianh13, #49. Design revision: 3 October 2026. Review: @VuSiSi.
 
 This is an implementation handoff, not a claim that all routes run. On `main`,
 only GET `/` (302 to `/market`) and GET `/market` (200/503 HTML) are implemented.
-The optional quote JSON endpoint and DNSE worker exist in draft PR #60, pending
-integration, real-provider verification and review. All other endpoints below
+The resumed PR #60 implements the quote list JSON endpoint and modular DNSE worker;
+authentication/subscription was verified, while actual quote/unit comparison and review remain pending. All other endpoints below
 are designed for later implementation; requesting them on current main yields 404.
 
 ## 1. Conventions and access
@@ -49,7 +49,7 @@ All errors below also use the shared validation/authorization rules above.
 | POST | `/api/sessions` | G; US01 | email, password | 200 account id/role; session cookie | 401 INVALID_CREDENTIALS; 429 LOGIN_LOCKED; 403 ACCOUNT_DISABLED | Designed |
 | DELETE | `/api/sessions/current` | U/A; US01 support | CSRF header; no body | 204; cookie expired, server session revoked | 401 AUTH_REQUIRED; 403 CSRF_FAILED | Designed |
 | GET | `/market` | G/U; US03 | none | 200 HTML with quotes, including empty state | 503 HTML unavailable page | Implemented on main |
-| GET | `/api/market/quotes` | G/U; US03 | no parameters | 200 quotes array; price/reference/time/source/stale/change | 503 MARKET_UNAVAILABLE | Implemented only in draft #60 |
+| GET | `/api/market/quotes` | G/U; US03 | no parameters | 200 quotes array; price/reference/time/source/stale/change | 503 MARKET_UNAVAILABLE | Implemented in resumed #60; review pending |
 | GET | `/api/market/quotes/{symbol}` | G/U; US03 | ticker path parameter | 200 one quote object; stale prices remain viewable | 404 TICKER_NOT_FOUND; 503 QUOTE_UNAVAILABLE | Designed |
 | POST | `/api/orders/preview` | U; US04/US05/US10 | side=buy/sell, symbol, quantity | 200 estimate_vnd, available quantity/cash, shortfall, can_submit, warning and quote time/source; no writes | 422 INVALID_QUANTITY/VALIDATION_ERROR; 404 TICKER_NOT_FOUND; 409 QUOTE_STALE; 503 QUOTE_UNAVAILABLE | Designed |
 | POST | `/api/orders/buy` | U; US04/US10 | symbol, quantity, expected_quote_at | 201 trade, cash and updated holding | 409 INSUFFICIENT_CASH/QUOTE_CHANGED/QUOTE_STALE; 422 INVALID_QUANTITY; 404 TICKER_NOT_FOUND; 503 QUOTE_UNAVAILABLE | Designed |

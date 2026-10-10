@@ -6,8 +6,10 @@ from pathlib import Path
 from virtutrade.market.errors import MarketDataUnavailable
 from virtutrade.market.models import Quote
 
-MARKET_QUERY = """SELECT i.symbol, i.name, q.price_vnd, q.previous_close_vnd,
-       q.quoted_at, q.source
+MARKET_QUERY = """SELECT i.symbol, i.name, q.price_vnd,
+       CASE WHEN q.source = 'seed' THEN q.previous_close_vnd
+            ELSE i.reference_price_vnd END AS previous_close_vnd,
+       i.reference_at, q.quoted_at, q.source
 FROM price_quote AS q
 JOIN instrument AS i ON i.id = q.instrument_id
 ORDER BY i.symbol"""

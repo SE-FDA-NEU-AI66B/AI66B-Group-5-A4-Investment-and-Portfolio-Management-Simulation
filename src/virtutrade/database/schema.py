@@ -1,4 +1,4 @@
-"""Shared M2 tables and constraints; no trading service is implemented."""
+"""Shared schema, including optional DNSE reference metadata."""
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS account (
@@ -13,13 +13,15 @@ CREATE TABLE IF NOT EXISTS account (
 CREATE TABLE IF NOT EXISTS instrument (
     id INTEGER PRIMARY KEY,
     symbol TEXT NOT NULL UNIQUE,
-    name TEXT NOT NULL
+    name TEXT NOT NULL,
+    reference_price_vnd INTEGER CHECK(reference_price_vnd > 0),
+    reference_at TEXT
 );
 CREATE TABLE IF NOT EXISTS price_quote (
     id INTEGER PRIMARY KEY,
     instrument_id INTEGER NOT NULL UNIQUE REFERENCES instrument(id),
     price_vnd INTEGER NOT NULL CHECK(price_vnd > 0),
-    previous_close_vnd INTEGER NOT NULL CHECK(previous_close_vnd > 0),
+    previous_close_vnd INTEGER CHECK(previous_close_vnd > 0),
     quoted_at TEXT NOT NULL,
     source TEXT NOT NULL CHECK(source IN ('seed', 'dnse'))
 );

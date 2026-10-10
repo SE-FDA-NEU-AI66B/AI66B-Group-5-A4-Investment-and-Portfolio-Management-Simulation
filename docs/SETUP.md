@@ -108,7 +108,7 @@ macOS / Linux:
 .venv/bin/python -m pytest -q
 ```
 
-Expected on this src-layout revision: `43 passed` (the suite may grow in later PRs). Tests use temporary databases and do not change the
+Expected on the resumed DNSE revision: `95 passed, 5 skipped` (the skips are existing unimplemented trading integration checks; the suite may grow). Tests use temporary databases and do not change the
 running demo's data. CI installs `pytest`, `pytest-cov` and `ruff` separately
 and runs on Python 3.12.
 
@@ -136,3 +136,17 @@ The placeholders below remain pending until the actual run is recorded.
 `b5fdb0f`; fresh venv and database, repeated init-db, tests and lint passed.
 See [handoff evidence](m2-po-handoff.md). A local author check does not satisfy
 the independent-machine condition above.
+
+
+## Optional DNSE worker (Sprint 3)
+
+The default demo remains usable without keys. For real market data, follow
+[DNSE setup and verification](DNSE.md): install the updated dependencies, stop
+DB users and back up/copy any old database, run `python -m virtutrade init-db`
+against the working copy, then run `python -m virtutrade stream` in a second
+terminal. Store DNSE_API_KEY/DNSE_API_SECRET only in the ignored local .env;
+DNSE_SYMBOLS optionally limits the subscriptions. Never send keys in chat.
+The worker only consumes market data. An authenticated subscription alone does
+not prove that a quote has arrived; inspect each stored source/time and the
+pending provider-board comparison in #59. Repeat independent-machine SETUP on
+the final merged revision rather than reusing old evidence.

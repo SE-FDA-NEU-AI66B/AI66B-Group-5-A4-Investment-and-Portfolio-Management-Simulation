@@ -89,7 +89,8 @@ All six tables exist after init-db; only instrument and price_quote are seeded.
 Empty account/holding/trade/audit tables do not implement those features. Deferred
 extensions are documented in [traceability](traceability.md).
 
-All columns are NOT NULL except `trade.realised_pnl_vnd`. An INTEGER PRIMARY KEY
+Nullable fields: `trade.realised_pnl_vnd`, `price_quote.previous_close_vnd`,
+`instrument.reference_price_vnd` and `instrument.reference_at`. An INTEGER PRIMARY KEY
 is the SQLite row identifier. Timestamps are UTC ISO 8601 TEXT, validated by the
 future service. Money is integer VND; services must validate integers because
 SQLite type affinity alone is not an input validator.
@@ -97,8 +98,8 @@ SQLite type affinity alone is not an input validator.
 | Table / purpose | Columns and types | Keys / constraints and rules |
 |-----------------|-------------------|------------------------------|
 | account: identity, role, state, virtual cash | id INTEGER; email TEXT COLLATE NOCASE; password_hash TEXT; role TEXT DEFAULT investor; status TEXT DEFAULT active; cash_vnd INTEGER DEFAULT 100000000; created_at TEXT | PK id; UNIQUE email (US01); role investor/admin and status active/disabled (BR9); cash >=0 (BR1 guard); default capital (BR5). Hashing, single grant and authorization need service code. |
-| instrument: ticker identity | id INTEGER; symbol TEXT; name TEXT | PK id; UNIQUE symbol (US03/BR10). |
-| price_quote: latest snapshot per ticker | id INTEGER; instrument_id INTEGER; price_vnd INTEGER; previous_close_vnd INTEGER; quoted_at TEXT; source TEXT | PK id; UNIQUE FK instrument_id → instrument.id; both prices >0; source seed/dnse (BR10). One snapshot, no tick history; newer-event ordering needs adapter logic. |
+| instrument: ticker identity | id INTEGER; symbol TEXT; name TEXT; reference_price_vnd INTEGER NULL; reference_at TEXT NULL | PK id; UNIQUE symbol (US03/BR10). |
+| price_quote: latest snapshot per ticker | id INTEGER; instrument_id INTEGER; price_vnd INTEGER; previous_close_vnd INTEGER NULL; quoted_at TEXT; source TEXT | PK id; UNIQUE FK instrument_id → instrument.id; price >0; reference positive when present; source seed/dnse (BR10). One snapshot, no tick history; newer-event ordering is enforced by the DNSE repository. |
 | holding: shares and remaining cost basis | id INTEGER; account_id INTEGER; instrument_id INTEGER; quantity INTEGER; cost_basis_vnd INTEGER | PK id; FKs account_id → account.id, instrument_id → instrument.id; UNIQUE(account_id, instrument_id); quantity >0, cost_basis_vnd >=0 (BR2/BR6 guards). Remove holding after full sale. |
 | trade: executed fill | id INTEGER; account_id INTEGER; instrument_id INTEGER; side TEXT; quantity INTEGER; fill_price_vnd INTEGER; realised_pnl_vnd INTEGER NULL; executed_at TEXT | PK id; FKs account_id → account.id, instrument_id → instrument.id; side buy/sell; quantity/fill price >0 (BR2/BR3 guards). Realised P&L is set for sales; buys may use NULL. Rejected attempts/conditional metadata require later extension. |
 | audit_event: account-status change | id INTEGER; admin_id INTEGER; target_account_id INTEGER; previous_status TEXT; new_status TEXT; occurred_at TEXT | PK id; both FKs → account.id; both statuses active/disabled (BR9). Future service checks admin role and writes status/audit atomically; FK alone cannot authorize. |
@@ -134,7 +135,7 @@ the external DNSE protocol boundary. [Traceability](traceability.md) maps each
 story to its scenario, screen, endpoint, tables and implementation status.
 
 Only GET `/` (302 redirect) and GET `/market` run on main. The quote JSON
-endpoint is in draft PR #60; all account/trade/portfolio/Admin APIs are designed,
+endpoint and worker are in resumed PR #60; all account/trade/portfolio/Admin APIs are designed,
 not implemented. M2 requires these contracts, not a complete trading engine.
 
 | Method | Path | Access / story | Input | Success output | Error codes | Status |
@@ -143,7 +144,7 @@ not implemented. M2 requires these contracts, not a complete trading engine.
 | POST | `/api/sessions` | G; US01 | email, password | 200 account id/role; session cookie | 401 INVALID_CREDENTIALS; 429 LOGIN_LOCKED; 403 ACCOUNT_DISABLED | Designed |
 | DELETE | `/api/sessions/current` | U/A; US01 support | CSRF header; no body | 204; cookie expired, server session revoked | 401 AUTH_REQUIRED; 403 CSRF_FAILED | Designed |
 | GET | `/market` | G/U; US03 | none | 200 HTML with quotes, including empty state | 503 HTML unavailable page | Implemented on main |
-| GET | `/api/market/quotes` | G/U; US03 | no parameters | 200 quotes array; price/reference/time/source/stale/change | 503 MARKET_UNAVAILABLE | Implemented only in draft #60 |
+| GET | `/api/market/quotes` | G/U; US03 | no parameters | 200 quotes array; price/reference/time/source/stale/change | 503 MARKET_UNAVAILABLE | Implemented in resumed #60; review pending |
 | GET | `/api/market/quotes/{symbol}` | G/U; US03 | ticker path parameter | 200 one quote object; stale prices remain viewable | 404 TICKER_NOT_FOUND; 503 QUOTE_UNAVAILABLE | Designed |
 | POST | `/api/orders/preview` | U; US04/US05/US10 | side=buy/sell, symbol, quantity | 200 estimate_vnd, available quantity/cash, shortfall, can_submit, warning and quote time/source; no writes | 422 INVALID_QUANTITY/VALIDATION_ERROR; 404 TICKER_NOT_FOUND; 409 QUOTE_STALE; 503 QUOTE_UNAVAILABLE | Designed |
 | POST | `/api/orders/buy` | U; US04/US10 | symbol, quantity, expected_quote_at | 201 trade, cash and updated holding | 409 INSUFFICIENT_CASH/QUOTE_CHANGED/QUOTE_STALE; 422 INVALID_QUANTITY; 404 TICKER_NOT_FOUND; 503 QUOTE_UNAVAILABLE | Designed |
@@ -317,3 +318,24 @@ inspection, not invented Sprint 2 Review outcomes.
 Deferred findings stay in the research record. Closed Sprint 1 issues are not
 reopened or counted again. New issues remain open until DoD, review and merge;
 remaining evidence requirements must also be met.
+
+
+### Sprint 3 DNSE implementation update — 10 October 2026
+
+The separate process `python -m virtutrade stream` owns DNSE market authentication,
+subscription and reconnect. The browser polls our read-only quote API; it never
+contacts DNSE or receives secrets. The provider is still a Machine User. No broker
+trading endpoint or token is used. Existing business layers remain separate.
+
+`database/migrations.py` adds nullable provider reference metadata and migrates
+price_quote without changing primary keys. The infrastructure table
+`feature_migration(name TEXT PRIMARY KEY)` records `dnse-reference-v1`; it is not
+a new business entity and does not consume auth's reserved user_version=2.
+Migration and seed run in one explicit transaction; DDL failure rolls back.
+Use a copied/backup database for upgrades as documented in SETUP and DNSE.md.
+Daily change is unavailable until reference/tick share a Vietnam date; the schema
+and ERD now show those nullable fields. Existing M2 fixed seed fixtures stay intact.
+
+Live verification reached authenticated/subscribed state but received no events
+in its bounded observation window. Price-unit comparison remains pending and
+#59 stays open; local WebSocket/regression tests are not proof of live accuracy.

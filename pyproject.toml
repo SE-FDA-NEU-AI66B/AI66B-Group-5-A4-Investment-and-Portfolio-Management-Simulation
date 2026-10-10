@@ -16,4 +16,4 @@ dependencies = {file = ["requirements.txt"]}
 where = ["src"]
 
 [tool.setuptools.package-data]
-"virtutrade.market" = ["templates/market/*.html", "static/*.css"]
+"virtutrade.market" = ["templates/market/*.html", "static/*.css", "static/*.js"]

@@ -2,9 +2,11 @@
 
 import json
 import sqlite3
+from contextlib import closing
 from pathlib import Path
 
 from virtutrade.config import ROOT
+from virtutrade.database.migrations import migrate_market_data
 from virtutrade.database.schema import SCHEMA
 
 
@@ -13,9 +15,11 @@ def init_database(path):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     seed = json.loads((ROOT / "data" / "demo-quotes.json").read_text())
-    with sqlite3.connect(path) as connection:
+    with closing(sqlite3.connect(path)) as connection, connection:
         connection.execute("PRAGMA foreign_keys = ON")
         connection.executescript(SCHEMA)
+        connection.execute("BEGIN IMMEDIATE")
+        migrate_market_data(connection)
         for row in seed:
             connection.execute(
                 "INSERT INTO instrument(symbol, name) VALUES (?, ?) "
