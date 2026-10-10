@@ -1,112 +1,84 @@
-# Optional DNSE realtime market data
+# DNSE market-data worker — #59
 
-Owner: @bianh13, #59 (US14, P1, 5 points). This extends the M2 seed-backed
-walking skeleton, separately from #49's API contracts. Login, virtual trades
-and Admin services remain unimplemented.
+This optional worker authenticates only to DNSE's market-data WebSocket and
+subscribes to G1 equity tick/reference streams. It sends no broker orders, OTPs,
+trading tokens or account instructions. The browser calls our read-only quote
+API; credentials stay in the worker's environment and never enter JSON/HTML.
 
-## Run it
+## Run locally
 
-1. Complete [SETUP](SETUP.md) and check the seed-only `/market` page.
-2. Obtain a DNSE OpenAPI key/secret with market-data access. Put them in the local
-   ignored `.env` as `DNSE_API_KEY` and `DNSE_API_SECRET`. Never commit them, put
-   them in an issue/chat or enter them in the browser. This quote-only worker
-   needs no trading token, OTP or account password.
-3. Install updated `requirements.txt`, stop the old app/worker and run
-   `python app.py init-db` to upgrade an existing DB. IDs/data are preserved.
-4. Start the web app and one feed worker in separate terminals with the same
-   venv and `.env`:
+Follow SETUP first and install the checkout with `python -m pip install -e .`.
+The runtime pins `websockets==15.0.1`. Stop processes using an existing database
+and make a copy before upgrading it; point DATABASE_PATH at that copy and run
+`python -m virtutrade init-db`. Verify rows/IDs before choosing that copy as the
+working DB. Do not experiment on the only copy of a developer database.
 
-   ```powershell
-   # Terminal 1 (Windows)
-   .\.venv\Scripts\python.exe app.py
-   # Terminal 2 (Windows)
-   .\.venv\Scripts\python.exe app.py stream
-   ```
+The upgrade is an atomic feature migration: nullable quote reference, two
+instrument reference fields and `feature_migration` ledger entry
+`dnse-reference-v1`. It preserves IDs/rows and leaves auth's `PRAGMA user_version`
+untouched. Failed migration rolls back DDL; a repeated successful run is harmless.
 
-   On macOS/Linux, substitute `.venv/bin/python`. Ctrl+C stops each process.
-   Run only one worker per database.
-5. Open `http://127.0.0.1:5000/market`. It polls our JSON snapshot every three
-   seconds. A row changes from Demo / seed to DNSE only after a valid tick.
-   The market may be idle. Source labels are provenance, not socket-health checks.
+Put DNSE_API_KEY and DNSE_API_SECRET in the local ignored `.env` at the checkout
+root. DNSE_SYMBOLS is a comma-separated selection of seeded equity symbols,
+for example HPG,FPT; at most 100 symbols (two streams each). Never share the file.
 
-| Variable | Value |
-|----------|-------|
-| DNSE_API_KEY | Required only for `stream`; backend only |
-| DNSE_API_SECRET | Required only for `stream`; backend only |
-| DNSE_SYMBOLS | Empty = seeded stocks; e.g. `HPG,FPT,VCB`. Existing stocks only, maximum 100; lowercase normalized. |
-| DATABASE_PATH | Same DB for app and worker; default `instance/virtutrade.db` |
+```text
+python -m virtutrade init-db
+python -m virtutrade stream
+```
 
-Environment variables override `.env`. The URL is fixed to
-`wss://ws-openapi.dnse.com.vn/v1/stream?encoding=json` using certificate-verified
-TLS. Keep workstation time synchronized for authentication.
+In a separate terminal using the same venv/configuration:
 
-## Protocol and data rules
+```text
+python -m virtutrade run
+```
 
-The worker signs `api_key:timestamp:nonce` using HMAC-SHA256, waits for auth success,
-then subscribes to `tick.G1.json` and `security_definition.G1.json`. It handles
-WebSocket control pings and provider JSON ping/pong, reauthenticates/resubscribes
-after network failure or a normal session close, and backs off from 1 to 60
-seconds. Authentication/subscription rejection stops with a fixed safe message.
-Raw payloads and credentials are never logged. SQLite write failure is fatal
-rather than silently discarding valid prices.
+Open the SETUP market URL. The page polls GET `/api/market/quotes` every three
+seconds, preserving the last table on failure and labelling source/time/staleness.
+An initial 503 also keeps a polling target so it can recover when storage returns.
+Polling the stored snapshot is not proof that the provider stream is connected.
 
-Only configured G1 stock events (`T: t` or `sd`) are accepted. JSON decimals
-convert to integer VND without float arithmetic. This adapter maps one G1 stock
-price unit to 1,000 VND (`24.35` -> `24,350`), based on DNSE stock examples/board
-convention; compare units in the first authenticated session. Do not apply the
-mapping to derivatives. Reject nonpositive, nonfinite, oversized or fractional-VND
-prices and timestamps more than five minutes ahead of the local clock.
+## Boundaries and handoff
 
-UTC provider timestamps keep nine fractional digits. Atomic SQL comparisons
-reject equal/older events, including nanosecond differences, across reconnects
-and restarts. A first DNSE tick can replace a seed row. Store one quote per ticker;
-there is no tick history. No incoming event creates an arbitrary instrument.
+`dnse/worker.py` owns validation/authentication/reconnect; `dnse/repository.py`
+owns newer-only writes. `market/service.py` derives percentage/freshness and
+`market/routes.py` maps HTML/JSON responses. Vu's #85 extends these same endpoints
+for search/detail; do not register a second list handler. The worker is a separate
+process, so its failure does not stop Flask from showing the last stored snapshot.
 
-For live quotes, `price_quote.previous_close_vnd` is NULL. The public projection
-uses DNSE `basicPrice` stored in `instrument.reference_price_vnd` only if its
-`reference_at` and the quote share a Vietnam trading date (UTC+7). This is the
-provider's reference, not necessarily the literal prior close after adjustments.
-Reference events persist separately, whether received before or after ticks.
-Demo references are never used for a live percentage change.
+Tick prices are converted from the G1 equity payload's thousands of VND using
+Decimal. Nanoseconds remain in stored timestamps for ordering. Seed references
+are never used for DNSE prices: until a provider reference for the same Vietnam
+date exists, reference and change are null and the UI says Reference unavailable.
+Unsupported/malformed/older/duplicate events cannot overwrite newer observations.
+Provider error text is not logged because it may echo credentials; authentication
+or subscription rejection stops safely. Network closures reconnect with fresh
+authentication/subscription and a 1–60 second bounded backoff.
 
-DNSE documents reference broadcasts around 08:00 and 20:00. Starting mid-session
-can show prices with **Reference unavailable** until a matching reference arrives;
-there is no REST bootstrap in this slice. Quotes older than 15 minutes show
-**Price may be delayed**, including after hours. Stopping/disconnecting preserves
-price/time. A successful database API response does not prove feed connectivity.
+No historical REST bootstrap is included. Reference streams may not emit on
+every connection; missing reference stays explicit rather than invented.
 
-GET `/api/market/quotes` is a public read-only snapshot, not an arbitrary broker
-proxy: 200 with `quotes: []` for an empty DB, or 503 with error code
-`MARKET_UNAVAILABLE` when unavailable. Prices are integer VND, `change` is a
-decimal string or NULL, and caching is disabled. The browser retains its last
-snapshot with a visible warning if refresh fails.
+## Verification status — 10 October 2026
 
-## Verification
+The resumed branch ports the original PR #60 without rewriting its history and
+includes current main, including the teammate's #80 migration-contract tests.
+Local tests cover a real localhost WebSocket handshake, reconnect, ping/pong,
+signatures, malformed events, ordering, null/date-boundary references, persistent
+reads, migration preservation/rollback and safe API failures.
 
-Run `python -m pytest -q` with the venv. Tests use temporary databases and a local
-WebSocket server with fake keys to verify signatures, subscriptions, ping/pong,
-reconnect with a fresh nonce, capped retries, malformed events, deduplication,
-ordering, reference-date boundaries, persistence, legacy migration and HTTP output.
-These tests do not establish live DNSE access.
+A bounded **real DNSE** probe on 10 October used local credentials and a temporary
+database: authentication succeeded and subscription was acknowledged. No tick or
+reference event arrived in the 25-second observation window, and no DNSE quote
+was persisted. This is proof of access only, **not** end-to-end live quote accuracy.
+Raw auth payloads and secrets were neither printed nor saved.
 
-Local Chrome checks also verified automatic polling, a simulated incoming quote
-changing the displayed price/source, and retention of the last snapshot with a
-warning on HTTP 503. The screenshot below shows the running seed-only page,
-not a live-provider session; the required browser-address-bar evidence remains #53.
+Still required for #59: run while subscribed instruments emit events, verify a
+persisted tick and compare symbol/price unit/value/provider timestamp with the
+DNSE board, then exercise disconnect/restart and obtain independent review.
+Record the exact tested commit, observation time and public quote evidence;
+leave #59 open until these checks pass. Five existing money-rule integration
+tests are skipped because the trading service has not landed; they are not DNSE
+acceptance evidence and are tracked under #76/#79.
 
-![Seed page after automatic refresh](images/market-refresh-page.png)
-
-**Real-provider acceptance is pending:** add local keys, run during trading hours,
-compare a subscribed ticker's unit/value/time with the DNSE board, then disconnect
-and restart. Record date, tested commit, ticker and result in #59 without secrets.
-If rejected, check key permissions and local clock; raw provider errors are not
-printed. For a DB failure check DATABASE_PATH, permissions and `init-db`.
-
-This slice does not bootstrap historical/last trades over REST, expose connection
-health, guarantee exchange latency or implement order fills. The three-second
-browser refresh interval is separate from the WebSocket stream.
-
-Sources: [DNSE guide](https://developers.dnse.com.vn/docs/guide/market-data/connect/),
-[official SDK protocol examples](https://github.com/dnse-tech/openapi-sdk/tree/main/python/dnse/websocket),
-[DNSE board guide](https://banggia.dnse.com.vn/cach-doc-bang-gia),
-[websockets client](https://websockets.readthedocs.io/en/15.0.1/reference/asyncio/client.html).
+Protocol references: [DNSE market-data guide](https://developers.dnse.com.vn/docs/guide/market-data/connect/)
+and [official Python client](https://github.com/dnse-tech/openapi-sdk/blob/main/python/dnse/websocket/client.py).

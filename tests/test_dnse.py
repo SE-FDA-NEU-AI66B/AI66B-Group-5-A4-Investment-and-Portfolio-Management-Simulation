@@ -11,9 +11,18 @@ import pytest
 from websockets.asyncio.client import connect
 from websockets.asyncio.server import serve
 
-from app import create_app
-from database import SCHEMA, init_database, read_market, write_dnse_event
-from dnse import FeedError, Settings, auth_message, parse_event, run_feed, session
+from virtutrade.app import create_app
+from virtutrade.database import SCHEMA, init_database
+from virtutrade.dnse.repository import write_dnse_event
+from virtutrade.dnse.worker import (
+    FeedError,
+    Settings,
+    auth_message,
+    parse_event,
+    run_feed,
+    session,
+)
+from virtutrade.market.repository import read_market
 
 
 @pytest.fixture

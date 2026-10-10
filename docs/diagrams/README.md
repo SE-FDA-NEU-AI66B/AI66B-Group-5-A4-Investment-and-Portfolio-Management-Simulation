@@ -6,6 +6,7 @@
 | Use cases | [PlantUML model](use-case-diagram.puml) and [SVG layout](use-case-diagram.svg) | [Use-case PNG](use-case-diagram.png) |
 | Buy sequence | [PlantUML](sequence-buy-order.puml) | [PNG](sequence-buy-order.png) |
 | Sell sequence | [PlantUML](sequence-sell-order.puml) | [PNG](sequence-sell-order.png) |
+| Architecture | [architecture_diagram.py](../../scripts/architecture_diagram.py) | [PNG](../images/architecture.png) |
 
 The [diagram script](../../scripts/diagram.py) recreates the ERD and use-case
 SVG/PNG files from its layout definitions. From the repository root:
@@ -21,7 +22,7 @@ or export directly from the replacement source instead.
 
 Edit the ERD SVG in a vector editor and export the updated PNG to
 `docs/images/erd.png`. Check that text, primary/foreign keys and relationship
-multiplicities remain readable. Keep the model consistent with `database.py`
+multiplicities remain readable. Keep the model consistent with `src/virtutrade/database/schema.py`
 and the data dictionary in `docs/design.md`.
 
 For the use-case diagram, the PlantUML file describes the model and the SVG

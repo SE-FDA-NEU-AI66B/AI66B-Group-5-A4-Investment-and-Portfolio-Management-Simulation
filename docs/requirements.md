@@ -6,8 +6,7 @@ the product backlog; an accepted specification is not an implemented feature.
 
 **M2 implementation slice:** a public, read-only `/market` page showing at least
 10 seeded quotes from a real database. Authentication, trading, administration
-remain designed backlog work. Optional DNSE ingestion is implemented in #59, with
-authenticated provider verification pending. Demo prices are labelled
+and live DNSE ingestion remain designed backlog work. Demo prices are labelled
 seed data, never live market data. P0 means essential product scope, not a claim
 that every P0 is implemented in M2.
 
@@ -410,14 +409,17 @@ in the integration scenario, not a human with a login or a portfolio.
 - Given an event with missing symbol, non-positive/non-integer VND price or invalid timestamp, when the adapter validates it, then no quote row is changed and the rejection is logged without credentials (BR10).
 - Given the connection stops after 09:15:05 UTC, when the page is opened at 09:31:00 UTC, then the last quote keeps its original timestamp and shows "Price may be delayed"; reconnecting must not relabel demo data as live data (US03, BR10).
 
-Implementation: optional G1 stock worker, persistence and automatically refreshing
-market page in #59; protocol follows official DNSE documentation/SDK. Local
-WebSocket tests pass; authenticated DNSE verification is pending local keys.
-This extension is separate from the required M2 seed-backed slice. See [DNSE](DNSE.md).
+Implementation is deferred beyond the M2 seed-backed route; provider protocol
+and credentials must be confirmed from official documentation before coding.
 
 ---
 
 ## 5. Business rules
+
+Implementation handoff: [API contract](api-contract.md) specifies all P0
+operations and errors; [money rules](money-rules.md) fixes exact cost allocation
+and rounding for BR6. These documents do not mark trading/auth services implemented.
+
 
 | ID | Rule | Worked example |
 |----|------|----------------|

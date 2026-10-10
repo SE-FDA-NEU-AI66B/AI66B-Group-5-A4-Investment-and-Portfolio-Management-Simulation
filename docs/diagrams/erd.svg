@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="2140" height="1480" viewBox="0 0 2140 1480">
 <rect width="100%" height="100%" fill="white"/>
-<text x="60" y="68" font-family="Arial,sans-serif" font-size="38" fill="#243b44">VirtuTrade / M2 data model</text>
+<text x="60" y="68" font-family="Arial,sans-serif" font-size="38" fill="#243b44">VirtuTrade / M3 market-data model</text>
 <text x="60" y="108" font-family="Arial,sans-serif" font-size="23" fill="#243b44">PK = primary key    FK = foreign key    UQ = unique    All FKs required</text>
 <rect x="60" y="160" width="530" height="310" fill="#f4f8fa" stroke="#35566a" stroke-width="2"/>
 <text x="80" y="200" font-family="Arial,sans-serif" font-size="28" fill="#243b44">account</text>
@@ -69,7 +69,7 @@
 <text x="1470" y="324" font-family="Arial,sans-serif" font-size="20" fill="#243b44">1</text>
 <text x="1310" y="647" font-family="Arial,sans-serif" font-size="20" fill="#243b44">0..*</text>
 <polyline points="1800,400 1800,650" fill="none" stroke="#6c8290" stroke-width="2"/>
-<text x="1815" y="434" font-family="Arial,sans-serif" font-size="20" fill="#243b44">1</text>
+<text x="1815" y="450" font-family="Arial,sans-serif" font-size="20" fill="#243b44">1</text>
 <text x="1815" y="627" font-family="Arial,sans-serif" font-size="20" fill="#243b44">0..1</text>
 <text x="1570" y="501" font-family="Arial,sans-serif" font-size="21" fill="#243b44">latest snapshot only</text>
 <polyline points="190,470 190,1125 760,1125" fill="none" stroke="#47786c" stroke-width="2"/>
@@ -80,5 +80,9 @@
 <text x="417" y="507" font-family="Arial,sans-serif" font-size="20" fill="#243b44">1</text>
 <text x="696" y="1180" font-family="Arial,sans-serif" font-size="20" fill="#243b44">0..*</text>
 <text x="440" y="1227" font-family="Arial,sans-serif" font-size="20" fill="#243b44">target_account_id</text>
-<text x="60" y="1412" font-family="Arial,sans-serif" font-size="22" fill="#243b44">Source: database.py::SCHEMA. Only instrument and price_quote are seeded; other services are not implemented.</text>
+<text x="60" y="1412" font-family="Arial,sans-serif" font-size="22" fill="#243b44">Schema: src/virtutrade/database/schema.py. Seed: instrument + price_quote; other services remain unimplemented.</text>
+<rect x="1540" y="1050" width="530" height="100" fill="#f4f8fa" stroke="#35566a" stroke-width="2"/>
+<text x="1560" y="1090" font-family="Arial,sans-serif" font-size="28" fill="#243b44">feature_migration (infrastructure)</text>
+<polyline points="1540,1105 2070,1105" fill="none" stroke="#6c8290" stroke-width="2"/>
+<text x="1558" y="1136" font-family="Arial,sans-serif" font-size="21" fill="#243b44">PK name: TEXT</text>
 </svg>

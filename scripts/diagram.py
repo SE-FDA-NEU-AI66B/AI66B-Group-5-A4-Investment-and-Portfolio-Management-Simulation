@@ -68,7 +68,7 @@ def entity(c, name, x, y, columns):
 
 def erd():
     c = Canvas(2140, 1480)
-    c.text(60, 30, "VirtuTrade / M2 data model", 38)
+    c.text(60, 30, "VirtuTrade / M3 market-data model", 38)
     c.text(
         60,
         85,
@@ -135,9 +135,7 @@ def erd():
         ],
     )
     entity(
-        c, "instrument", 1540, 160,
-        ["PK id: INTEGER", "UQ symbol: TEXT", "name: TEXT",
-         "reference_price_vnd: INTEGER NULL", "reference_at: TEXT NULL"]
+        c, "instrument", 1540, 160, ["PK id: INTEGER", "UQ symbol: TEXT", "name: TEXT", "reference_price_vnd: INTEGER NULL", "reference_at: TEXT NULL"]
     )
     entity(
         c,
@@ -164,7 +162,7 @@ def erd():
     c.text(1470, 304, "1", 20)
     c.text(1310, 627, "0..*", 20)
     c.line([(1800, 400), (1800, 650)])
-    c.text(1815, 414, "1", 20)
+    c.text(1815, 430, "1", 20)
     c.text(1815, 607, "0..1", 20)
     c.text(1570, 480, "latest snapshot only", 21)
     c.line([(190, 470), (190, 1125), (760, 1125)], "#47786c")
@@ -178,9 +176,10 @@ def erd():
     c.text(
         60,
         1390,
-        "Source: database.py::SCHEMA. Only instrument and price_quote are seeded; other services are not implemented.",
+        "Schema: src/virtutrade/database/schema.py. Seed: instrument + price_quote; other services remain unimplemented.",
         22,
     )
+    entity(c, "feature_migration (infrastructure)", 1540, 1050, ["PK name: TEXT"] )
     c.save("erd")
 
 

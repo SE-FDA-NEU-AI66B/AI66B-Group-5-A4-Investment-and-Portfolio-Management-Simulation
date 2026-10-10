@@ -10,6 +10,37 @@ the team worked continuously.
 
 ## 2026-09-30
 
-- @bianh13 — Refined the Sprint 2 stories/roles and schema-backed market demo, corrected priorities and the diagram helper name, and translated all 10 M2 issue descriptions into English.
-Implemented the optional DNSE worker, quote JSON endpoint, automatic page refresh and schema upgrade, with local tests covering protocol/reconnect, validation, ordering and persistence; real-provider verification awaits local keys.
-Next I will verify DNSE access and collect peer review while Vu completes architecture/evidence, Long handles independent setup/tests, and Tue reviews or redraws the ERD and coordinates wrap-up; the original 21/40-point baseline now has a separately estimated 5-point API extension.
+- @bianh13 — Updated Scenarios and User Stories today, added Admin and DNSE Machine User roles, and labeled/assigned Sprint 2 fields across 10 issues (my scope accounts for 21/40 story points).
+Built the ERD/schema for 6 tables and implemented the market page to read 12 seed rows from SQLite. Verified idempotent seeding, data persistence across restarts, and empty/error states with passing tests.
+Next steps: Collect team reviews so Vu can finalize the architecture/ADRs and diagrams, Long can run independent SETUP/testing, and Tue can test or redraw the ERD and handle the wrap-up; meanwhile, I will pick up the API integration in the next phase ahead of the deadline.
+
+---
+
+## 2026-10-01
+
+- @nguyentue110 — Today: reviewed the full Milestone 2 scope and team issues, and checked Thanh's PR #60 (DNSE draft). Result: finished the SM tracking table (daily/PR/review/issue) and confirmed the PR #60 schema falls under my #56 review scope. Blocked: PR #60 is stuck on credentials so the review cannot finish yet; waiting on Long/Vu for progress on #51/#52/#47/#53.
+
+---
+
+## 2026-10-03
+
+- @bianh13 — Completed the P0 API contract and scenario-to-endpoint traceability, including access rules, request/response examples and trade rejection cases.
+Resolved the ERD cost-allocation question, checked a separate clean clone, and packaged the market page into route/service/repository/template/style modules with 34 tests and lint passing.
+Next I need peer approval, Long's independent-machine verification and the address-bar screenshot; I reviewed the DNSE Python SDK, but optional live-feed issue #59 stays deferred while required M2 deliverables take priority.
+
+---
+
+## 2026-10-04
+
+- @bianh13 — Moved unfinished DNSE issue #59 to Sprint 3 and temporarily closed PR #60 while retaining its branch/code, five-point estimate and all acceptance/DoD requirements.
+Recorded the carry-over without rewriting Sprint 2's 45-point historical commitment or adding unfinished work to completed points, and synchronized the agreed review rotation.
+Strengthened the market layers and moved the application into src/virtutrade with a package CLI, synchronized SETUP/CI and a fresh-environment check; independent verification must identify the final tested commit.
+
+
+---
+
+## 2026-10-10
+
+- @bianh13 — Refined the M3 backlog into sixteen deliveries totalling 52 points, with 13 points per member and Long as Sprint 3 Scrum Master.
+Mapped every P0 story to an owner and UI entry point, drafted the four-section UI dossier and documented the shared navigation design change while keeping unbuilt features marked incomplete.
+After drafting #75, I resumed #59 in the src modules and verified real DNSE authentication/subscription; no live quote arrived during the bounded probe, so quote comparison and peer review remain pending.

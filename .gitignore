@@ -39,3 +39,9 @@ Thumbs.db
 # M2 runtime and local tooling
 instance/
 .ruff_cache/
+*.egg-info/
+
+# Local research/model artifacts (preserved from the legacy file named gitignore)
+data/raw/*.csv
+*.pkl
+checkpoints/

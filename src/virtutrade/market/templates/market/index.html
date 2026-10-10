@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Market overview · VirtuTrade</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='market.css') }}">
+  <link rel="stylesheet" href="{{ url_for('market.static', filename='market.css') }}">
 </head>
 <body>
   <header><a class="brand" href="/market">V<span>■</span> VirtuTrade</a><span class="badge">PAPER TRADING</span></header>
@@ -15,8 +15,8 @@
     <aside id="data-notice">{% if quotes|selectattr('source', 'equalto', 'dnse')|list %}<strong>DNSE market data</strong> · The last received prices are shown below. Check each timestamp and source; some rows may still contain demo data.{% else %}<strong>Demo data</strong> · These are seeded example prices, not live DNSE quotes.{% endif %} No real money or market orders.</aside>
     <p id="refresh-status" class="intro" role="status">Quotes refresh every 3 seconds. Check each quote's timestamp for freshness.</p>
     {% if error %}
-      <section class="empty" role="alert"><h2>Market data is unavailable</h2><p>Please ask the project operator to check the database setup, then reload.</p></section>
-    {% else %}
+      <section id="market-error" class="empty" role="alert"><h2>Market data is unavailable</h2><p>Please ask the project operator to check the database setup; this page will retry automatically.</p></section>
+    {% endif %}
       <section aria-labelledby="quotes-heading">
         <div class="section-heading"><h2 id="quotes-heading">Market snapshot</h2><span id="symbol-count">{{ quotes|length }} symbols · VND</span></div>
         <div class="table-wrap"><table>
@@ -30,9 +30,8 @@
           </tr>{% else %}<tr><td colspan="5"><h2>No quotes yet</h2><p>Market prices will appear here when data is available.</p></td></tr>{% endfor %}</tbody>
         </table></div>
       </section>
-    {% endif %}
     <footer>VirtuTrade · Team 05 <span>Investment &amp; Portfolio Management Simulation</span></footer>
   </main>
-  <script src="{{ url_for('static', filename='market.js') }}" defer></script>
+  <script src="{{ url_for('market.static', filename='market.js') }}" defer></script>
 </body>
 </html>

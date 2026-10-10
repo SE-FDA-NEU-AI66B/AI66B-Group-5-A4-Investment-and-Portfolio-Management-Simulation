@@ -1,4 +1,4 @@
-"""DNSE G1 equity feed. Run one worker per database with `python app.py stream`."""
+"""DNSE G1 equity feed. Run one worker per database with `python -m virtutrade stream`."""
 
 import asyncio
 import hashlib
@@ -16,7 +16,7 @@ from uuid import uuid4
 from websockets.asyncio.client import connect
 from websockets.exceptions import WebSocketException
 
-from database import read_symbols, write_dnse_event
+from virtutrade.dnse.repository import read_symbols, write_dnse_event
 
 URL = "wss://ws-openapi.dnse.com.vn/v1/stream?encoding=json"
 LOGGER = logging.getLogger(__name__)

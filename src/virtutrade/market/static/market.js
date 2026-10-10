@@ -13,6 +13,8 @@
   }
 
   function update(quotes) {
+    const initialError = document.getElementById("market-error");
+    if (initialError) initialError.hidden = true;
     const fragment = document.createDocumentFragment();
     for (const quote of quotes) {
       const row = document.createElement("tr");
