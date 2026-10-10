@@ -247,3 +247,17 @@ tests for implemented behavior. Designed endpoints need service tests when built
 no screenshot or mock response here is evidence that they exist.
 
 Auth design reference: [OWASP session management](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html).
+
+
+## Order implementation status — #76
+
+The buy branch implements `/trade`, POST `/api/orders/preview`, POST
+`/api/orders/buy` and POST `/api/simulation/quotes/refresh`. They require the
+trusted #77 auth/CSRF adapter; without it, private requests fail closed with 503.
+This is not completion of the login-to-trade journey. See
+[concrete interfaces and remaining integration](order-implementation.md).
+Simulation refresh returns 200 source/generated_at/updated; it accepts `{}`
+only. Shared auth errors still apply, with 403 SIMULATION_DISABLED for wrong
+mode/source, 409 SIMULATION_CLOCK_NOT_ADVANCED, 422 VALIDATION_ERROR and 503
+SERVICE_UNAVAILABLE. No broker API is called. Existing exact-money and no-auto-retry
+contracts remain binding; sell execution belongs to #79.

@@ -14,4 +14,4 @@ def load_config():
     database = Path(os.environ.get('DATABASE_PATH', 'instance/virtutrade.db'))
     if not database.is_absolute():
         database = ROOT / database
-    return {'DATABASE': str(database)}
+    return {'DATABASE': str(database), 'QUOTE_MODE': os.environ.get('QUOTE_MODE', 'seed')}

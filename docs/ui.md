@@ -15,13 +15,15 @@ working M3 journey. Feature owners update rows with verified PR/commit evidence.
 | US01 — Register / sign in | Landing page → Register / Sign in | `/register`, `/login` | not started | [#77](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/77) |
 | US02 — Initial virtual capital | Register → portfolio balance | `/register` → `/portfolio` | not started | [#78](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/78) |
 | US03 — Find a stock and inspect its quote | Market → search → stock detail | `/market`, `/market/<symbol>` | partly works | [#85](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/85) |
-| US04 — Buy shares | Market detail → Buy | `/trade?side=buy&symbol=HPG` | not started | [#76](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/76) |
+| US04 — Buy shares | Market detail → Buy | `/trade?side=buy&symbol=HPG` | partly works | [#76](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/76) |
 | US05 — Sell shares | Portfolio holding → Sell | `/trade?side=sell&symbol=HPG` | not started | [#79](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/79) |
 | US06 — View portfolio | Navigation → Portfolio | `/portfolio` | not started | [#81](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/81) |
-| US10 — Insufficient-balance warning | Buy form → change quantity → preview | `/trade?side=buy` | not started | [#76](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/76) |
+| US10 — Insufficient-balance warning | Buy form → change quantity → preview | `/trade?side=buy` | partly works | [#76](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/76) |
 
-US03 currently renders only a seeded table with a stale-data indicator;
-search/detail and the navigation shown below are planned. No other P0 is complete.
+US03 renders stored seed/DNSE/simulation snapshots; search/detail remain pending.
+US04/US10 have a buy form, preview and atomic purchase implementation, but actual
+authentication and portfolio integration remain pending, so neither is works.
+See [the implementation handoff](order-implementation.md) for verified tests and dependencies.
 
 Updated screen flow (M1 target refined for M3; only home → market exists today):
 
@@ -103,3 +105,13 @@ simulation-quote refresh flow because fixed old seed prices correctly fail the
 trade freshness check. Keep demo/live labels and provider timestamps honest;
 update this section, design.md and api-contract.md together when that design is
 agreed. A successful M3 demo must not depend on a live DNSE session.
+
+
+Implementation update for #76: Market now links to `/trade`. The buy form shows
+loading, validation/shortfall, preview and success/unknown-result states; changing
+quantity invalidates the old preview. `QUOTE_MODE=simulation` with a new database
+supports explicit `init-demo` and generation through the authenticated refresh
+endpoint after #77 installs auth. Schema source `simulation` and a separate ledger
+entry preserve provenance. [Design](design.md) and [API handoff](order-implementation.md)
+describe the same change. Actual login, portfolio transition and screenshots for
+final P0 acceptance are still pending; no fake test session counts as that evidence.
