@@ -334,3 +334,140 @@ implementation has not started and is not silently included in that estimate.
 | @VuSiSi | TBD — SM to confirm | Pending | Pending |
 | @nguyentue110 | TBD — SM to confirm | Pending | Pending |
 | @longbk761-bot | TBD — SM to confirm | Pending | Pending |
+
+
+---
+
+## Sprint 3 - Milestone 3
+
+### Goal, dates and roles
+
+Make all seven P0 stories usable end-to-end through visible navigation with real
+database persistence and actionable errors; complete the four-section UI dossier.
+PO: @bianh13. **Scrum Master: @longbk761-bot (Long)**, succeeding Vu (S1) and Tue (S2).
+Review rotation: **Long reviews Tue → Tue reviews Thanh → Thanh reviews Vu → Vu reviews Long**.
+
+LMS opens **9 October 2026, 00:00** and closes **21 October 2026, 00:00 (UTC+7)**.
+Use 9–20 October as this M3 delivery window; no work on 21 October is before the
+deadline. The earlier board Sprint 3 configuration (30 September, 14 days) was
+stale; correct the active iteration to this confirmed delivery window without
+changing historical Sprint 1/2 records. The teacher's generic 14-day activity
+criterion does not match the 12-day LMS window: Long must confirm the audit window
+and report the denominator explicitly rather than invent two extra days.
+
+### Planned scope and allocation
+
+Planning baseline on **10 October**: **committed 52 points**, **completed 0**,
+**velocity 0** for these newly planned deliveries; final velocity is recorded at
+close. This is the PO's published plan pending team capacity review, not evidence
+of a meeting or unanimous agreement. Each member has **13/52 points = 25%** and
+four planned issue deliveries. Estimates describe work; equal points do not
+guarantee equal effort or actual contribution. Re-estimate transparently if needed.
+The original Sprint 2 commitment of 45 is unchanged; #59 adds no completed S2 points.
+
+| Member | Planned issues (points) | Total | Share |
+|--------|-------------------------|-------|-------|
+| @bianh13 | [#59](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/59) (5), [#74](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/74) (2), [#75](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/75) (1), [#76](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/76) (5) | 13 | 25% |
+| @nguyentue110 | [#77](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/77) (5), [#78](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/78) (2), [#79](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/79) (5), [#80](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/80) (1) | 13 | 25% |
+| @longbk761-bot | [#81](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/81) (5), [#82](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/82) (5), [#83](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/83) (2), [#84](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/84) (1) | 13 | 25% |
+| @VuSiSi | [#85](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/85) (5), [#86](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/86) (3), [#87](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/87) (2), [#88](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/88) (3) | 13 | 25% |
+
+Issue register:
+
+| Issue | Outcome | Owner | Points | Status |
+|-------|---------|-------|--------|--------|
+| [#59](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/59) | [US14] Integrate DNSE realtime stock quotes | @bianh13 | 5 | Todo |
+| [#74](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/74) | [Chore] Refine backlog for Sprint 3 | @bianh13 | 2 | In progress; planning PR pending |
+| [#75](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/75) | [Task] Agree shared buy/sell interfaces and simulation quote policy | @bianh13 | 1 | Todo |
+| [#76](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/76) | [US04/US10] Complete buy preview, balance warning and virtual order UI | @bianh13 | 5 | Todo |
+| [#77](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/77) | [US01] Implement registration, login and logout through the UI | @nguyentue110 | 5 | Todo |
+| [#78](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/78) | [US02] Grant initial virtual capital exactly once | @nguyentue110 | 2 | Todo |
+| [#79](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/79) | [US05] Complete virtual sell preview and confirmation UI | @nguyentue110 | 5 | Todo |
+| [#80](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/80) | [Task] Document and verify account-state schema migration | @nguyentue110 | 1 | Todo |
+| [#81](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/81) | [US06] Implement private portfolio API and screen | @longbk761-bot | 5 | Todo |
+| [#82](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/82) | [Task] Verify every P0 journey and business-rule error through the browser | @longbk761-bot | 5 | Todo |
+| [#83](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/83) | [Task] Verify M3 SETUP on an independent clean machine | @longbk761-bot | 2 | Todo |
+| [#84](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/84) | [Chore] Sprint 3 wrap-up | @longbk761-bot | 1 | Todo |
+| [#85](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/85) | [US03] Complete searchable market and stock-detail UI | @VuSiSi | 5 | Todo |
+| [#86](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/86) | [Task] Draw all P0 wireframes and maintain the M3 UI dossier | @VuSiSi | 3 | Todo |
+| [#87](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/87) | [Task] Fix verified usability issues and standardize user-facing errors | @VuSiSi | 2 | Todo |
+| [#88](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/88) | [Task] Prepare Team05_M3.pdf from reviewed and merged UI documentation | @VuSiSi | 3 | Todo |
+
+#59 remains P1, with original acceptance criteria and pending live verification;
+PR #60 stays closed until that work resumes. Required P0 stories come first. If
+capacity cannot cover 52 points, negotiate scope before dropping P0 acceptance
+criteria: defer optional work explicitly and rebalance genuine tasks, never
+inflate teammates' estimates just to retain 25%. Historic completed M2 PRs are
+not reassigned to this commitment. PR #73 (7 October) precedes this delivery window.
+Reopening #60 retains its original creation date; report that carry-over age
+honestly when calculating merge latency rather than opening a replacement solely
+to reset the metric.
+
+### Delivery order and ownership boundaries
+
+- **10–12 October:** review planning and shared transaction/simulation contract;
+  Tue starts auth/schema, Long starts portfolio contract/tests, Vu starts real
+  wireframes and market navigation. Each member should open their own substantive
+  PR early; complete foundational interfaces before dependent integration.
+- **13–15 October:** deliver independently testable feature slices and review
+  them as they become ready. Everyone should have an actual PR by 15 October
+  (the end of the first seven days), not a placeholder opened for a statistic.
+- **16–17 October:** integrate all P0 journeys, fix failures, run browser checks
+  and independent SETUP verification. Aim to finish most planned PRs before 18 October.
+- **18–20 October:** resolve final defects, retest changed paths, peer-review
+  documentation, capture submission evidence and export the merged UI PDF.
+  Internal target: submit by 20 October 20:00 UTC+7, leaving four hours of buffer.
+
+Thanh owns shared order preview/transaction wiring and buy; Tue owns sell and auth,
+coordinating changes to shared order files before editing. Long owns portfolio
+and integration evidence. Vu owns market presentation and UI assets. JSON quote
+contracts are agreed between Vu's #85 and Thanh's #59/#75; no competing versions.
+Each member implements their assigned work and commits under their own identity;
+the PO must not implement the whole sprint and redistribute authorship afterward.
+
+Four issue deliveries per person give a balanced starting point for meaningful
+PRs; combine or split only along reviewable technical boundaries, record why,
+and keep actual PR/issue/point shares visible. A docs-only PO commit is real
+planning progress, not implementation or completion of a P0 feature.
+
+### Eight process checks and evidence rules
+
+These thresholds are the PO's notes from the teacher; report both raw counts
+and calculation choices, and ask the SM to confirm ambiguous definitions.
+
+| Check | Calculation / evidence | Action |
+|-------|------------------------|--------|
+| Balanced work | Per member: accepted points, authored merged PRs and accepted closed issues / team totals, shown separately | Plan 25% each; compare actual scope/complexity as well as counts |
+| No faint contribution | Inspect each member's shares; flag any below 10% | Reassign real remaining work early; do not manufacture credit |
+| Review distribution | Count substantive formal reviews on others' PRs per reviewer / team total; also report distinct PRs reviewed | Rotate reviews and flag any reviewer above 60%; repeated rubber stamps are not useful evidence |
+| Last-three-day concentration | PRs opened on 18–20 October / all PRs opened in window; also report merges in those days separately | Flag over 50%; confirm whether teacher uses opening or merge date |
+| First seven days | Show PRs opened 9–15 October with real changes, by member | Escalate if none; do not backdate |
+| Active commit days | Count distinct UTC+7 dates with substantive authored commits; report team and per-member days | Flag fewer than 5; report observed 12-day window and confirm 14-day rubric interpretation |
+| Very fast merge | Merged PRs with creation-to-merge under 5 minutes / merged PRs in window; inspect review quality separately | Flag at least 25%; elapsed time alone does not prove a bad review, and waiting five minutes does not create a good one |
+| Slow merge | Merged PRs with creation-to-merge over 72 hours / merged PRs in window; also list open PRs older than 72 hours | Flag at least 25%; seek feedback within one working day and surface blockers |
+
+Measure reviews via **Review changes**, not ordinary bottom-of-page comments.
+Record concrete findings, actual tests read/run and fixes verified on the latest
+commit. Do not write a teammate's review as if they performed it. No empty commits,
+fake dates, historical daily entries or timer-based merges. A zero denominator
+is N/A, not zero-percent success. Save the actual planning board capture now and
+submission capture later; never portray a reconstructed board as an earlier state.
+
+### Review, closure and submission gates
+
+Minimum: four peer-reviewed merged PRs, five accepted closed issues, and at least
+one merged PR + one formal review given + one accepted closed issue per member.
+These minimums do not replace full P0 delivery or the balance/activity checks.
+Close #74 after backlog refinement and substantive review; close #84 only after
+the SM's evidence reconciliation. Count completed points once after acceptance,
+review and merge; an issue closed by automation alone is not acceptance evidence.
+
+Long records the actual M3 independent-machine tester/date/duration/commit in
+SETUP. Vu exports **Team05_M3.pdf** from merged ui.md, with the full cover, planning
+and submission boards on page 2, and two real address-bar browser captures on
+page 3 (a database-backed P0 screen and a business-rule error). Record actual LMS
+submission evidence, not an assumption. The repository is authoritative.
+
+Planning attendance, Sprint Review, retrospective feedback, completed points,
+formal review evidence and LMS receipt: **pending actual events**. Daily entries
+contain three truthful sentences per member and are committed on the date written.

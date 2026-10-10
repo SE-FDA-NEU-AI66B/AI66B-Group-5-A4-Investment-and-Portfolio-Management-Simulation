@@ -1,5 +1,35 @@
 # AI66B - Group 5 - Topic A4: Investment & Portfolio Management Simulation (Paper Trading)
 
+
+## Sprint 3 / Milestone 3: start here
+
+**Product Owner:** @bianh13 · **Scrum Master:** @longbk761-bot (Long).
+M3 opens **9 October 2026, 00:00** and is due **21 October 2026, 00:00 (UTC+7)**;
+submit before the end of 20 October. [Issues](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/milestone/2)
+· [Sprint plan](docs/sprint-log.md#sprint-3---milestone-3)
+· [UI dossier](docs/ui.md) · [SETUP](docs/SETUP.md).
+
+Current implementation baseline: only the public database-backed market snapshot
+runs. The entry points below are the M3 navigation plan, **not a claim that the
+unbuilt screens work**. Start the app using SETUP and open its documented home URL;
+all P0 journeys must eventually be reachable by visible links/buttons.
+
+| P0 story | Where the user starts | Current status |
+|----------|-----------------------|----------------|
+| US01 — Register / sign in | Landing page → Register / Sign in | not started |
+| US02 — Initial virtual capital | Register → portfolio balance | not started |
+| US03 — Find a stock and inspect its quote | Market → search → stock detail | partly works |
+| US04 — Buy shares | Market detail → Buy | not started |
+| US05 — Sell shares | Portfolio holding → Sell | not started |
+| US06 — View portfolio | Navigation → Portfolio | not started |
+| US10 — Insufficient-balance warning | Buy form → change quantity → preview | not started |
+
+No login or seeded test account exists on the current baseline. Fake local test
+accounts and their setup instructions must be added with authentication; never
+put real credentials in README or SETUP. Live DNSE data (#59) is P1; the instructor's
+P0 demonstration must also work with clearly labelled simulation data in the DB.
+
+
 ## Introduction
 
 A **"paper trading"** application: Users can buy and sell stocks using **virtual money** based on real-world reference prices. The system automatically tracks the profit and loss (PnL) of each investment portfolio.
@@ -42,10 +72,10 @@ reader interface so its rules can be tested without a server or database.
 
 | **Full Name** | **Student ID** | **GitHub Username** | **Role** | 
 |----|-------|----------|--------|
-| Pham Huy Thanh | 11247351 | bianh13 | Product Owner / Lead Developer (Sprint 2) |
+| Pham Huy Thanh | 11247351 | bianh13 | Product Owner / Developer (Sprint 3) |
 | Pham Quang Vu | 11247372 | VuSiSi | Dev Team |
-| Nguyen Van Tue | 11247366 | nguyentue110 | Scrum Master (Sprint 2 - Milestone 2) |
-| Bui Khang Long | 11247312 | longbk761-bot | Dev Team | 
+| Nguyen Van Tue | 11247366 | nguyentue110 | Developer (Sprint 3); Scrum Master in Sprint 2 |
+| Bui Khang Long | 11247312 | longbk761-bot | Scrum Master / Developer (Sprint 3) |
 
 > *Note: The Scrum Master role rotates every sprint. Each member will take on this role at least once during the semester.*
 
@@ -91,7 +121,7 @@ http://127.0.0.1:5000/market; expect 12 symbols with a **Demo / seed** label.
 
 * **Product Owner:** [bianh13](https://github.com/bianh13)
 
-* **Scrum Master for Sprint 2 (current):** [nguyentue110](https://github.com/nguyentue110). Previous Sprint 1 Scrum Master: [VuSiSi](https://github.com/VuSiSi).
+* **Scrum Master for Sprint 3 (current):** [longbk761-bot](https://github.com/longbk761-bot). Previous: Sprint 1 [VuSiSi](https://github.com/VuSiSi); Sprint 2 [nguyentue110](https://github.com/nguyentue110).
 
 * **Definition of Done:** [docs/definition-of-done.md](docs/definition-of-done.md)
 
