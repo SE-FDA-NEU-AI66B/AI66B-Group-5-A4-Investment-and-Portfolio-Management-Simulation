@@ -54,6 +54,13 @@ One command, `python -m virtutrade init-db`, creates six tables and seeds **12 i
 fresh database).` The four other tables stay empty. Re-running preserves current
 prices and inserts missing demo entries; it does not reset data or migrate schemas.
 
+Schema upgrades (proposed contract in `docs/account-migration.md`, implemented
+under #77): copy the database file first and migrate the copy, never a live
+database — verify row counts and ids before swapping the file back. Reruns of a
+guarded migration are no-ops. If a migration fails midway, delete the broken
+copy and start again from the untouched original; the applier rolls back
+partial work.
+
 Page-specific code is grouped under `src/virtutrade/market/`; schema and initialization
 are under `src/virtutrade/database/`. See [code structure](code-structure.md) for the
 file to open when debugging a route, calculation, query, template or stylesheet.
