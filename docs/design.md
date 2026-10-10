@@ -49,6 +49,29 @@ remain in the shared schema. A market storage failure becomes a local 503;
 this does not claim isolation from process-wide or shared-database failures.
 Service tests use an in-memory reader without a Flask context or database.
 
+
+### M3 UI-driven navigation refinement — 10 October 2026
+
+The M2 runtime still redirects `/` to `/market`. The M3 UI walkthrough in
+[ui.md](ui.md#4-what-changed-since-m2) exposes missing discoverable entry points.
+Add designed page routes `/register`, `/login`, `/market/<symbol>`, `/trade`
+and `/portfolio`; the existing account/order/portfolio JSON contracts remain
+their backend boundaries. A guest can browse quotes, while Buy/Sell/Portfolio
+guide them to sign in when required. Navigation must not substitute for server
+authorization, and redirect targets must remain local.
+
+Introduce a shared `src/virtutrade/templates/base.html` shell for visible
+Market, Portfolio, Sign in/Register and Logout actions according to session state.
+The factory configures shared templates; feature Blueprints own their page
+templates and routes. The shell contains presentation only, not SQL, business
+rules or secrets. This is an architecture/design change for M3, not a claim that
+these screens or authentication work on the M2 baseline. Owners implement and
+test these boundaries under #77, #81 and #85; #86 supplies the wireframes.
+
+Sprint 3 Scrum Master is @longbk761-bot; the M2 role header above records history.
+Simulation quote freshness for the clean-clone trading demo remains an explicit
+decision under #75, without weakening stale/changed-quote checks.
+
 ## 2. Data model
 
 Baseline owner: @bianh13, #48. Independent ERD review/testing: @nguyentue110,
