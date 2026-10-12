@@ -71,6 +71,19 @@ Store only the token hash, never the token. A session is active when
 - Upgrade rule: **copy the database file first, migrate the copy, verify
   counts, then swap**. Never migrate a live developer database in place.
 
+## Amendment for #77 implementation
+
+- `auth_session` also stores `last_seen_at TEXT NOT NULL`, updated on every
+  authenticated request, so the 30-minute idle expiry is enforced server-side
+  alongside the 12-hour absolute `expires_at`. The #80 proposal predates this
+  column; its tests still cover the agreed contract.
+- `init_database()` applies the migration silently after seeding (committing
+  the seed loop first, since the applier refuses a dirty connection). No
+  separate migrate command exists: fresh and old databases both end at version
+  2 through the single documented command, and reruns stay no-ops.
+- Coordinate `user_version` numbering with PR #60 before it merges so two
+  migrations never claim the same version.
+
 ## References
 
 - Source of truth today: `src/virtutrade/database/schema.py::SCHEMA`.
