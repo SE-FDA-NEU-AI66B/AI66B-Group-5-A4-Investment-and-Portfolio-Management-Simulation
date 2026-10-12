@@ -14,6 +14,7 @@ from virtutrade.database import init_database
 
 SECRET = 'test-secret-12345'
 PASSWORD = 'Password123'
+WRONG_PASSWORD = 'Wrongpass1'
 LOCK_MESSAGE = 'Account locked. Try again in 900 seconds.'
 
 
@@ -140,7 +141,7 @@ def test_login_success_rotates_cookie(client):
 def test_login_wrong_password_and_unknown_email_same_401(client):
     agent, _app, _db = client
     register(agent)
-    wrong = login(agent, password='Wrongpass1')
+    wrong = login(agent, password=WRONG_PASSWORD)
     assert wrong.status_code == 401
     unknown = login(agent, email='ghost@example.com')
     assert unknown.status_code == 401
@@ -153,8 +154,8 @@ def test_lockout_on_fifth_failure_with_retry_after(client):
     agent, _app, _db = client
     register(agent)
     for _ in range(4):
-        assert login(agent, password='Wrongpass1').status_code == 401
-    locked = login(agent, password='Wrongpass1')
+        assert login(agent, password=WRONG_PASSWORD).status_code == 401
+    locked = login(agent, password=WRONG_PASSWORD)
     assert locked.status_code == 429
     assert locked.get_json()['error']['code'] == 'LOGIN_LOCKED'
     assert locked.headers['Retry-After'] == '900'
@@ -169,7 +170,7 @@ def test_lockout_expires_and_clears_counter(client):
     agent, _app, db_path = client
     register(agent)
     for _ in range(5):
-        login(agent, password='Wrongpass1')
+        login(agent, password=WRONG_PASSWORD)
     db_exec(db_path,
             "UPDATE account SET locked_until = '2000-01-01T00:00:00Z'")
     response = login(agent)
