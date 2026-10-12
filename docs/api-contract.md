@@ -1,6 +1,7 @@
 # Application API contract
 
-Owner: @bianh13, #49. Design revision: 3 October 2026. Review: @VuSiSi.
+M2 baseline: #49, 3 October 2026. M3 shared contract: #75, 10 October 2026.
+Owner: @bianh13. M3 reviewer: @nguyentue110; agreement pending review.
 
 This is an implementation handoff, not a claim that all routes run. On `main`,
 only GET `/` (302 to `/market`) and GET `/market` (200/503 HTML) are implemented.
@@ -247,3 +248,153 @@ tests for implemented behavior. Designed endpoints need service tests when built
 no screenshot or mock response here is evidence that they exist.
 
 Auth design reference: [OWASP session management](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html).
+
+
+## 7. M3 shared order and simulation contract — #75
+
+**Design handoff, not implemented behavior.** This section adds an explicit
+simulation workflow to the M2 contract; existing production-like quote checks
+still apply. Tue must review the shared interfaces before #75 is accepted.
+
+### 7.1 File ownership and module interfaces
+
+All paths below are relative to `src/virtutrade/` and describe planned files.
+
+| Owner / issue | Primary files and responsibility | Interface supplied to other modules |
+|---------------|----------------------------------|-------------------------------------|
+| Thanh #76 | `orders/routes.py`, `orders/service.py`, `orders/repository.py`, `orders/models.py`, `orders/errors.py`; shared `orders/templates/orders/trade.html` and form script | Shared preview/execute entry points and buy calculation; routes own HTTP/error mapping, repository owns SQL/transaction |
+| Tue #79 | `orders/sell.py` plus sell tests; coordinate additions to shared form/routes with Thanh | Pure sell calculation returning proceeds, remaining holding and realised P&L; no independent transaction or duplicate preview endpoint |
+| Tue #77/#80 | `accounts/` plus versioned auth migrations | Resolve/revalidate session and account status, provide CSRF validation; private routes receive trusted account identity rather than client account_id |
+| Long #81 | `portfolio/` | Read-only cash/holding/valuation snapshot for the authenticated account; trades do not call portfolio over HTTP |
+| Vu #85 | `market/routes.py`, `market/service.py`, `market/repository.py`, templates/static | Own list/detail quote JSON and visible stock navigation; share one quote contract with #59 |
+| Thanh #59 | Separate DNSE worker/provider adapter and its migrations | Persist validated provider events; reuse the market endpoints rather than register competing URL handlers |
+| Thanh #76; reviewed with Tue | `simulation/` and CLI `init-demo` wiring | Explicit local-demo initialization and refresh described below; this implementation is part of #76, not completed by this design PR |
+
+Agree changes to shared files before editing; only one Blueprint registers each
+endpoint. Auth and trading migrations must be versioned/sequenced together;
+quote schema changes must preserve old rows/IDs on upgrades. Module services use
+plain values/domain errors; only controllers know HTTP, and only repositories
+know SQLite. No internal HTTP calls connect these modules.
+
+Proposed Python-facing contracts (names are agreed integration boundaries):
+
+```text
+preview_order(account_id, side, symbol, quantity, reader, now) -> OrderPreview
+execute_order(session_id, side, symbol, quantity, expected_quote_at,
+              unit_of_work, now) -> TradeResult
+calculate_sell(holding, quantity, fill_price_vnd) -> SellResult
+```
+
+`OrderPreview` serializes to the fields in section 4. `TradeResult` uses section
+5's `trade`, `cash_vnd` and `holding`. `SellResult` contains proceeds, allocated
+cost, remaining quantity/cost and realised P&L, using money-rules.md. These are
+domain values, not Flask responses. The execution service resolves the trusted
+session/account again inside the transaction; it never accepts a browser's
+account_id, cash or claimed preview authorization. An authenticated route passes
+the server-side session identity, never a cookie secret into logs or JSON.
+
+### 7.2 One atomic execution boundary
+
+1. Controller validates JSON shape, same-origin/CSRF and obtains session identity.
+2. Repository unit of work opens a connection with foreign keys enabled and
+   acquires `BEGIN IMMEDIATE`; the service revalidates session expiry/revocation,
+   account status, balance, holding and current quote using that connection.
+3. Validate integer quantity, bounded money arithmetic, freshness and the exact
+   preview timestamp. Reject shortage/stale/change before any financial write.
+4. Calculate buy or sell using integer VND and the exact partial-sale allocation
+   in money-rules.md. Update cash, upsert/delete the holding and insert one trade
+   inside this same transaction. Repository methods never commit individually.
+5. Commit once on success; any domain/storage exception rolls back everything.
+   Return the saved fill result, then let the browser refresh its portfolio.
+
+Preview uses one consistent read snapshot and never reserves cash/shares or
+inserts a trade. Serialize concurrent writers; a second order must re-read the
+post-first-order balance/holding. Use a bounded busy timeout; an unavailable
+database returns 503 `SERVICE_UNAVAILABLE` with a useful message. If the client
+cannot determine whether an order committed, show an unknown-result state and
+refresh the portfolio; never automatically retry the order POST. Durable order
+idempotency is not added or claimed by this contract.
+
+### 7.3 Explicit local simulation quotes
+
+The fixed M2 seed is historical and becomes stale. Loading a page, starting the
+server or running `init-db` must not retimestamp it to make a trade succeed.
+Instead, add a separately configured **simulation database** and explicit actions:
+
+- Proposed settings: `QUOTE_MODE=simulation` and
+  `DATABASE_PATH=instance/simulation.db`. Existing mode remains `seed` by default;
+  DNSE mode and simulation mode are mutually exclusive for one configured DB.
+- Proposed `python -m virtutrade init-demo` creates a **new** simulation database,
+  using fixture instruments/prices with fresh generated simulation timestamps.
+  It records `source=simulation`, not `seed` or `dnse`. It never copies real
+  credentials or modifies the existing M2/DNSE DB. If the destination already
+  exists, refuse with instructions to use refresh; never reset balances/holdings.
+- Add `simulation` to the price_quote source constraint through a versioned
+  migration preserving existing IDs/rows; update schema, dictionary and ERD in
+  the implementation PR. Do not run a DNSE worker against a simulation DB, or a
+  simulation writer against any database containing seed/DNSE quotes. Check both
+  mode and stored sources before a refresh; reject a mixed DB without writes.
+- On a local demo instance, an authenticated investor clicks **Generate demo
+  quotes** in the market/trade UI. POST `/api/simulation/quotes/refresh` accepts an
+  empty JSON object and requires same-origin/CSRF and an active account. It is
+  unavailable outside simulation mode. Bind the classroom demo to localhost;
+  document that all users of this demo DB share its simulated market.
+- In one transaction, generate a new batch from the committed deterministic
+  fixture prices, set new UTC simulation-generation timestamps and preserve
+  instruments/accounts/holdings/trades. A refresh generates a new simulated
+  observation; it does not represent an exchange trade or change DNSE timestamps.
+  Reject non-advancing clock values rather than silently reusing a timestamp;
+  all accepted refreshes must invalidate earlier preview timestamps.
+- Display **Simulation / generated**, generation time and **Change vs scenario
+  reference**. Do not call this DNSE/live data or today's actual market change.
+  A quote older than 900 seconds is still stale; after a refresh the investor
+  must preview again before confirmation. Preserve the M2 seed fixture unchanged.
+
+No account credentials are created by `init-demo`; registration supplies the
+one-time capital. SETUP owners may add explicitly fake test accounts via the
+account service. The new settings/commands belong in SETUP only when implemented
+and verified, so the current working M2 setup remains executable meanwhile.
+
+### 7.4 Requests, responses and rejection examples
+
+New designed endpoint: POST `/api/simulation/quotes/refresh`, authenticated
+Investor, simulation mode only, `{}` body and `X-CSRF-Token` header.
+
+```json
+{"source":"simulation","generated_at":"2026-10-10T09:00:00.000001Z","updated":12}
+```
+
+Return 200 for that response. Return 401 `AUTH_REQUIRED`, 403 `CSRF_FAILED` or
+`ACCOUNT_DISABLED`, 403 `SIMULATION_DISABLED` for wrong mode/mixed sources,
+409 `SIMULATION_CLOCK_NOT_ADVANCED` for a non-advancing clock, 422
+`VALIDATION_ERROR` for unexpected input, or 503 `SERVICE_UNAVAILABLE` for storage
+failure. Clock/mode/source/storage errors leave every row unchanged.
+
+Example visible mode error: "Demo quote generation is unavailable in this mode.
+Ask the operator to start the local simulation setup." Clock error: "A new demo
+timestamp could not be generated. Wait a moment and try again."
+
+Preview a buy with `{"side":"buy","symbol":"HPG","quantity":1000}`. At
+28,000 VND and 100,000,000 cash, return `estimate_vnd:28000000`,
+`can_submit:true`, plus `quote.source:"simulation"` and the actual generated
+`quote.quoted_at`. Submit to `/api/orders/buy`:
+
+```json
+{"symbol":"HPG","quantity":1000,"expected_quote_at":"2026-10-10T09:00:00.000001Z"}
+```
+
+If accepted, return section 5's 201 result: 72,000,000 cash and 1,000 HPG. If a
+refresh happened after preview, return 409 `QUOTE_CHANGED`: "Price changed;
+refresh the preview. Check the new price before confirming your order." If the
+timestamp is older than 900 seconds, return 409 `QUOTE_STALE`: "This quote is
+over 15 minutes old. Generate demo quotes, then preview your order again."
+In DNSE mode advise waiting for a fresh feed quote instead; never expose a demo
+refresh as the cure for a provider outage. Existing section 5 shortage/quantity
+errors and section 6 portfolio ownership/valuation rules remain unchanged.
+
+Required implementation checks: repeat preview writes nothing; two competing
+orders cannot overspend/oversell; rejected orders roll back; partial/full sales
+conserve cost basis; old previews fail after refresh; wrong mode/mixed DB refresh
+changes nothing; DNSE timestamps survive; a new user completes registration →
+generate simulated quotes → buy → portfolio → sell using visible navigation.
+These checks are acceptance work for #76/#79/#82, not tests already run here.
