@@ -15,8 +15,9 @@ def load_config():
     database = Path(os.environ.get('DATABASE_PATH', 'instance/virtutrade.db'))
     if not database.is_absolute():
         database = ROOT / database
-    # Signs CSRF tokens. Production must set SECRET_KEY in .env; without one
-    # each boot mints a fresh random secret (pending forms/sessions from a
-    # previous boot stop validating, which is the safe default).
+    # Signs CSRF tokens. Production must set SECRET_KEY in .env; a missing or
+    # empty value mints a fresh random secret on every boot (pending forms and
+    # sessions from a previous boot stop validating, which is the safe
+    # default). Never ship a public placeholder: forgeable CSRF tokens follow.
     secret = os.environ.get('SECRET_KEY') or secrets.token_hex(32)
     return {'DATABASE': str(database), 'SECRET_KEY': secret}

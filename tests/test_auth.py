@@ -3,6 +3,7 @@ lockout, ownership and the account-state migration inside init-db.
 
 Each test uses a throwaway database; no developer database is touched.
 """
+import re
 import sqlite3
 
 import pytest
@@ -468,3 +469,16 @@ def test_orders_identity_and_csrf_callbacks(client):
         '/', headers={'Cookie': 'vt_session=bogus'})
     with forged, pytest.raises(errors.AuthRequired):
         require_order_session(request)
+
+
+def test_empty_secret_key_falls_back_to_random(monkeypatch):
+    """Shipping .env.example with an empty SECRET_KEY must never produce a
+    forgeable public value: each boot mints its own random key (PR #93
+    review finding)."""
+    from virtutrade.config import load_config
+
+    monkeypatch.setenv('SECRET_KEY', '')
+    first = load_config()['SECRET_KEY']
+    second = load_config()['SECRET_KEY']
+    assert re.fullmatch(r'[0-9a-f]{64}', first)
+    assert first != second
