@@ -166,6 +166,25 @@ def test_lockout_on_fifth_failure_with_retry_after(client):
     assert 890 <= remaining['retry_after_seconds'] <= 900
 
 
+def test_expired_lock_resets_counter_before_retry(client):
+    """Regression for the PR #93 review finding: after the 15-minute lock
+    expires, one wrong password is a plain 401 (not an instant re-lock),
+    and the correct password afterwards succeeds."""
+    agent, _app, db_path = client
+    register(agent)
+    for _ in range(5):
+        login(agent, password=WRONG_PASSWORD)
+    db_exec(db_path,
+            "UPDATE account SET locked_until = '2000-01-01T00:00:00Z'")
+    retry = login(agent, password=WRONG_PASSWORD)
+    assert retry.status_code == 401
+    row = db_row(db_path, 'SELECT failed_attempts, locked_until'
+                          ' FROM account WHERE email = ?',
+                 ('a@example.com',))
+    assert tuple(row) == (1, None)
+    assert login(agent).status_code == 200
+
+
 def test_lockout_expires_and_clears_counter(client):
     agent, _app, db_path = client
     register(agent)

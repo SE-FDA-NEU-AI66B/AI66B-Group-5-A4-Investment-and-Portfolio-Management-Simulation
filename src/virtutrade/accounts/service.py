@@ -173,6 +173,12 @@ def authenticate(db_path, *, email, password, now=None):
                 remaining = seconds_until(locked_until, stamp)
                 connection.rollback()
                 raise errors.AccountLocked(remaining)
+            if locked_until is not None:
+                # Expired lock: drop the stale counter first, or a single
+                # wrong password would re-lock immediately and even block
+                # the correct one (PR #93 review finding).
+                repository.clear_lockout(connection, row['id'])
+                attempts = 0
             if not check_password_hash(
                     _stored_hash(connection, row['id']), password):
                 attempts = (attempts or 0) + 1
