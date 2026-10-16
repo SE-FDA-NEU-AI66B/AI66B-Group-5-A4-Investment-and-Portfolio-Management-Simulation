@@ -34,7 +34,7 @@ def test_migration_failure_rolls_back_ddl_and_preserves_auth_version(tmp_path):
     init_database(path)
     with closing(sqlite3.connect(path)) as connection:
         assert connection.execute('PRAGMA user_version').fetchone()[0] == 2
-        assert connection.execute('SELECT name FROM feature_migration').fetchall() == [('dnse-reference-v1',)]
+        assert set(connection.execute('SELECT name FROM feature_migration').fetchall()) == {('dnse-reference-v1',), ('simulation-source-v1',)}
 
 
 def test_initial_error_page_keeps_refresh_target_for_recovery(tmp_path):

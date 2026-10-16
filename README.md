@@ -19,10 +19,10 @@ all P0 journeys must eventually be reachable by visible links/buttons.
 | US01 — Register / sign in | Landing page → Register / Sign in | not started |
 | US02 — Initial virtual capital | Register → portfolio balance | not started |
 | US03 — Find a stock and inspect its quote | Market → search → stock detail | partly works |
-| US04 — Buy shares | Market detail → Buy | not started |
+| US04 — Buy shares | Market detail → Buy | partly works |
 | US05 — Sell shares | Portfolio holding → Sell | not started |
 | US06 — View portfolio | Navigation → Portfolio | not started |
-| US10 — Insufficient-balance warning | Buy form → change quantity → preview | not started |
+| US10 — Insufficient-balance warning | Buy form → change quantity → preview | partly works |
 
 No login or seeded test account exists on the current baseline. Fake local test
 accounts and their setup instructions must be added with authentication; never

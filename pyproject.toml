@@ -17,3 +17,4 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 "virtutrade.market" = ["templates/market/*.html", "static/*.css", "static/*.js"]
+"virtutrade.orders" = ["templates/orders/*.html", "static/*.js"]

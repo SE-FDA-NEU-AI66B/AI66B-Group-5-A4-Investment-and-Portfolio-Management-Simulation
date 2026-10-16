@@ -481,3 +481,12 @@ five pre-existing trading placeholders skipped. Real DNSE authentication and
 subscription acknowledgement succeeded; no tick/reference event arrived in
 the bounded probe, so provider-price verification, peer review and acceptance
 remain pending. Completed points and velocity do not increase for #59 yet.
+
+
+### 10 October — #76 partial implementation
+
+Buy preview/transaction/form and explicit simulation quotes are implemented on
+a branch based on resumed #60. 115 tests pass and three deferred auth/sell cases
+remain skipped; the browser flow was checked with a clearly test-only session.
+Real #77 authentication/CSRF and #81 portfolio integration are still required.
+US04/US10 are partly works; #76 stays open and contributes no completed points yet.

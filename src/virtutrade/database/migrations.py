@@ -17,7 +17,8 @@ def migrate_market_data(connection):
     if "reference_at" not in columns:
         connection.execute("ALTER TABLE instrument ADD COLUMN reference_at TEXT")
     quote_columns = list(connection.execute("PRAGMA table_info(price_quote)"))
-    if any(row[1] == "previous_close_vnd" and row[3] for row in quote_columns):
+    sql = connection.execute("SELECT sql FROM sqlite_master WHERE name='price_quote'").fetchone()[0]
+    if any(row[1] == "previous_close_vnd" and row[3] for row in quote_columns) or "'simulation'" not in sql:
         # No other table references price_quote. Keep its PK, FK, UNIQUE and CHECKs.
         statement = SCHEMA.split("CREATE TABLE IF NOT EXISTS price_quote (")[1].split(
             ";"
@@ -30,3 +31,4 @@ def migrate_market_data(connection):
 
     connection.execute("CREATE TABLE IF NOT EXISTS feature_migration (name TEXT PRIMARY KEY)")
     connection.execute("INSERT OR IGNORE INTO feature_migration VALUES ('dnse-reference-v1')")
+    connection.execute("INSERT OR IGNORE INTO feature_migration VALUES ('simulation-source-v1')")

@@ -175,18 +175,9 @@ def test_money_arithmetic_never_uses_binary_floating_point():
 # tested because no service implements it yet, and states what it will assert
 # once the trading service exists.
 
-DEFERRED = "No trading service yet; see #59. Arithmetic is covered above."
-
-
-@pytest.mark.skip(reason=DEFERRED)
-def test_buy_order_debits_cash_and_creates_the_holding_atomically():
-    """US04-AC1: cash 100,000,000 buying 1,000 HPG at 28,000 leaves
-    72,000,000 cash and a 1,000-share holding, in one transaction."""
-
-
-@pytest.mark.skip(reason=DEFERRED)
-def test_buy_order_is_rejected_when_cash_is_insufficient():
-    """BR1 / US04-AC2: the order is refused and no row changes."""
+# Buy persistence, rejection, concurrency and rollback now exercise the real
+# implementation in tests/test_orders.py; do not retain empty skipped duplicates.
+DEFERRED = "Sell/auth integration is pending #79/#77; real buy checks are in test_orders.py."
 
 
 @pytest.mark.skip(reason=DEFERRED)

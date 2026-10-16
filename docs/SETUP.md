@@ -108,7 +108,7 @@ macOS / Linux:
 .venv/bin/python -m pytest -q
 ```
 
-Expected on the resumed DNSE revision: `95 passed, 5 skipped` (the skips are existing unimplemented trading integration checks; the suite may grow). Tests use temporary databases and do not change the
+Expected on the resumed DNSE revision: `115 passed, 3 skipped` (the skips are existing unimplemented trading integration checks; the suite may grow). Tests use temporary databases and do not change the
 running demo's data. CI installs `pytest`, `pytest-cov` and `ruff` separately
 and runs on Python 3.12.
 
@@ -150,3 +150,20 @@ The worker only consumes market data. An authenticated subscription alone does
 not prove that a quote has arrived; inspect each stored source/time and the
 pending provider-board comparison in #59. Repeat independent-machine SETUP on
 the final merged revision rather than reusing old evidence.
+
+
+## Optional local simulation / buy branch
+
+Set `QUOTE_MODE=simulation` and choose a NEW path such as
+`DATABASE_PATH=instance/simulation.db` in the local .env. Run the configured venv's
+`python -m virtutrade init-demo`, then `python -m virtutrade run`. The market shows
+12 generated scenario quotes. The command refuses an existing path, so it cannot
+reset balances. Keep seed and DNSE databases separate and never point the DNSE
+worker at this simulation DB.
+
+The Buy shares link opens the form, but **actual trading requires #77's auth
+integration, which is not installed in this revision**. Controls remain disabled
+without it; no working account/password is invented. After auth lands, register,
+generate quotes if stale, preview and confirm, then inspect the portfolio. Record
+independent-machine acceptance against that final integrated commit, not this
+partial branch. See [the implementation handoff](order-implementation.md).

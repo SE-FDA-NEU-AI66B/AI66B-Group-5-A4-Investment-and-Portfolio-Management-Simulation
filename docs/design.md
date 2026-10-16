@@ -99,7 +99,7 @@ SQLite type affinity alone is not an input validator.
 |-----------------|-------------------|------------------------------|
 | account: identity, role, state, virtual cash | id INTEGER; email TEXT COLLATE NOCASE; password_hash TEXT; role TEXT DEFAULT investor; status TEXT DEFAULT active; cash_vnd INTEGER DEFAULT 100000000; created_at TEXT | PK id; UNIQUE email (US01); role investor/admin and status active/disabled (BR9); cash >=0 (BR1 guard); default capital (BR5). Hashing, single grant and authorization need service code. |
 | instrument: ticker identity | id INTEGER; symbol TEXT; name TEXT; reference_price_vnd INTEGER NULL; reference_at TEXT NULL | PK id; UNIQUE symbol (US03/BR10). |
-| price_quote: latest snapshot per ticker | id INTEGER; instrument_id INTEGER; price_vnd INTEGER; previous_close_vnd INTEGER NULL; quoted_at TEXT; source TEXT | PK id; UNIQUE FK instrument_id → instrument.id; price >0; reference positive when present; source seed/dnse (BR10). One snapshot, no tick history; newer-event ordering is enforced by the DNSE repository. |
+| price_quote: latest snapshot per ticker | id INTEGER; instrument_id INTEGER; price_vnd INTEGER; previous_close_vnd INTEGER NULL; quoted_at TEXT; source TEXT | PK id; UNIQUE FK instrument_id → instrument.id; price >0; reference positive when present; source seed/dnse/simulation (BR10). One snapshot, no tick history; newer-event ordering is enforced by the DNSE repository. |
 | holding: shares and remaining cost basis | id INTEGER; account_id INTEGER; instrument_id INTEGER; quantity INTEGER; cost_basis_vnd INTEGER | PK id; FKs account_id → account.id, instrument_id → instrument.id; UNIQUE(account_id, instrument_id); quantity >0, cost_basis_vnd >=0 (BR2/BR6 guards). Remove holding after full sale. |
 | trade: executed fill | id INTEGER; account_id INTEGER; instrument_id INTEGER; side TEXT; quantity INTEGER; fill_price_vnd INTEGER; realised_pnl_vnd INTEGER NULL; executed_at TEXT | PK id; FKs account_id → account.id, instrument_id → instrument.id; side buy/sell; quantity/fill price >0 (BR2/BR3 guards). Realised P&L is set for sales; buys may use NULL. Rejected attempts/conditional metadata require later extension. |
 | audit_event: account-status change | id INTEGER; admin_id INTEGER; target_account_id INTEGER; previous_status TEXT; new_status TEXT; occurred_at TEXT | PK id; both FKs → account.id; both statuses active/disabled (BR9). Future service checks admin role and writes status/audit atomically; FK alone cannot authorize. |
@@ -339,3 +339,20 @@ and ERD now show those nullable fields. Existing M2 fixed seed fixtures stay int
 Live verification reached authenticated/subscribed state but received no events
 in its bounded observation window. Price-unit comparison remains pending and
 #59 stays open; local WebSocket/regression tests are not proof of live accuracy.
+
+
+### M3 partial buy/simulation implementation — #76
+
+The order Blueprint adds `/trade`, preview and buy JSON plus simulation refresh.
+Routes handle HTTP; services enforce rules; one repository unit of work commits
+cash, holding and trade atomically with in-transaction session/quote validation.
+See [the auth/ownership handoff](order-implementation.md). No real auth adapter is
+installed yet; missing integration fails closed. Auth/sell/portfolio remain with
+their assigned owners and US04/US10 remain partly works.
+
+The price_quote source CHECK now includes `simulation`; the feature ledger adds
+`simulation-source-v1` without altering the auth schema version. `init-demo`
+exclusively creates a new DB and explicitly generated quotes; it refuses to reset
+an existing DB. A manual refresh checks auth, mode, sources and clock advancement
+before writing, preserves financial rows and never changes seed fixtures/DNSE
+timestamps. The source labels and separate DB boundary are part of the UI design.

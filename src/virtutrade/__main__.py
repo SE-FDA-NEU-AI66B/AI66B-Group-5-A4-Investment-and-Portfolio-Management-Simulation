@@ -10,12 +10,21 @@ from virtutrade.database import init_database
 def main():
     parser = argparse.ArgumentParser(prog='python -m virtutrade',
                                      description='VirtuTrade M2 walking skeleton')
-    parser.add_argument('command', nargs='?', choices=['run', 'init-db', 'stream'], default='run')
+    parser.add_argument('command', nargs='?', choices=['run', 'init-db', 'init-demo', 'stream'], default='run')
     args = parser.parse_args()
     application = create_app()
     if args.command == 'init-db':
         count = init_database(application.config['DATABASE'])
         print(f'Database ready: {count} price_quote rows (12 on a fresh database).')
+    elif args.command == 'init-demo':
+        from virtutrade.simulation.repository import init_demo
+        if application.config.get('QUOTE_MODE') != 'simulation':
+            parser.exit(1, 'Set QUOTE_MODE=simulation and a new DATABASE_PATH first.\n')
+        try:
+            init_demo(application.config['DATABASE'])
+        except FileExistsError:
+            parser.exit(1, 'Database already exists; use Generate demo quotes instead of resetting it.\n')
+        print('Simulation database ready: 12 generated quotes; register an account when authentication is available.')
     elif args.command == 'stream':
         import asyncio
         import logging

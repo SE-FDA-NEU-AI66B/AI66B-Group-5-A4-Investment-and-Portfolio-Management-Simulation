@@ -30,7 +30,7 @@
       time.dateTime = quote.quoted_at;
       timestamp.append(time);
       const source = document.createElement("td");
-      source.append(element("span", quote.source === "dnse" ? "DNSE" : "Demo / seed", "source"));
+      source.append(element("span", quote.source === "simulation" ? "Simulation / generated" : quote.source === "dnse" ? "DNSE" : "Demo / seed", "source"));
       if (quote.stale) source.append(element("small", "Price may be delayed", "delayed"));
       row.append(company, element("td", money.format(quote.price_vnd), "number price"),
         changeCell, timestamp, source);
@@ -45,7 +45,9 @@
     }
     rows.replaceChildren(fragment);
     document.getElementById("symbol-count").textContent = `${quotes.length} symbols · VND`;
-    document.getElementById("data-notice").textContent = quotes.some(q => q.source === "dnse")
+    document.getElementById("data-notice").textContent = quotes.some(q => q.source === "simulation")
+      ? "Simulation / generated · Scenario reference prices, not live DNSE data."
+      : quotes.some(q => q.source === "dnse")
       ? "DNSE market data · Last received prices. Check timestamps and sources; some rows may still contain demo data. No real money or market orders."
       : "Demo data · Seeded example prices, not live DNSE quotes. No real money or market orders.";
   }
