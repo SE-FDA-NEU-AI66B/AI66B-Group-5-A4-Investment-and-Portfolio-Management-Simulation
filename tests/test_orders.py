@@ -149,6 +149,30 @@ def test_execution_revalidates_session_account_and_quote(database, change, code)
     assert e.value.code == code and snapshot(database) == before
 
 
+@pytest.mark.parametrize(
+    "source,advice",
+    [
+        ("simulation", "Generate demo quotes, then preview again."),
+        ("dnse", "Wait for a fresh market quote, then preview again."),
+    ],
+)
+def test_stale_quote_preserves_guidance_and_never_saves_buy(database, source, advice):
+    stamp = (NOW - timedelta(seconds=901)).isoformat()
+    with closing(sqlite3.connect(database)) as c, c:
+        c.execute(
+            "UPDATE price_quote SET quoted_at=?, source=?",
+            (stamp, source),
+        )
+    before = snapshot(database)
+
+    with pytest.raises(OrderError) as error:
+        buy(database, stamp=stamp)
+
+    assert error.value.code == "QUOTE_STALE"
+    assert str(error.value) == "Price may be delayed. " + advice
+    assert snapshot(database) == before
+
+
 def test_simulation_refresh_invalidates_preview_without_resetting_portfolio(database):
     buy(database, 1)
     previous = preview(database)["quote"]["quoted_at"]

@@ -45,6 +45,12 @@ def load_inputs(repo, session_id, symbol, now):
             "ACCOUNT_DISABLED", "Trading is disabled for this account. Contact support."
         )
     quote = repo.quote(symbol)
+    validate_quote(quote, now)
+    return account, quote, repo.holding(account.id, quote.instrument_id)
+
+
+def validate_quote(quote, now):
+    """Reject missing, invalid or stale quotes before an order uses their price."""
     if quote is None:
         raise OrderError(
             "TICKER_NOT_FOUND", "Ticker not found. Choose a stock from Market."
@@ -66,7 +72,6 @@ def load_inputs(repo, session_id, symbol, now):
             else "Wait for a fresh market quote, then preview again."
         )
         raise OrderError("QUOTE_STALE", "Price may be delayed. " + advice)
-    return account, quote, repo.holding(account.id, quote.instrument_id)
 
 
 def checked(value):
