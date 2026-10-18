@@ -1,6 +1,7 @@
 # Milestone 2 — VirtuTrade design
 
-Team 05 · Topic A4 · Updated 4 October 2026.
+Team 05 · Topic A4 · Updated 4 October 2026; M3 UI notes added 17 October 2026.
+
 PO / lead developer: @bianh13. Scrum Master: @nguyentue110.
 
 **Working document, not final submission.** Architecture/ADRs (#47) and the
@@ -67,6 +68,45 @@ templates and routes. The shell contains presentation only, not SQL, business
 rules or secrets. This is an architecture/design change for M3, not a claim that
 these screens or authentication work on the M2 baseline. Owners implement and
 test these boundaries under #77, #81 and #85; #86 supplies the wireframes.
+
+**Search, detail, sign-in and navigation decisions (#85/#86, M3).** Drawing
+the P0 wireframes in [ui.md](ui.md) exposed gaps in the M2 design. `/register`,
+`/login` and `/logout` now exist in the accounts module (#77); the routes below
+remain **designed** unless section 3 marks them implemented.
+
+- **Search (proposed).** A beginner must be able to find a stock by ticker or
+  company name. `GET /market?q=<text>` filters the existing snapshot,
+  case-insensitively, by symbol or name. The filter lives in
+  `market/service.py`; the route only passes `q` and the repository still
+  returns every quote. The entered text is echoed back in the search box,
+  including on the 503 error page, so a retry does not lose it. An empty or
+  absent `q` shows all quotes. The parameter name awaits confirmation by #85
+  and the quote-API owners (#59/#75).
+- **Stock detail.** `GET /market/<symbol>` renders one quote: price, change
+  versus previous close, quote time, source and the delayed or "Reference
+  unavailable" state. The symbol is trimmed and uppercased as in the JSON API.
+  An unknown symbol returns HTTP 404 with "Ticker not found". It reads through
+  the same market service as the list, so there is no second query path; its
+  JSON counterpart stays `GET /api/market/quotes/{symbol}`.
+- **Private pages and return path (proposed).** Trade and Portfolio are private
+  HTML pages. A guest who requests one, for example by pressing Buy on Stock
+  detail, receives a 302 to `/login?next=<URL-encoded local path>`; the JSON API
+  keeps returning 401 `AUTH_REQUIRED`. After a successful login or registration
+  the server redirects to `next` only when it is a local path: it must start
+  with a single `/`, must not start with `//`, and must contain no scheme,
+  backslash or control character. Anything else is ignored. The default
+  destination is `/market` until #81 lands, then `/portfolio`. This extends the
+  rule that redirect targets must remain local and does not replace server-side
+  authorization. Owned by #77 with #76; not implemented.
+- **After an order.** Trade leads to Portfolio only for a saved order (201). A
+  rejected or invalid order keeps the user on Trade with the error beside the
+  input. If the outcome is unknown, the page links to Portfolio and never
+  retries the POST automatically (see api-contract.md section 5).
+- **Sell entry point.** Each Portfolio holding links to
+  `/trade?side=sell&symbol=<SYMBOL>`, so the selected symbol is preserved.
+
+At the time of this change the header is inlined in the market template; the
+shared `base.html` described above is still to be extracted.
 
 Sprint 3 Scrum Master is @longbk761-bot; the M2 role header above records history.
 The proposed #75 [shared order/simulation contract](api-contract.md#7-m3-shared-order-and-simulation-contract--75)
@@ -172,6 +212,18 @@ and details. Buy/sell reject cash/share shortages, stale/changed quotes and
 invalid quantities without partial writes. US10 preview does not replace
 the backend's atomic BR1 validation. Refer to the full contract for exact
 messages, example balances, initial grant and partial-sale allocation.
+
+**HTML page routes.** These serve the browser and are not part of the JSON
+contract above; each uses the same service as its API counterpart.
+
+| Method | Path | Access | Input | Success | Errors | Status |
+|--------|------|--------|-------|---------|--------|--------|
+| GET | `/market` | G/U | optional `q` | 200 HTML list; "No stocks match" when a search finds nothing | 503 HTML unavailable page | List implemented; `q` proposed (#85) |
+| GET | `/market/<symbol>` | G/U | path symbol | 200 HTML detail | 404 "Ticker not found"; 503 HTML unavailable page | Designed (#85) |
+| GET, POST | `/register`, `/login` | G | form fields, `csrf_token`, optional `next` | 302 to `/market` with session cookie today; to `next` or `/portfolio` once designed | Page re-rendered with the API message and status (409, 401, 429, 403, 422) | Pages and sessions implemented (#77); `next` and `/portfolio` redirect designed; browser verification pending |
+| POST | `/logout` | U | `csrf_token` | 302 to `/market`, cookie expired | Redirect to `/login` | Implemented (#77); browser verification pending |
+| GET | `/trade` | U | `side`, `symbol` | 200 HTML preview and confirm form | 302 to `/login?next=...` for a guest | Designed (#76/#79) |
+| GET | `/portfolio` | U | none | 200 HTML cash, holdings, total | 302 to `/login?next=...` for a guest | Designed (#81) |
 
 ## 4. Walking skeleton
 

@@ -6,48 +6,58 @@ wireframes, implemented journeys and browser evidence are still required.
 
 ## 1. P0 stories and status
 
-Statuses describe the observed implementation baseline, not the ambition of an
+Statuses describe the implementation observed on `main`, not the ambition of an
 issue or the existence of a schema. Old M1/M2 issue closure does not prove a
-working M3 journey. Feature owners update rows with verified PR/commit evidence.
+working M3 journey. Screen names are used consistently below: **Register,
+Login, Market list, Stock detail, Trade, Portfolio**. The Notes column
+separates what is **implemented on `main`**, what is **planned** (route or
+behavior not on `main`) and **open PR work**.
 
-| Story | Screen(s) | Route | Status | Issue | Note |
-| ----- | --------- | ----- | ------ | ----- | ---- |
-| US01 - Register / sign in | Register, Login (linked from the market header) | `/register`, `/login` | partly works | [#77](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/77) | |
-| US02 - Initial virtual capital | Register → portfolio balance | `/register` → `/portfolio` | partly works | [#78](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/78) | |
-| US03 - Find a stock and inspect its quote | Market → search → stock detail | `/market`, `/market/<symbol>` | partly works | [#85](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/85) | Or Market list → stock detail (?) |
-| US04 - Buy shares | Market detail → Buy | `/trade?side=buy&symbol=HPG` | not started | [#76](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/76) | Or Stock detail → Trade (?) |
-| US05 - Sell shares | Portfolio holding → Sell | `/trade?side=sell&symbol=HPG` | not started | [#79](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/79) | |
-| US06 - View portfolio | Navigation → Portfolio | `/portfolio` | not started | [#81](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/81) | Or just Portfolio (?) |
-| US10 - Insufficient-balance warning | Buy form → change quantity → preview | `/trade?side=buy` | not started | [#76](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/76) | |
+| Story | Screen(s) | Route | Status | Issue | Notes |
+| ----- | --------- | ----- | ------ | ----- | ----- |
+| US01 - Register / sign in | Register, Login | `/register`, `/login` | partly works | [#77](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/77) | Implemented: both pages, session cookie, CSRF, lockout; both redirect to Market list today. Planned: return to the page the guest came from via a local `next` (proposed), otherwise Portfolio once #81 lands. Open PR: <add number or "none">. |
+| US02 - Initial virtual capital | Register | `/register` | partly works | [#78](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/78) | Implemented: 100,000,000 VND granted when the account is created (tested). Planned: balance visible on Portfolio (#81); no screen shows it today. |
+| US03 - Find a stock and inspect its quote | Market list, Stock detail | `/market`, `/market/<symbol>` | partly works | [#85](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/85) | Implemented: Market list only. Planned (#85): search (`?q=`, proposed) and Stock detail. Open PR: <add number or "none">. |
+| US04 - Buy shares | Stock detail, Trade | `/market/<symbol>`, `/trade?side=buy&symbol=HPG` | not started | [#76](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/76) | Planned: Buy on Stock detail; a guest is sent to Login first. |
+| US05 - Sell shares | Portfolio, Trade | `/portfolio`, `/trade?side=sell&symbol=HPG` | not started | [#79](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/79) | Planned: Sell on each Portfolio holding, keeping the symbol in the link. Needs the shared order code from #76 and the Portfolio screen from #81. |
+| US06 - View portfolio | Portfolio | `/portfolio` | not started | [#81](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/81) | Planned: a "Portfolio" header link for signed-in users. |
+| US10 - Insufficient-balance warning | Trade | `/trade?side=buy&symbol=HPG` | not started | [#76](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/76) | Planned: inline warning on the buy preview. |
 
-US03 currently renders only a seeded table with a stale-data indicator;
-search/detail and the navigation shown below are planned. No other P0 is complete.
+On `main` today: `/` redirects to Market list; Register, Login and Log out are
+reachable from the Market list header; there is no Portfolio link and no Trade
+screen. Everything else in this document is planned.
 
-Updated screen flow (M1 target refined for M3; only home → market exists today):
-
-### Screen flow (real navigation today, planned navigation dashed)
+### Screen flow (solid = on `main`, dashed = planned)
 
 ```mermaid
 flowchart TD
-    Home[Home /] -->|redirect| Market[Market /market]
+    Home[Home /] -->|redirect| Market[Market list /market]
     Market --> Login[Login /login]
     Market --> Register[Register /register]
     Login -->|success, today| Market
     Register -->|success, today| Market
-    Login -. success, planned .-> Portfolio[Portfolio /portfolio]
-    Register -. success, planned .-> Portfolio
-    Market -. search / select .-> Detail[Stock detail /market/symbol]
-    Detail -. Buy, sign in if needed .-> Trade[Trade /trade]
-    Portfolio -. Buy or Sell .-> Trade
-    Trade -. confirm .-> Portfolio
-    Trade -. rejected: fix input .-> Trade
-    Portfolio -. Browse stocks .-> Market
-    Portfolio -. Log out .-> Market
     Market -->|Log out| Market
+
+    Market -. "header Portfolio, signed in" .-> Portfolio[Portfolio /portfolio]
+    Market -. "header Portfolio, guest" .-> Login
+    Market -. "select a stock" .-> Detail[Stock detail /market/symbol]
+    Detail -. "Buy, signed in" .-> Trade[Trade /trade]
+    Detail -. "Buy, guest" .-> Login
+    Login -. "success, came from Buy: back to Trade (local next)" .-> Trade
+    Login -. "success, no next" .-> Portfolio
+    Register -. "same as Login" .-> Portfolio
+    Trade -. "order saved (201)" .-> Portfolio
+    Trade -. "rejected or invalid: stay, fix input" .-> Trade
+    Trade -. "result unknown: Check your portfolio" .-> Portfolio
+    Portfolio -. "Sell on a holding" .-> Trade
+    Portfolio -. "header Market" .-> Market
+    Portfolio -. "Log out" .-> Market
+    Portfolio -. "Buy more" .-> Trade
 ```
 
-Solid arrows exist in `main`; dashed arrows are designed and not yet
-implemented.
+Trade → Portfolio means an order that was **saved**, not a click on Confirm.
+A rejected order keeps the user on Trade with the error beside the input.
+The `next` value must be a local path (`/trade?...`), never an external URL.
 
 ## 2. Wireframes
 
@@ -71,17 +81,19 @@ service). Pre-auth CSRF token is embedded in the form.
 | Create your simulation account                                |
 | You receive 100,000,000 VND once.                             |
 |                                                               |
-| [!] Email already in use            <- on error               |
-| [!] Email must be valid             <- on error               |
-| [!] Passwords must match            <- on error               |
+| [!] Email already in use            <- on error (today)       |
+| [!] Enter a valid email address.    <- on error (today)       |
+| [!] Passwords must match            <- proposed, see below    |
 |                                                               |
 | Email                 [______________________]                |
 | Password              [______________________]  8-128 chars   |
-| Confirm Password      [______________________]                |
+| Confirm Password      [______________________]  (proposed)    |
 | [ Register ]                                                  |
 | Already registered? Log in                                    |
 +---------------------------------------------------------------+
 ```
+
+Confirm Password and its error are proposed; the current form has Email and Password only.
 
 ### 2.2 Login - `/login`
 
@@ -90,16 +102,20 @@ service). Pre-auth CSRF token is embedded in the form.
 **Calls:** `POST /api/sessions` (form: `POST /login`).
 
 ```text
-+---------------------------------------------------------------------------------------------------+
-| VirtuTrade   Market   Register                                                                    |
-+---------------------------------------------------------------------------------------------------+
-| Log in to your simulation account                                                                 |
-| [!] Invalid email or password. Five wrong passwords lock the account 15 min.       <- on error    |
-| Email     [______________________]                                                                |
-| Password  [______________________]                                                                |
-| [ Log in ]                                                                                        |
-| Already have account? Sign in                                                                     |
-+---------------------------------------------------------------------------------------------------+
++---------------------------------------------------------------+
+| VirtuTrade   Market   Register                                |
++---------------------------------------------------------------+
+| Log in to your simulation account                             |
+|                                                               |
+| [!] Invalid email or password       <- wrong credentials      |
+| [!] Account locked. Try again in N seconds.  <- locked        |
+|                                                               |
+| Email     [______________________]                            |
+| Password  [______________________]                            |
+| [ Log in ]                                                    |
+| Five wrong passwords lock the account for 15 minutes.         |
+| Already have account? Register                                |
++---------------------------------------------------------------+
 ```
 
 ### 2.3 Market list - `/market` (four states)
@@ -167,25 +183,72 @@ Unknown symbol:  "Ticker not found"  [ Back to market ]
 No reference:    change shown as "Reference unavailable"
 ```
 
-### 2.5 Trade (buy / sell) - `/trade`
+### 2.5 Trade: distinct states, corrected amounts, and sell variants - `/trade`
 
-*The user comes here to preview the cost of a virtual order and confirm it.*
+*The user comes here to preview a virtual order and confirm it. Buy and sell
+show separate validation states; an invalid order cannot be confirmed.*
 
 **Calls:** `POST /api/orders/preview`, `POST /api/orders/buy` or
 `POST /api/orders/sell`. A failed order POST is never auto-retried.
 
+**Buy, sufficient cash:**
+
 ```text
 +--------------------------------------------------+
-| Buy HPG        Cash: 100,000,000 VND             |
-| Quantity [1000]   Quote 28,000 (09:15:00)        |
+| Buy HPG               Cash: 100,000,000 VND      |
+| Quantity [1000]       Quote 28,000 (09:15:00)    |
 | Estimated cost: 28,000,000 VND                   |
-|                                                  |
-| [!] Exceeds available balance by 300,000 VND     |
-| [ Confirm buy ] (disabled while warning shows)   |
-|                                                  |
-| Quote stale: generate demo quotes, preview again |
-| Result unknown? "Check your portfolio" - no retry|
+| [ Confirm buy ]  (enabled)                       |
 +--------------------------------------------------+
+```
+
+**Buy, insufficient cash (US10 acceptance data):**
+
+```text
++--------------------------------------------------+
+| Buy ACB               Cash: 500,000 VND          |
+| Quantity [32]         Quote 25,000 (09:15:00)    |
+| Estimated cost: 800,000 VND                      |
+| [!] Exceeds available balance by 300,000 VND     |
+| [ Confirm buy ]  (disabled)                      |
++--------------------------------------------------+
+```
+
+**Sell, valid quantity:**
+
+```text
++--------------------------------------------------+
+| Sell HPG              You hold: 1,000 shares     |
+| Quantity [1000]       Quote 30,000 (09:15:00)    |
+| Estimated proceeds: 30,000,000 VND               |
+| [ Confirm sell ]  (enabled)                      |
++--------------------------------------------------+
+```
+
+**Sell, quantity exceeds shares held:**
+
+```text
++--------------------------------------------------+
+| Sell HPG              You hold: 500 shares       |
+| Quantity [800]        Quote 30,000 (09:15:00)    |
+| Estimated proceeds: 24,000,000 VND               |
+| [!] You hold 500 HPG; the maximum you can sell   |
+|     is 500                                       |
+| [ Confirm sell ]  (disabled)                     |
++--------------------------------------------------+
+```
+
+After an order is saved, show its result on the Portfolio page. For example:
+"Sold 1,000 HPG at 30,000.  
+Proceeds 30,000,000 VND.  
+Realised P&L +2,000,000 VND."  
+Realised P&L appears only after the order is saved; the preview API does not return it.
+
+Shared states:
+
+```text
+Quote stale:     "Generate demo quotes, then preview again"
+Result unknown:  "Result unknown. Check your portfolio." (link; no retry)
 ```
 
 ### 2.6 Portfolio - `/portfolio`
@@ -195,13 +258,14 @@ No reference:    change shown as "Reference unavailable"
 **Calls:** `GET /api/portfolio`; Sell links to `/trade?side=sell`.
 
 ```text
-+--------------------------------------------------+
-| Portfolio        Total: 46,600,000 VND           |
-| Cash: 40,000,000 VND                             |
-| HPG  200 sh  avg 30,000  value 6,600,000         |
-|      P&L +600,000 (+10.00%)       [ Sell ]       |
-| Empty: "No positions yet" (total = cash)         |
-+--------------------------------------------------+
++---------------------------------------------------------------+
+| Portfolio        Total: 46,600,000 VND                        |
+| Cash: 40,000,000 VND                                          |
+| HPG  200 sh           avg 30,000          value 6,600,000     |
+|      P&L +600,000 (+10.00%)                                   |
+|      [ Sell ] -> /trade?side=sell&symbol=HPG                  |
+| Empty: "No positions yet" (total = cash)                      |
++---------------------------------------------------------------+
 ```
 
 ## 3. Error messages
@@ -224,7 +288,7 @@ API error codes never change.
 ### 3.2 Implemented, verified by tests only
 
 | API error code | Business rule | Exact message today | Why it is not shown in the UI |
-|----------------|---------------|---------------------|-------------------------------|
+| ---------------- | --------------- | --------------------- | ------------------------------- |
 | 403 `ACCOUNT_DISABLED` | BR9 - disabled accounts cannot sign in or trade | Account is disabled | No Admin screen exists yet (US13, P1); only a database edit triggers it. |
 | 422 `VALIDATION_ERROR` | US01 - email format, password 8..128 characters | Enter a valid email address. / Password must be 8..128 characters. | The browser's own form validation blocks these first; the server message appears only for direct API calls. |
 
