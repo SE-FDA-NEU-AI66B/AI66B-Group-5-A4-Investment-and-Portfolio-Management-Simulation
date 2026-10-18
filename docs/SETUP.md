@@ -108,7 +108,7 @@ macOS / Linux:
 .venv/bin/python -m pytest -q
 ```
 
-Run the full suite; auth and buy tests use real temporary SQLite databases. Tests use temporary databases and do not change the
+Run the full suite; auth and buy tests use real temporary SQLite databases and do not change the
 running demo's data. CI installs `pytest`, `pytest-cov` and `ruff` separately
 and runs on Python 3.12.
 

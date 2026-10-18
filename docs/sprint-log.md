@@ -375,20 +375,20 @@ Issue register:
 
 | Issue | Outcome | Owner | Points | Status |
 |-------|---------|-------|--------|--------|
-| [#59](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/59) | [US14] Integrate DNSE realtime stock quotes | @bianh13 | 5 | Todo |
+| [#59](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/59) | [US14] Integrate DNSE realtime stock quotes | @bianh13 | 5 | In progress; draft #60, live quotes unverified |
 | [#74](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/74) | [Chore] Refine backlog for Sprint 3 | @bianh13 | 2 | Done; #89 approved/merged, team capacity confirmed |
 | [#75](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/75) | [Task] Agree shared buy/sell interfaces and simulation quote policy | @bianh13 | 1 | Done; #91 approved/merged |
-| [#76](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/76) | [US04/US10] Complete buy preview, balance warning and virtual order UI | @bianh13 | 5 | Todo |
+| [#76](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/76) | [US04/US10] Complete buy preview, balance warning and virtual order UI | @bianh13 | 5 | In progress; draft #92, real auth integrated, portfolio pending |
 | [#77](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/77) | [US01] Implement registration, login and logout through the UI | @nguyentue110 | 5 | Closed; #93 approved/merged, final cross-feature demo pending |
-| [#78](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/78) | [US02] Grant initial virtual capital exactly once | @nguyentue110 | 2 | Todo |
+| [#78](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/78) | [US02] Grant initial virtual capital exactly once | @nguyentue110 | 2 | Open; #95 merged to auth branch, not main |
 | [#79](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/79) | [US05] Complete virtual sell preview and confirmation UI | @nguyentue110 | 5 | Todo |
 | [#80](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/80) | [Task] Document and verify account-state schema migration | @nguyentue110 | 1 | Done; #90 approved/merged |
-| [#81](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/81) | [US06] Implement private portfolio API and screen | @longbk761-bot | 5 | Todo |
+| [#81](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/81) | [US06] Implement private portfolio API and screen | @longbk761-bot | 5 | In progress; portfolio model branch, no PR yet |
 | [#82](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/82) | [Task] Verify every P0 journey and business-rule error through the browser | @longbk761-bot | 5 | Todo |
 | [#83](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/83) | [Task] Verify M3 SETUP on an independent clean machine | @longbk761-bot | 2 | Todo |
 | [#84](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/84) | [Chore] Sprint 3 wrap-up | @longbk761-bot | 1 | Todo |
 | [#85](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/85) | [US03] Complete searchable market and stock-detail UI | @VuSiSi | 5 | Todo |
-| [#86](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/86) | [Task] Draw all P0 wireframes and maintain the M3 UI dossier | @VuSiSi | 3 | Todo |
+| [#86](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/86) | [Task] Draw all P0 wireframes and maintain the M3 UI dossier | @VuSiSi | 3 | In review; #96 awaits revisions and formal review |
 | [#87](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/87) | [Task] Fix verified usability issues and standardize user-facing errors | @VuSiSi | 2 | Todo |
 | [#88](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/88) | [Task] Prepare Team05_M3.pdf from reviewed and merged UI documentation | @VuSiSi | 3 | Todo |
 

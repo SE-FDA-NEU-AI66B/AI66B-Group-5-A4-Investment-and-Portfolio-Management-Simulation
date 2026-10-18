@@ -51,3 +51,9 @@ Follow docs/SETUP.md for a new simulation DB and real UI registration. Optional
 Windows/Edge smoke: install playwright==1.63.0 in the development venv, then run
 python scripts/check_buy_ui.py. It creates a disposable random password locally,
 does not print it, never replaces auth callbacks and never calls DNSE/broker APIs.
+
+Author clean-clone check on 18 October: local clone of commit `bb2e28f`, new
+Python 3.10 venv, editable install plus pytest/ruff, copied .env.example, init-db
+and init-demo succeeded. Full suite: 125 passed, 2 sell placeholders skipped;
+Ruff passed. `websockets` was absent from this environment. This was a fresh
+checkout on the author's machine, not the independent machine required by #83.
