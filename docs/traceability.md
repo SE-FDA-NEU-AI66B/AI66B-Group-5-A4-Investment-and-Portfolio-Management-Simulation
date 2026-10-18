@@ -7,8 +7,8 @@ implemented run; designed endpoints remain future work.
 
 | Story | Scenario steps | Acceptance checks | Screen / entry | Endpoint (proposed unless stated) | Tables | Work / history | Implementation / verification |
 |-------|----------------|-------------------|----------------|----------------------------------|--------|----------------|-------------------------------|
-| US01 P0 | S1.1 | Register, login, duplicate email, lockout | `/` | POST `/api/accounts`, POST `/api/sessions` | account | #46; history #13 | Specified; not implemented |
-| US02 P0 | S1.1 | 100,000,000 VND once | `/` registration | POST `/api/accounts` | account | #46; history #14 | Schema default only; registration not implemented |
+| US01 P0 | S1.1 | Register, login, duplicate email, lockout | `/` | POST `/api/accounts`, POST `/api/sessions` | account | #46; history #13 | Auth implemented on main via #93; final independent UI evidence remains #82/#83 |
+| US02 P0 | S1.1 | 100,000,000 VND once | `/` registration | POST `/api/accounts` | account | #46; history #14 | One-time grant implemented/tested in #93; #95 display is not on main; portfolio pending |
 | US03 P0 | S1.2, S2.1, S6.3 | Price, daily change, timestamp, delayed/unknown ticker | `/market` | GET `/market` **implemented**; GET `/api/market/quotes/{symbol}` designed; list JSON implemented in resumed PR #60 (Sprint 3), review pending | instrument, price_quote | #50; history #15 | Snapshot subset implemented and locally tested; search/detail and live feed pending |
 | US04 P0 | S1.3–S1.4 | Preview, valid fill, insufficient cash, invalid quantity | `/trade` | POST `/api/orders/preview`, POST `/api/orders/buy` | account, holding, trade, price_quote | #46/#49; history #16 | Specified; not implemented |
 | US05 P0 | S2.2–S2.3 | Fill, realised result, oversell, quote time | `/trade` | POST `/api/orders/preview`, POST `/api/orders/sell` | account, holding, trade, price_quote | #46/#49; history #17 | Specified; not implemented |
@@ -23,7 +23,7 @@ implemented run; designed endpoints remain future work.
 | US14 P1 | S6.1–S6.3 | Valid/newer event only, deduplication, disconnect | DNSE adapter; external Machine User | Provider integration, not an app HTTP route | instrument, price_quote | #46/#48/#59 | Sprint 3 resumed; #59 Open; modular worker and list API tested; real authentication/subscription succeeded, but no tick/reference arrived in bounded probe; quote/unit comparison and review pending |
 
 Access: market snapshot G/U (public read-only), trading/personal screens U,
-administration A, quote ingestion M. Future authentication gates are server-side.
+administration A, quote ingestion M. Implemented authentication gates are server-side; Admin remains planned.
 
 ## Business rules and enforcement boundaries
 
@@ -33,7 +33,7 @@ administration A, quote ingestion M. Future authentication gates are server-side
 | BR2 | Atomic sell transaction rechecks held quantity | Schema guards only; no sell service |
 | BR3 | Capture accepted quote inside the order transaction | Snapshot schema only |
 | BR4 | Conditional-order monitor with idempotent execution | Deferred |
-| BR5 | Account creation grants 100,000,000 VND once; login/enable never grants again | Default only; service pending |
+| BR5 | Account creation grants 100,000,000 VND once; login/enable never grants again | Real account service and grant-once tests in #93 |
 | BR6 | Exact total cost / quantity; partial-sale whole-VND allocation and final residual per money-rules.md | Integer cost storage; rounding contract ready for review, trading service pending |
 | BR7 | Benchmark/performance service compares matching dates | Deferred |
 | BR8 | Ranking uses achievement timestamps to break ties | Deferred |

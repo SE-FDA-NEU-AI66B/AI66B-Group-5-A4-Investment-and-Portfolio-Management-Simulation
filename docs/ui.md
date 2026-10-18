@@ -98,8 +98,19 @@ The same PR updates `docs/design.md` section 1 with this boundary and route plan
 Authentication/market owners implement it in their issues, and Vu provides the
 wireframes. The shared shell must not contain SQL, trading rules or provider keys.
 
-**Open integration decision:** [#75](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/75) must settle the explicit
-simulation-quote refresh flow because fixed old seed prices correctly fail the
-trade freshness check. Keep demo/live labels and provider timestamps honest;
-update this section, design.md and api-contract.md together when that design is
-agreed. A successful M3 demo must not depend on a live DNSE session.
+**Shared transaction and simulation proposal — #75:**
+[API contract section 7](api-contract.md#7-m3-shared-order-and-simulation-contract--75)
+defines the module interfaces and one atomic cash/holding/trade transaction.
+The new local-demo flow is Register → Market → **Generate demo quotes** → select
+stock → Preview → Confirm → Portfolio. Add the refresh action to the market/trade
+wireframes; it calls POST `/api/simulation/quotes/refresh` and appears only in
+simulation mode. The UI uses source **Simulation / generated**, generation time
+and **Change vs scenario reference**, keeping simulated data distinct from DNSE.
+
+Fixed old seed quotes cannot authorize a trade. Explicit initialization creates
+a separate simulation DB; manual refresh generates new labelled observations,
+invalidates previous previews and preserves balances/holdings/trades. Never
+retimestamp historical provider data. The proposed source constraint/migration,
+endpoint and ownership change is documented in design.md in this same PR;
+implementation belongs to #76, review/agreement to #75, wireframes to #86.
+All story statuses above remain unchanged until the UI actually works.
