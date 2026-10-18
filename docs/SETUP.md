@@ -136,3 +136,19 @@ The placeholders below remain pending until the actual run is recorded.
 `b5fdb0f`; fresh venv and database, repeated init-db, tests and lint passed.
 See [handoff evidence](m2-po-handoff.md). A local author check does not satisfy
 the independent-machine condition above.
+
+
+## M3 auth update — 18 October 2026
+
+The main checkout now includes real registration, login and logout from #93.
+Open the market page and use its Register/Log in links. Register a disposable
+local email such as learner@example.test and choose your own 8–128-character
+password; no real or shared password is supplied. Account creation grants
+100,000,000 virtual VND once. The separate grant-display PR #95 is not yet on main.
+
+`init-db` now applies the idempotent account/session migration as well as seeding;
+the earlier six-table count describes M2. `SECRET_KEY` can be empty locally and
+will be generated at each boot; set a private random value in ignored .env if
+stable CSRF across restarts is needed. Never commit the value. Buy/simulation
+instructions belong to PR #92 until it merges. The independent-machine table
+above is still pending #83; an author test must not fill those placeholders.

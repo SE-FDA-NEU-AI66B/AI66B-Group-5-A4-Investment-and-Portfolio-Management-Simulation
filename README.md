@@ -9,25 +9,24 @@ submit before the end of 20 October. [Issues](https://github.com/SE-FDA-NEU-AI66
 · [Sprint plan](docs/sprint-log.md#sprint-3---milestone-3)
 · [UI dossier](docs/ui.md) · [SETUP](docs/SETUP.md).
 
-Current implementation baseline: only the public database-backed market snapshot
-runs. The entry points below are the M3 navigation plan, **not a claim that the
-unbuilt screens work**. Start the app using SETUP and open its documented home URL;
-all P0 journeys must eventually be reachable by visible links/buttons.
+Current checkout: real registration/login/logout and the database-backed market are implemented.
+Buy/simulation remains in draft PR #92; the DNSE worker remains in draft PR #60.
+Search/detail, sell and portfolio are still pending; see the table and linked evidence.
 
 | P0 story | Where the user starts | Current status |
 |----------|-----------------------|----------------|
-| US01 — Register / sign in | Landing page → Register / Sign in | not started |
-| US02 — Initial virtual capital | Register → portfolio balance | not started |
+| US01 — Register / sign in | Market header → Register / Log in | partly works |
+| US02 — Initial virtual capital | Register; balance presentation/portfolio integration pending | partly works |
 | US03 — Find a stock and inspect its quote | Market → search → stock detail | partly works |
 | US04 — Buy shares | Market detail → Buy | not started |
 | US05 — Sell shares | Portfolio holding → Sell | not started |
 | US06 — View portfolio | Navigation → Portfolio | not started |
 | US10 — Insufficient-balance warning | Buy form → change quantity → preview | not started |
 
-No login or seeded test account exists on the current baseline. Fake local test
-accounts and their setup instructions must be added with authentication; never
-put real credentials in README or SETUP. Live DNSE data (#59) is P1; the instructor's
-P0 demonstration must also work with clearly labelled simulation data in the DB.
+Register a disposable local account through the visible Register link; no shared or real credentials are committed.
+Auth is on main via #93; independent M3 SETUP and final story acceptance remain pending.
+Live DNSE data (#59) is P1 and is not required for the labelled simulation demo.
+
 
 
 ## Introduction

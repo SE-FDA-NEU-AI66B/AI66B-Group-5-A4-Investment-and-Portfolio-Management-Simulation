@@ -84,8 +84,7 @@ its errors include 401 AUTH_REQUIRED, 403 CSRF_FAILED/ACCOUNT_DISABLED/
 SIMULATION_DISABLED, 409 SIMULATION_CLOCK_NOT_ADVANCED, 422 VALIDATION_ERROR
 and 503 SERVICE_UNAVAILABLE. Existing stale/changed-quote checks and atomic
 cash/holding/trade writes remain mandatory. #76 implements the shared transaction
-and simulation flow; #79 supplies sell calculations; Tue's agreement is pending
-review of #75. New commands/endpoints do not run yet.
+and simulation flow; #79 supplies sell calculations; Tue approved the #75 contract in PR #91. New commands/endpoints do not run yet.
 
 ## 2. Data model
 
@@ -148,9 +147,11 @@ authentication/authorization, validation, errors, transaction boundaries and
 the external DNSE protocol boundary. [Traceability](traceability.md) maps each
 story to its scenario, screen, endpoint, tables and implementation status.
 
-Only GET `/` (302 redirect) and GET `/market` run on main. The quote JSON
-endpoint is in draft PR #60; all account/trade/portfolio/Admin APIs are designed,
-not implemented. M2 requires these contracts, not a complete trading engine.
+M2 originally exposed only GET `/` and GET `/market`. Auth HTML/API routes
+are now implemented on main via #93. Buy/simulation and shared quote JSON are
+in PR #92; the optional provider worker is PR #60. Sell, portfolio, stock detail
+and Admin remain separate pending deliveries. The table below retains the M2
+design baseline; the current checkout status is in ui.md and api-contract.md.
 
 | Method | Path | Access / story | Input | Success output | Error codes | Status |
 |--------|------|----------------|-------|----------------|-------------|--------|

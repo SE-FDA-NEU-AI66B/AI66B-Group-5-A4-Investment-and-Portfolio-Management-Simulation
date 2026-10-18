@@ -12,8 +12,8 @@ working M3 journey. Feature owners update rows with verified PR/commit evidence.
 
 | Story | Screen(s) | Route | Status | Issue |
 |-------|-----------|-------|--------|-------|
-| US01 — Register / sign in | Landing page → Register / Sign in | `/register`, `/login` | not started | [#77](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/77) |
-| US02 — Initial virtual capital | Register → portfolio balance | `/register` → `/portfolio` | not started | [#78](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/78) |
+| US01 — Register / sign in | Landing page → Register / Sign in | `/register`, `/login` | partly works | [#77](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/77) |
+| US02 — Initial virtual capital | Register → portfolio balance | `/register` → `/portfolio` | partly works | [#78](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/78) |
 | US03 — Find a stock and inspect its quote | Market → search → stock detail | `/market`, `/market/<symbol>` | partly works | [#85](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/85) |
 | US04 — Buy shares | Market detail → Buy | `/trade?side=buy&symbol=HPG` | not started | [#76](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/76) |
 | US05 — Sell shares | Portfolio holding → Sell | `/trade?side=sell&symbol=HPG` | not started | [#79](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/79) |
@@ -23,7 +23,7 @@ working M3 journey. Feature owners update rows with verified PR/commit evidence.
 US03 currently renders only a seeded table with a stale-data indicator;
 search/detail and the navigation shown below are planned. No other P0 is complete.
 
-Updated screen flow (M1 target refined for M3; only home → market exists today):
+Updated screen flow (M1 target refined for M3; original M2 flow; current auth paths are noted below):
 
 ```mermaid
 flowchart TD
@@ -114,3 +114,14 @@ retimestamp historical provider data. The proposed source constraint/migration,
 endpoint and ownership change is documented in design.md in this same PR;
 implementation belongs to #76, review/agreement to #75, wireframes to #86.
 All story statuses above remain unchanged until the UI actually works.
+
+
+### Baseline correction — 18 October 2026
+
+Main now includes #93: Market links to Register/Login, successful HTML forms
+return to Market, and the signed-in header offers Logout. The earlier M1/M2 flow
+above is historical; Vu's #96 updates the full diagram and wireframes. Auth and
+the one-time grant are implemented, while final independent M3 browser evidence
+remains pending. Buy/simulation is in draft #92, not yet on main; search/detail,
+sell and portfolio are unfinished. The grant header in #95 was merged into an
+auth branch, not main. This progress correction does not approve or complete #86.

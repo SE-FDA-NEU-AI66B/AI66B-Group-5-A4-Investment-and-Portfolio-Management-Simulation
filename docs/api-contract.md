@@ -1,13 +1,12 @@
 # Application API contract
 
 M2 baseline: #49, 3 October 2026. M3 shared contract: #75, 10 October 2026.
-Owner: @bianh13. M3 reviewer: @nguyentue110; agreement pending review.
+Owner: @bianh13. M3 reviewer: @nguyentue110; agreement approved in PR #91 on 12 October 2026.
 
-This is an implementation handoff, not a claim that all routes run. On `main`,
-only GET `/` (302 to `/market`) and GET `/market` (200/503 HTML) are implemented.
-The optional quote JSON endpoint and DNSE worker exist in draft PR #60, pending
-integration, real-provider verification and review. All other endpoints below
-are designed for later implementation; requesting them on current main yields 404.
+This contract separates implemented routes from planned work. Auth HTML/API
+routes and the public seeded market are on main via #93. Portfolio, sell and
+stock detail are still planned. The buy/simulation integration is PR #92;
+the optional provider worker is PR #60, with live price acceptance pending.
 
 ## 1. Conventions and access
 
@@ -254,7 +253,7 @@ Auth design reference: [OWASP session management](https://cheatsheetseries.owasp
 
 **Design handoff, not implemented behavior.** This section adds an explicit
 simulation workflow to the M2 contract; existing production-like quote checks
-still apply. Tue must review the shared interfaces before #75 is accepted.
+still apply. Tue approved the shared interfaces in #91; #75 is accepted.
 
 ### 7.1 File ownership and module interfaces
 
