@@ -240,7 +240,7 @@ and ping/pong are part of the provider protocol. See [DNSE guide](https://develo
 and [official SDK](https://github.com/dnse-tech/openapi-sdk/tree/main/python/dnse/websocket).
 
 PR #60 contains implementation and local tests for this optional path; real-provider acceptance
-is waiting for keys under #59. No keys, real trades or broker tokens are required
+has verified authentication/subscription but still awaits actual tick/reference and price comparison under #59. No keys, real trades or broker tokens are required
 to demonstrate the required seed-backed M2 slice.
 
 Review method: match every P0 row in [traceability](traceability.md), check the
