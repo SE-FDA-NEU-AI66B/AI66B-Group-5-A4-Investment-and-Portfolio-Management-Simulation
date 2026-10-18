@@ -12,8 +12,8 @@ working M3 journey. Feature owners update rows with verified PR/commit evidence.
 
 | Story | Screen(s) | Route | Status | Issue |
 |-------|-----------|-------|--------|-------|
-| US01 — Register / sign in | Landing page → Register / Sign in | `/register`, `/login` | not started | [#77](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/77) |
-| US02 — Initial virtual capital | Register → portfolio balance | `/register` → `/portfolio` | not started | [#78](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/78) |
+| US01 — Register / sign in | Landing page → Register / Sign in | `/register`, `/login` | partly works | [#77](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/77) |
+| US02 — Initial virtual capital | Register → portfolio balance | `/register` → `/portfolio` | partly works | [#78](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/78) |
 | US03 — Find a stock and inspect its quote | Market → search → stock detail | `/market`, `/market/<symbol>` | partly works | [#85](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/85) |
 | US04 — Buy shares | Market detail → Buy | `/trade?side=buy&symbol=HPG` | partly works | [#76](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/76) |
 | US05 — Sell shares | Portfolio holding → Sell | `/trade?side=sell&symbol=HPG` | not started | [#79](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/79) |
@@ -22,10 +22,10 @@ working M3 journey. Feature owners update rows with verified PR/commit evidence.
 
 US03 renders stored seed/DNSE/simulation snapshots; search/detail remain pending.
 US04/US10 have a buy form, preview and atomic purchase implementation, but actual
-authentication and portfolio integration remain pending, so neither is works.
+real auth integration is tested on this branch; portfolio integration and peer acceptance remain pending, so neither is works.
 See [the implementation handoff](order-implementation.md) for verified tests and dependencies.
 
-Updated screen flow (M1 target refined for M3; only home → market exists today):
+Updated screen flow (M1 target refined for M3; auth navigation is implemented; trading links below are identified by checkout status):
 
 ```mermaid
 flowchart TD
@@ -60,7 +60,7 @@ substitute for wireframes. No running-app screenshot or wireframe is claimed yet
 
 Shared logout: DELETE `/api/sessions/current`. The login/register page supplies
 the pre-auth CSRF token specified in the M2 contract; private mutations must use
-the authenticated token. APIs in this inventory remain unimplemented.
+the authenticated token. Auth, buy preview/buy and simulation refresh are implemented on this branch; sell/detail/portfolio remain planned.
 
 Draw the market list in **all four states**: empty (no quotes/search results,
 clear action), loading (visible feedback), error (read retry and support path),
@@ -100,18 +100,34 @@ The same PR updates `docs/design.md` section 1 with this boundary and route plan
 Authentication/market owners implement it in their issues, and Vu provides the
 wireframes. The shared shell must not contain SQL, trading rules or provider keys.
 
-**Open integration decision:** [#75](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/75) must settle the explicit
-simulation-quote refresh flow because fixed old seed prices correctly fail the
-trade freshness check. Keep demo/live labels and provider timestamps honest;
-update this section, design.md and api-contract.md together when that design is
-agreed. A successful M3 demo must not depend on a live DNSE session.
+**Shared transaction and simulation proposal — #75:**
+[API contract section 7](api-contract.md#7-m3-shared-order-and-simulation-contract--75)
+defines the module interfaces and one atomic cash/holding/trade transaction.
+The new local-demo flow is Register → Market → **Generate demo quotes** → select
+stock → Preview → Confirm → Portfolio. Add the refresh action to the market/trade
+wireframes; it calls POST `/api/simulation/quotes/refresh` and appears only in
+simulation mode. The UI uses source **Simulation / generated**, generation time
+and **Change vs scenario reference**, keeping simulated data distinct from DNSE.
 
+Fixed old seed quotes cannot authorize a trade. Explicit initialization creates
+a separate simulation DB; manual refresh generates new labelled observations,
+invalidates previous previews and preserves balances/holdings/trades. Never
+retimestamp historical provider data. The proposed source constraint/migration,
+endpoint and ownership change is documented in design.md in this same PR;
+implementation belongs to #76, review/agreement to #75, wireframes to #86.
+All story statuses above remain unchanged until the UI actually works.
 
-Implementation update for #76: Market now links to `/trade`. The buy form shows
-loading, validation/shortfall, preview and success/unknown-result states; changing
-quantity invalidates the old preview. `QUOTE_MODE=simulation` with a new database
-supports explicit `init-demo` and generation through the authenticated refresh
-endpoint after #77 installs auth. Schema source `simulation` and a separate ledger
-entry preserve provenance. [Design](design.md) and [API handoff](order-implementation.md)
-describe the same change. Actual login, portfolio transition and screenshots for
-final P0 acceptance are still pending; no fake test session counts as that evidence.
+### Integration evidence — 18 October 2026 (PR #92 branch)
+
+Real browser navigation, without typed deep links: Home → Market → Buy shares
+(guest guard) → Register → Market → Buy shares → shortage/correction → confirmed
+purchase → Market → Logout → Login → Market → Buy shares. The test used real
+account services, cookie sessions, CSRF and a temporary SQLite simulation DB;
+no auth callbacks were replaced. It also verified manual quote refresh and a
+server-committed purchase whose response was lost, with submission locked afterward.
+
+US04/US10 remain **partly works** until peer acceptance and the real #81 portfolio
+transition. `/portfolio` links appear only when that real GET route is registered;
+there is no placeholder portfolio. #86 wireframes remain Vu's PR #96 and are not
+claimed complete by this integration note. Auth error messages stay unchanged;
+the buy UI adds separate recovery guidance for login, CSRF and disabled accounts.

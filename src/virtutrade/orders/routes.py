@@ -1,9 +1,11 @@
-"""Buy UI and API. Fail closed until #77 installs the trusted auth adapter."""
+"""Buy UI and API composed with the account module's session/CSRF adapter."""
 
+import sqlite3
 from functools import partial
 
-from flask import Blueprint, current_app, jsonify, render_template, request
+from flask import Blueprint, current_app, g, jsonify, render_template, request
 
+from virtutrade.accounts.errors import AuthError
 from virtutrade.orders.errors import OrderError
 from virtutrade.orders.repository import order_unit_of_work
 from virtutrade.orders.service import execute_buy, preview_order
@@ -73,6 +75,21 @@ def error_response(error):
     return response
 
 
+@blueprint.errorhandler(AuthError)
+def auth_error_response(error):
+    # Keep the account module's public code/message contract unchanged.
+    return jsonify(error={"code": error.code, "message": error.message,
+                          "details": error.details}), error.status
+
+
+@blueprint.errorhandler(sqlite3.Error)
+def storage_error_response(error):
+    return error_response(OrderError(
+        "SERVICE_UNAVAILABLE",
+        "Trading data is temporarily unavailable. Please try again later.",
+    ))
+
+
 @blueprint.after_request
 def private_response(response):
     response.headers["Cache-Control"] = "no-store"
@@ -83,12 +100,13 @@ def private_response(response):
 def trade_form():
     # Public shell does not expose balances; every read/write API checks identity.
     token_provider = current_app.extensions.get("orders_csrf_token")
+    signed_in = g.get("current_session_id") is not None
     return render_template(
         "orders/trade.html",
         symbol=request.args.get("symbol", ""),
-        csrf_token=token_provider() if token_provider else "",
+        csrf_token=token_provider() if token_provider and signed_in else "",
         simulation=current_app.config.get("QUOTE_MODE") == "simulation",
-        auth_ready="orders_identity" in current_app.extensions,
+        auth_ready=signed_in and "orders_identity" in current_app.extensions,
     )
 
 

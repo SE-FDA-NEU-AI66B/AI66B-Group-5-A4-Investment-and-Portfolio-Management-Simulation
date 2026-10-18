@@ -14,7 +14,7 @@ class OrderRepository:
 
     def account_for_session(self, session_id):
         row = self.connection.execute(
-            "SELECT a.id, a.cash_vnd, a.status, s.expires_at, s.revoked_at "
+            "SELECT a.id, a.cash_vnd, a.status, s.expires_at, s.revoked_at, s.last_seen_at "
             "FROM account a JOIN auth_session s ON s.account_id=a.id WHERE s.id=?",
             (session_id,),
         ).fetchone()

@@ -2,6 +2,7 @@
 
 from datetime import datetime, timezone
 
+from virtutrade.accounts.service import IDLE_SECONDS
 from virtutrade.market.service import parse_timestamp
 from virtutrade.orders.errors import OrderError
 
@@ -15,6 +16,7 @@ def refresh_quotes(session_id, unit_of_work, *, now=None):
                 account
                 and not account.revoked_at
                 and parse_timestamp(account.expires_at) > now
+                and (now - parse_timestamp(account.last_seen_at)).total_seconds() < IDLE_SECONDS
             )
         except (TypeError, ValueError, AttributeError):
             active = False

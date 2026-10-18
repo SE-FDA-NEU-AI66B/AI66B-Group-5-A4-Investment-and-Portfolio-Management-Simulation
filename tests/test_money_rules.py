@@ -177,7 +177,7 @@ def test_money_arithmetic_never_uses_binary_floating_point():
 
 # Buy persistence, rejection, concurrency and rollback now exercise the real
 # implementation in tests/test_orders.py; do not retain empty skipped duplicates.
-DEFERRED = "Sell/auth integration is pending #79/#77; real buy checks are in test_orders.py."
+DEFERRED = "Sell integration is pending #79; real buy checks are in test_orders.py."
 
 
 @pytest.mark.skip(reason=DEFERRED)
@@ -188,9 +188,3 @@ def test_sell_order_is_rejected_beyond_the_held_quantity():
 @pytest.mark.skip(reason=DEFERRED)
 def test_market_order_fills_at_the_quote_when_submitted():
     """BR3 / US05-AC3: a later quote change does not alter the fill price."""
-
-
-@pytest.mark.skip(reason=DEFERRED)
-def test_account_creation_grants_the_initial_capital_exactly_once():
-    """BR5: the grant and the account are created in one transaction, and a
-    duplicate email creates neither."""

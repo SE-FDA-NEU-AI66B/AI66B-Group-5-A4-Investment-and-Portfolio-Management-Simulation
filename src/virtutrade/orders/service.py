@@ -3,6 +3,7 @@
 import re
 from datetime import datetime, timezone
 
+from virtutrade.accounts.service import IDLE_SECONDS
 from virtutrade.market.service import parse_timestamp
 from virtutrade.orders.errors import OrderError
 
@@ -33,6 +34,7 @@ def load_inputs(repo, session_id, symbol, now):
             account
             and account.revoked_at is None
             and parse_timestamp(account.expires_at) > now
+            and (now - parse_timestamp(account.last_seen_at)).total_seconds() < IDLE_SECONDS
         )
     except (TypeError, ValueError, AttributeError):
         valid = False

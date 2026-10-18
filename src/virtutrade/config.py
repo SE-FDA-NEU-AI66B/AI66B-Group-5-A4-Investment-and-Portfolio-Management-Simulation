@@ -1,6 +1,7 @@
 """Resolve local configuration independently of the shell's working directory."""
 
 import os
+import secrets
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -14,4 +15,9 @@ def load_config():
     database = Path(os.environ.get('DATABASE_PATH', 'instance/virtutrade.db'))
     if not database.is_absolute():
         database = ROOT / database
-    return {'DATABASE': str(database), 'QUOTE_MODE': os.environ.get('QUOTE_MODE', 'seed')}
+    # Signs CSRF tokens. Production must set SECRET_KEY in .env; a missing or
+    # empty value mints a fresh random secret on every boot (pending forms and
+    # sessions from a previous boot stop validating, which is the safe
+    # default). Never ship a public placeholder: forgeable CSRF tokens follow.
+    secret = os.environ.get('SECRET_KEY') or secrets.token_hex(32)
+    return {'DATABASE': str(database), 'SECRET_KEY': secret, 'QUOTE_MODE': os.environ.get('QUOTE_MODE', 'seed')}

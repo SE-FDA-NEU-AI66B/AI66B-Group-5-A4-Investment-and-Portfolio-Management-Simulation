@@ -16,7 +16,12 @@
         headers:{"Content-Type":"application/json", "X-CSRF-Token":document.querySelector('meta[name="csrf-token"]').content},
         body:JSON.stringify(body)});
       const data = await response.json();
-      if (!response.ok) { const e = new Error(data.error?.message || "Request rejected. Reload the form and try again."); e.rejected = true; throw e; }
+      if (!response.ok) {
+        const hints = {AUTH_REQUIRED:" Sign in again, then return to Buy shares.", CSRF_FAILED:" Reload the form before trying again.", ACCOUNT_DISABLED:" Contact the project operator."};
+        const e = new Error((data.error?.message || "Request rejected. Reload the form and try again.") + (hints[data.error?.code] || ""));
+        // A server/proxy 5xx may follow a commit; treat the result as uncertain.
+        e.rejected = response.status < 500; throw e;
+      }
       return data;
     } finally { clearTimeout(timeout); }
   }
@@ -47,7 +52,7 @@
     byId("order-status").textContent = "Submitting virtual order…";
     try {
       const result = await request("/api/orders/buy", {...accepted.input, expected_quote_at:accepted.data.quote.quoted_at});
-      byId("result").textContent = `Bought ${result.trade.quantity} ${result.trade.symbol}. Cash remaining: ${cash(result.cash_vnd)}. Order #${result.trade.id}.`;
+      byId("result").textContent = `Bought ${result.trade.quantity} ${result.trade.symbol}. Cash remaining: ${cash(result.cash_vnd)}. Holding: ${result.holding.quantity} shares; cost basis: ${cash(result.holding.cost_basis_vnd)}. Order #${result.trade.id}.`;
       byId("order-status").textContent = "Order completed. Preview again before another purchase.";
     } catch (e) {
       uncertain = !e.rejected;

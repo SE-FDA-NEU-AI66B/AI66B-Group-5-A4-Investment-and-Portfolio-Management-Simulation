@@ -69,8 +69,22 @@ these screens or authentication work on the M2 baseline. Owners implement and
 test these boundaries under #77, #81 and #85; #86 supplies the wireframes.
 
 Sprint 3 Scrum Master is @longbk761-bot; the M2 role header above records history.
-Simulation quote freshness for the clean-clone trading demo remains an explicit
-decision under #75, without weakening stale/changed-quote checks.
+The proposed #75 [shared order/simulation contract](api-contract.md#7-m3-shared-order-and-simulation-contract--75)
+defines one transaction owner for preview/buy/sell integration and a separate
+local simulation database. Explicit `init-demo` initialization and authenticated
+POST `/api/simulation/quotes/refresh` generate labelled simulation observations;
+reading the page and `init-db` never retimestamp historical seed/provider data.
+The implementation will extend the price_quote source constraint with
+`simulation` through a versioned migration; the existing schema above/below
+remains the M2 runtime baseline until that migration lands. The provider worker
+and simulation writer must reject incompatible database modes/sources.
+
+The new designed POST returns 200 with source/generation time/updated count;
+its errors include 401 AUTH_REQUIRED, 403 CSRF_FAILED/ACCOUNT_DISABLED/
+SIMULATION_DISABLED, 409 SIMULATION_CLOCK_NOT_ADVANCED, 422 VALIDATION_ERROR
+and 503 SERVICE_UNAVAILABLE. Existing stale/changed-quote checks and atomic
+cash/holding/trade writes remain mandatory. #76 implements the shared transaction
+and simulation flow; #79 supplies sell calculations; Tue approved the #75 contract in PR #91. New commands/endpoints do not run yet.
 
 ## 2. Data model
 
@@ -356,3 +370,20 @@ exclusively creates a new DB and explicitly generated quotes; it refuses to rese
 an existing DB. A manual refresh checks auth, mode, sources and clock advancement
 before writing, preserves financial rows and never changes seed fixtures/DNSE
 timestamps. The source labels and separate DB boundary are part of the UI design.
+
+
+### Auth/buy integration and independent demo — 18 October 2026
+
+The application factory registers accounts, market/list JSON and orders, then
+installs the account module's real session/CSRF callbacks. Controllers translate
+AuthError to the same code/message/status envelope; domain services do not know
+HTTP. Guest trade pages offer visible login/register links and never request a
+private token. Financial writes revalidate session idle/absolute expiry, revocation
+and account status inside the same transaction as cash/holding/trade changes.
+
+Quote schema/API and explicit simulation are shared local infrastructure. The
+provider worker, stream command and websockets dependency are excluded from this
+buy branch and remain in #60, so provider verification cannot block the P0 demo.
+Auth and quote migrations have distinct ledgers/version ownership; seed reruns
+preserve grants, quotes and holdings. Portfolio links are exposed only after the
+real /portfolio GET route is registered by #81; no placeholder UI is presented.

@@ -1,3 +1,6 @@
+> Provider-specific instructions: run these only on feature/dnse-market-data (PR #60).
+> The buy/simulation branch deliberately has no worker or stream command.
+
 # DNSE market-data worker — #59
 
 This optional worker authenticates only to DNSE's market-data WebSocket and
@@ -82,3 +85,18 @@ acceptance evidence and are tracked under #76/#79.
 
 Protocol references: [DNSE market-data guide](https://developers.dnse.com.vn/docs/guide/market-data/connect/)
 and [official Python client](https://github.com/dnse-tech/openapi-sdk/blob/main/python/dnse/websocket/client.py).
+
+
+## Recheck — 18 October 2026
+
+The feed branch integrates main commit 25aff26, including real auth and its
+account migration; merge conflicts are resolved. Local suite: 120 passed,
+5 pre-existing money-rule placeholders skipped. No broker-order/OTP endpoint exists.
+
+A read-only probe started at 2026-10-18T16:08:49Z (23:08:49 UTC+7), using local
+credentials and a temporary DB. Authentication and subscription acknowledgement
+succeeded. During the bounded 25-second observation: zero tick events, zero
+reference events, zero persisted DNSE quotes. No secret or raw payload was logged.
+This verifies access only. Quote value/unit/provider-time comparison and live
+disconnect/restart acceptance still need an observation with actual events;
+#59 and #60 remain incomplete and must not be marked accepted from these results.

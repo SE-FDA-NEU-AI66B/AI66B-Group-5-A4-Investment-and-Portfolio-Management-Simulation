@@ -10,6 +10,7 @@ class Account:
     status: str
     expires_at: str
     revoked_at: str | None
+    last_seen_at: str
 
 
 @dataclass(frozen=True)

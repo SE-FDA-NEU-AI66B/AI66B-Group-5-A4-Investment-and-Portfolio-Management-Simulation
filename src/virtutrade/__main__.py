@@ -10,7 +10,7 @@ from virtutrade.database import init_database
 def main():
     parser = argparse.ArgumentParser(prog='python -m virtutrade',
                                      description='VirtuTrade M2 walking skeleton')
-    parser.add_argument('command', nargs='?', choices=['run', 'init-db', 'init-demo', 'stream'], default='run')
+    parser.add_argument('command', nargs='?', choices=['run', 'init-db', 'init-demo'], default='run')
     args = parser.parse_args()
     application = create_app()
     if args.command == 'init-db':
@@ -24,23 +24,7 @@ def main():
             init_demo(application.config['DATABASE'])
         except FileExistsError:
             parser.exit(1, 'Database already exists; use Generate demo quotes instead of resetting it.\n')
-        print('Simulation database ready: 12 generated quotes; register an account when authentication is available.')
-    elif args.command == 'stream':
-        import asyncio
-        import logging
-        import sqlite3
-
-        from virtutrade.dnse.worker import FeedError, Settings, run_feed
-        logging.basicConfig(level=logging.INFO)
-        try:
-            settings = Settings.from_environment(application.config['DATABASE'])
-            asyncio.run(run_feed(settings, application.config['DATABASE']))
-        except FeedError as exc:
-            parser.exit(1, str(exc) + '\n')
-        except sqlite3.Error:
-            parser.exit(1, 'Database unavailable; check setup and init-db.\n')
-        except KeyboardInterrupt:
-            pass
+        print('Simulation database ready: 12 generated quotes; open Market and Register to start.')
     else:
         application.run(host=os.environ.get('HOST', '127.0.0.1'),
                         port=int(os.environ.get('PORT', '5000')), debug=False)

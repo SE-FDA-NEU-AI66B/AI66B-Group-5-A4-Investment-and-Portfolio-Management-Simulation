@@ -1,4 +1,4 @@
-"""Real SQLite order rules; auth is an explicit test adapter until #77 lands."""
+"""Real SQLite order rules; HTTP integration with real auth is tested separately."""
 
 import sqlite3
 from concurrent.futures import ThreadPoolExecutor
@@ -27,13 +27,9 @@ def database(tmp_path):
             "INSERT INTO account(id,email,password_hash,created_at) VALUES(1,'test@example.test','test-only',?)",
             (NOW.isoformat(),),
         )
-        # This is only the reviewed #80 storage contract, not implemented login.
         c.execute(
-            "CREATE TABLE auth_session(id INTEGER PRIMARY KEY,account_id INTEGER,token_hash TEXT,created_at TEXT,expires_at TEXT,revoked_at TEXT)"
-        )
-        c.execute(
-            "INSERT INTO auth_session VALUES(1,1,?,?,?,NULL)",
-            ("test-only-hash", NOW.isoformat(), (NOW + timedelta(hours=1)).isoformat()),
+            "INSERT INTO auth_session(id,account_id,token_hash,created_at,expires_at,last_seen_at) VALUES(1,1,?,?,?,?)",
+            ("test-only-hash", NOW.isoformat(), (NOW + timedelta(hours=1)).isoformat(), NOW.isoformat()),
         )
     return path
 
@@ -134,6 +130,7 @@ def test_failed_trade_insert_rolls_back_cash_and_holding(database):
     [
         ("UPDATE auth_session SET revoked_at='2026-01-01T00:00:00Z'", "AUTH_REQUIRED"),
         ("UPDATE auth_session SET expires_at='2000-01-01T00:00:00Z'", "AUTH_REQUIRED"),
+        ("UPDATE auth_session SET last_seen_at='2000-01-01T00:00:00Z'", "AUTH_REQUIRED"),
         ("UPDATE account SET status='disabled'", "ACCOUNT_DISABLED"),
         ("UPDATE price_quote SET quoted_at='2000-01-01T00:00:00Z'", "QUOTE_STALE"),
         ("UPDATE price_quote SET quoted_at='2099-01-01T00:00:00Z'", "QUOTE_STALE"),
@@ -218,6 +215,7 @@ def test_routes_fail_closed_then_use_explicit_test_auth_adapter(database):
         {"TESTING": True, "DATABASE": str(database), "QUOTE_MODE": "simulation"}
     )
     client = app.test_client()
+    app.extensions.pop("orders_identity")
     before = snapshot(database)
     assert client.post("/api/orders/buy", json={}).status_code == 503
     assert b'href="/trade"' in client.get("/market").data

@@ -5,6 +5,7 @@ import sqlite3
 from contextlib import closing
 from pathlib import Path
 
+from virtutrade.accounts.repository import migrate_account_state
 from virtutrade.config import ROOT
 from virtutrade.database.migrations import migrate_market_data
 from virtutrade.database.schema import SCHEMA
@@ -42,4 +43,10 @@ def init_database(path):
                 ),
             )
         count = connection.execute("SELECT COUNT(*) FROM price_quote").fetchone()[0]
+        # The seed loop above leaves an open implicit transaction, so commit
+        # first: the migration opens its own explicit transaction and refuses
+        # a dirty connection. Idempotent: reruns change nothing.
+        connection.commit()
+        migrate_account_state(connection)
+        connection.commit()
     return count
