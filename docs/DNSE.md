@@ -100,3 +100,32 @@ reference events, zero persisted DNSE quotes. No secret or raw payload was logge
 This verifies access only. Quote value/unit/provider-time comparison and live
 disconnect/restart acceptance still need an observation with actual events;
 #59 and #60 remain incomplete and must not be marked accepted from these results.
+
+## Live ticks and controlled restart — 19 October 2026
+
+Tested application commit: `31d4f0a2db81e33567bddfbd412d0419ab94799d`.
+The [sanitized observation report](evidence/dnse-live-2026-10-19.json) records
+only public quote fields, counters and verification outcomes; it contains no
+credentials, account data or raw authentication payloads.
+
+At 10:43:31 UTC+7, a 25-second read-only session authenticated, subscribed and
+received five tick events. SQLite stored FPT at 57,800 VND and HPG at 20,900 VND
+with original provider timestamps and `source=dnse`. These are observations at
+those timestamps, not current-price promises or independently verified values.
+
+A separate temporary database was then used for two 25-second sessions starting
+at 10:44:51 and 10:45:16 UTC+7. The first received seven ticks. After stopping
+that connection, recreating Flask over the same database preserved the exact
+stored rows and `/api/market/quotes` still returned HTTP 200. A newly authenticated
+and subscribed connection received nine more ticks; the API then exposed FPT at
+57,700 VND and HPG at 20,950 VND with fresh provider timestamps and `stale=false`.
+The market HTML route returned HTTP 200 after each session. This verifies a
+controlled stop/reconnect and application recreation, not a real network-outage
+backoff test or a browser rendering test. Automated local-server tests cover
+the reconnect/backoff behavior separately.
+
+Neither probe received reference events, so live `previous_close_vnd` and
+`change` correctly remained null. Comparison against the public DNSE board
+has not been completed: no browser connection was available in this session.
+The final price/unit comparison acceptance criterion and independent review
+remain unchecked; #59 stays open with zero completed points.

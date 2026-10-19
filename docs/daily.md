@@ -50,3 +50,9 @@ After drafting #75, I resumed #59 in the src modules and verified real DNSE auth
 - @bianh13 — Integrated the current auth module with the buy branch, preserved quote/financial checks and separated the optional DNSE worker from the simulation demo.
 Verified real registration/login, CSRF/session rejection, persisted purchases and ambiguous-response handling with automated tests and a real browser, while portfolio acceptance remains with #81.
 Reconciled PO planning and contract evidence, resolved the feed branch conflicts and repeated a read-only DNSE probe that authenticated/subscribed but received no quote, leaving live price comparison and peer acceptance pending.
+
+## 2026-10-19
+
+- @bianh13 — Fixed the browser QA credential-scanner false positive in PR #92, reran both browser scenarios and verified that its GitHub CI passed.
+Observed real HPG/FPT ticks through the read-only DNSE worker, verified persisted quotes through the market API and checked data preservation across a controlled stop/reconnect and app recreation.
+Recorded sanitized evidence while leaving provider-board comparison, independent review and portfolio integration pending, so #59 and #76 remain open.

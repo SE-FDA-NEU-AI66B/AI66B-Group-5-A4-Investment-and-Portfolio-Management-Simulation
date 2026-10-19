@@ -20,7 +20,7 @@ implemented run; designed endpoints remain future work.
 | US11 P2 | S4.2 | Matched dates, shorter history, percentage-point gap | `/performance` | Deferred | Future benchmark and valuation snapshots | history #23 | Backlog |
 | US12 P2 | S4.3 | Top 10, own rank, timestamp tie-break | `/leaderboard` | Deferred | account; future performance-achievement timestamps | history #24 | Backlog |
 | US13 P1 | S5.1–S5.3 | Admin-only, disabled-account denial, audit, no regrant | `/admin/accounts` | PATCH `/api/admin/accounts/{id}/status` (designed) | account, audit_event | #46/#48 | Specified; schema present, service not implemented |
-| US14 P1 | S6.1–S6.3 | Valid/newer event only, deduplication, disconnect | DNSE adapter; external Machine User | Provider integration, not an app HTTP route | instrument, price_quote | #46/#48/#59 | Sprint 3 resumed; #59 Open; modular worker and list API tested; real authentication/subscription succeeded, but no tick/reference arrived in bounded probe; quote/unit comparison and review pending |
+| US14 P1 | S6.1–S6.3 | Valid/newer event only, deduplication, disconnect | DNSE adapter; external Machine User | Provider integration, not an app HTTP route | instrument, price_quote | #46/#48/#59 | Sprint 3 resumed; #59 Open; modular worker and list API tested; real HPG/FPT ticks persisted and reached the JSON API on 19 Oct; controlled stop/reconnect preserved data; reference events not observed; provider-board unit/value comparison and review pending |
 
 Access: market snapshot G/U (public read-only), trading/personal screens U,
 administration A, quote ingestion M. Implemented authentication gates are server-side; Admin remains planned.
