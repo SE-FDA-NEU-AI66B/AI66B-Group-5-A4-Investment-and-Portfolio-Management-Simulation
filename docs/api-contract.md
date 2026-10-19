@@ -187,8 +187,10 @@ Trying to sell 800 when only 500 are held returns 409:
 Execution contract (BR1/BR2/BR3/BR6): begin a write transaction, re-read session
 account status, cash/holding and latest quote; validate quantity, symbol,
 freshness and the exact `expected_quote_at` from preview. A changed snapshot
-returns 409 `QUOTE_CHANGED` (`Price changed; refresh the preview`); a stale quote
-returns 409 `QUOTE_STALE` (`Price may be delayed; refresh before trading`).
+returns 409 `QUOTE_CHANGED` (`Price changed; refresh the preview before confirming.`).
+A stale simulation quote returns 409 `QUOTE_STALE` with `Price may be delayed.
+Generate demo quotes, then preview again.`; a stale seed/DNSE quote instead says
+`Price may be delayed. Wait for a fresh market quote, then preview again.`
 Do not silently fill from a different timestamp or from an invalid future time.
 Re-check affordability/availability using the accepted snapshot, then update
 cash, the unique holding pair and trade together; roll back on any error.
@@ -400,9 +402,8 @@ Preview a buy with `{"side":"buy","symbol":"HPG","quantity":1000}`. At
 
 If accepted, return section 5's 201 result: 72,000,000 cash and 1,000 HPG. If a
 refresh happened after preview, return 409 `QUOTE_CHANGED`: "Price changed;
-refresh the preview. Check the new price before confirming your order." If the
-timestamp is older than 900 seconds, return 409 `QUOTE_STALE`: "This quote is
-over 15 minutes old. Generate demo quotes, then preview your order again."
+refresh the preview before confirming." If the timestamp is older than 900 seconds,
+return 409 `QUOTE_STALE`: "Price may be delayed. Generate demo quotes, then preview again."
 In DNSE mode advise waiting for a fresh feed quote instead; never expose a demo
 refresh as the cure for a provider outage. Existing section 5 shortage/quantity
 errors and section 6 portfolio ownership/valuation rules remain unchanged.
