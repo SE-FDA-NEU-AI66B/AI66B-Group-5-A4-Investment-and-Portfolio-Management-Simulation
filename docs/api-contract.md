@@ -5,11 +5,11 @@ Owner: @bianh13. M3 reviewer: @nguyentue110; agreement approved in PR #91 on 12 
 
 This contract separates implemented routes from planned work. Auth HTML/API
 routes and the public seeded market are on main via #93. Portfolio, sell and
-stock detail are still planned. The buy/simulation integration is PR #92;
+stock detail are still planned. The buy/simulation integration is on main via merged PR #92;
 the optional provider worker is PR #60, with live price acceptance pending.
 On this checkout, real auth, GET /trade, POST /api/orders/preview,
 POST /api/orders/buy, POST /api/simulation/quotes/refresh and the quote
-list JSON endpoint run. The DNSE worker is not shipped on this branch.
+list JSON endpoint run. Optional DNSE worker integration is tracked separately in PR #60.
 
 ## 1. Conventions and access
 

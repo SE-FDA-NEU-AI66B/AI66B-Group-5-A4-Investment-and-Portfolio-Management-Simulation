@@ -10,7 +10,7 @@ submit before the end of 20 October. [Issues](https://github.com/SE-FDA-NEU-AI66
 · [UI dossier](docs/ui.md) · [SETUP](docs/SETUP.md).
 
 Current checkout: real registration/login/logout and the database-backed market are implemented.
-This buy integration branch also supports authenticated previews, virtual purchases and explicit simulation quotes.
+Main includes authenticated previews, virtual purchases and explicit simulation quotes through merged PR #92.
 Search/detail, sell and portfolio are still pending; see the table and linked evidence.
 
 | P0 story | Where the user starts | Current status |
@@ -35,7 +35,7 @@ A **"paper trading"** application: Users can buy and sell stocks using **virtual
 
 **Sprint 2 / Milestone 2:** [Assigned issues](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/milestone/1) · [Sprint plan](docs/sprint-log.md#sprint-2---milestone-2). Submission deadline: **5 October 2026, 00:00 (UTC+7)**.
 
-**Run the M2 walking skeleton:** [New-machine setup guide](docs/SETUP.md). `/market` reads 12 demo quotes from SQLite; the optional [DNSE worker](docs/DNSE.md) is under Sprint 3 verification and buy/simulation runs on this branch; sell and portfolio remain pending. [Design draft](docs/design.md) · [API contract](docs/api-contract.md).
+**Run the M2 walking skeleton:** [New-machine setup guide](docs/SETUP.md). `/market` reads 12 demo quotes from SQLite; the optional [DNSE worker](docs/DNSE.md) is under Sprint 3 verification and buy/simulation is on main via #92; sell and portfolio remain pending. [Design draft](docs/design.md) · [API contract](docs/api-contract.md).
 
 **Code modules:** The market page's routes, service, query, HTML and CSS live in
 [src/virtutrade/market/](src/virtutrade/market/); shared schema/seed code lives in

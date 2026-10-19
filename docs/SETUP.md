@@ -180,7 +180,9 @@ password; it does not replace the independent-machine verification under #83.
 
 ## Optional provider work — separate PR #60
 
-This buy checkout has no DNSE worker, `stream` command or websockets dependency.
-The provider code and tests remain on `feature/dnse-market-data` in PR #60. Follow
-its version of [DNSE.md](DNSE.md) only on that branch. Live tick/reference reception,
-price-unit comparison and review are still pending; no keys are needed here.
+The optional worker, `stream` command and provider tests are maintained in PR #60.
+For a checkout containing that worker, follow [DNSE.md](DNSE.md) and keep its database
+separate from the simulation database. The labelled simulation workflow above
+needs no provider keys. The 19 October probe on the provider branch received real
+ticks; provider-board price/unit comparison and independent review remain pending.
+Repeat independent-machine SETUP on the final merged revision under #83.
