@@ -111,3 +111,18 @@ def test_two_accounts_stay_isolated(tmp_path):
     assert cash_of(db_path, 'b@example.com') == GRANT
     assert b'50,000,000 VND' in client_a.get('/market').data
     assert b'100,000,000 VND' in client_b.get('/market').data
+
+
+def test_client_selected_balance_never_overrides_the_grant(tmp_path):
+    """Extra client fields cannot choose or add to the initial balance."""
+    agent, _app, db_path = make_client(tmp_path)
+    response = register(agent, email='c@example.com')
+    assert response.status_code == 201
+    assert response.json['account']['cash_vnd'] == GRANT
+    extra = agent.post('/api/accounts', json={
+        'email': 'd@example.com', 'password': PASSWORD,
+        'cash_vnd': 1, 'initial_balance': 1, 'balance': 1,
+    }, headers={'X-CSRF-Token': mint_preauth_csrf(SECRET)})
+    assert extra.status_code == 201
+    assert extra.json['account']['cash_vnd'] == GRANT
+    assert cash_of(db_path, 'd@example.com') == GRANT

@@ -56,3 +56,6 @@ Reconciled PO planning and contract evidence, resolved the feed branch conflicts
 - @bianh13 — Separated the browser QA email and randomly generated password assignments to remove a false positive from the existing credential scanner without changing its rules.
 Reran both browser scenarios through real registration, login and persisted simulated purchases, including disconnected and gateway-error responses after a committed order, and both passed.
 Portfolio integration and peer acceptance remain pending, so this correction does not close #76 or establish live DNSE quote verification for #59.
+- @nguyentue110 — Brought the #78 grant display onto `main` after the earlier slice landed only on the old auth branch, keeping the one-time grant unchanged.
+Expanded the grant tests for client-supplied balance fields and captured a real-browser screenshot of the Market-header balance after registration and login.
+The Portfolio balance and independent verification remain pending #81/#83.
