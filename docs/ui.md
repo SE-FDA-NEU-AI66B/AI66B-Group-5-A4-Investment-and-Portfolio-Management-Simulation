@@ -306,6 +306,13 @@ code of `ACCOUNT_DISABLED`, and the `VALIDATION_ERROR` messages have no test.
 | 409 `EMAIL_IN_USE` | US01 - an email can register only once | Email already in use | Sign in with this email, or register with another one. |
 | 401 `INVALID_CREDENTIALS` | US01 - wrong password and unknown email give the same answer | Invalid email or password | Check both fields and try again. |
 | 429 `LOGIN_LOCKED` | US01 - five wrong passwords lock the account for 15 minutes | Account locked. Try again in N seconds. (N is the remaining time from the server) | You can sign in again when the countdown ends. |
+| 409 `QUOTE_STALE` | BR3 / US04 - stale quotes cannot authorize a buy | Price may be delayed. Generate demo quotes, then preview again. | Recovery is included in this exact simulation-mode message; verified through the real preview endpoint on 20 October, see [buy evidence](buy-acceptance.md). |
+
+Buy/US10 also shows `Exceeds available balance by 12,000,000 VND. Reduce the quantity.`
+for the 4,000 HPG fixture, with confirmation disabled. This is a warning returned
+by a successful preview (HTTP 200), not an API error code. A real server-rejected
+stale preview is the fourth reachable error above; its fixture ages only the
+throwaway test database. DNSE/seed mode uses `Price may be delayed. Wait for a fresh market quote, then preview again.`
 
 ### 3.2 Implemented, not reachable as visible text today
 
@@ -316,17 +323,16 @@ code of `ACCOUNT_DISABLED`, and the `VALIDATION_ERROR` messages have no test.
 | 403 `CSRF_FAILED` | Every state-changing request needs a valid CSRF token | Invalid or missing CSRF token | Reload the page and try again. | Appears only when a form stays open past its token lifetime (pre-auth tokens last about one to two hours). |
 | 401 `AUTH_REQUIRED` | Private routes need a valid session | Authentication required | Sign in again to continue. | Browser pages redirect a guest to Login instead of showing text; the message reaches JSON clients, and the Trade and Portfolio pages once built if a session expires mid-use. |
 
-### 3.3 Proposed - not implemented until #76 and #79 merge
+### 3.3 Other order errors ? buy implemented; sell integration pending #98
 
-Amounts below are the acceptance fixtures; the screen shows the user's own numbers.
+Buy handling below is implemented via #92, with service/route coverage; this table alone does not prove each browser trigger. Sell remains in open PR #98. Amounts are acceptance fixtures; the screen shows the user's own numbers.
 
 | API error code | Business rule | API message (contract) | UI hint (proposal) |
 | -------------- | ------------- | ---------------------- | ------------------ |
-| 409 `INSUFFICIENT_CASH` | BR1 - an order may not cost more than the available cash | Insufficient cash: this order needs 360,000,000 VND but only 72,000,000 VND is available | Reduce the quantity and preview again. |
+| 409 `INSUFFICIENT_CASH` | BR1 - an order may not cost more than the available cash | Insufficient cash: this order needs 360,000,000 VND but only 72,000,000 VND is available. Reduce the quantity and preview again. | Included in the message. |
 | 409 `INSUFFICIENT_SHARES` | BR2 - a sale may not exceed the shares held | You hold 500 HPG; the maximum you can sell is 500 | Reduce the quantity and preview again. |
-| 422 `INVALID_QUANTITY` | US04/US05 - quantity is a whole number of at least 1 | Quantity must be a whole number of at least 1 share | Enter a whole number of 1 or more and preview again. |
-| 409 `QUOTE_CHANGED` | BR3 - the fill uses the quote accepted at submission | Price changed; refresh the preview | Check the new price before confirming your order. |
-| 409 `QUOTE_STALE` | US03/US14 - a quote older than 15 minutes cannot authorize a trade | Price may be delayed; refresh before trading | Simulation mode: generate demo quotes, then preview again. DNSE mode: wait for a fresh quote, then preview again. |
+| 422 `INVALID_QUANTITY` | US04/US05 - quantity is a whole number of at least 1 | Quantity must be a whole number of at least 1 share. | Enter a whole number of 1 or more and preview again. |
+| 409 `QUOTE_CHANGED` | BR3 - the fill uses the quote accepted at submission | Price changed; refresh the preview before confirming. | Recovery is included in the message. |
 
 Rows in 3.3 move to 3.1 only after someone has reproduced them in a browser.
 Place errors next to the relevant input or in an accessible alert, and never

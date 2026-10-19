@@ -1,8 +1,11 @@
 """Browser QA using real registration/login and SQLite, with no auth overrides."""
+import argparse
+import json
 import secrets
 import sqlite3
 import tempfile
 from contextlib import closing
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from threading import Thread
 
@@ -13,7 +16,19 @@ from virtutrade.app import create_app
 from virtutrade.simulation.repository import init_demo
 
 
-def main(loss_mode="disconnect"):
+def main(loss_mode="disconnect", evidence_dir=None):
+    observations = []
+
+    def capture(page, name):
+        if evidence_dir is None:
+            return
+        evidence_dir.mkdir(parents=True, exist_ok=True)
+        filename = f"buy-{loss_mode}-{name}.png"
+        page.screenshot(path=str(evidence_dir / filename), full_page=True)
+        observations.append({"state": name, "screenshot": filename,
+                             "observed_at_utc": datetime.now(timezone.utc).isoformat(),
+                             "route": page.url.split(str(server.server_port), 1)[-1]})
+
     with tempfile.TemporaryDirectory(prefix="buy-ui-") as tmp:
         database = Path(tmp) / "demo.db"
         init_demo(database)
@@ -33,6 +48,7 @@ def main(loss_mode="disconnect"):
                 page.goto(f"http://127.0.0.1:{server.server_port}/")
                 page.get_by_role("link", name="Buy shares", exact=True).click()
                 expect(page.get_by_role("button", name="Preview order")).to_be_disabled()
+                capture(page, "guest-guard")
                 page.get_by_role("link", name="Register", exact=True).click()
                 page.get_by_label("Email", exact=True).fill(email)
                 page.get_by_label("Password", exact=False).fill(password)
@@ -44,11 +60,31 @@ def main(loss_mode="disconnect"):
                 expect(page.locator("#order-error")).to_contain_text(
                     "Exceeds available balance by 12,000,000 VND")
                 expect(page.get_by_role("button", name="Confirm buy")).to_be_disabled()
+                expect(page.locator("#order-status")).to_have_text("Adjust the quantity to continue.")
+                capture(page, "shortfall")
                 page.get_by_label("Number of shares").fill("1000")
                 expect(page.get_by_role("button", name="Confirm buy")).to_be_enabled()
                 page.get_by_role("button", name="Confirm buy").click()
                 expect(page.locator("#result")).to_contain_text("72,000,000 VND")
                 expect(page.locator("#result")).to_contain_text("Holding: 1000 shares")
+                expect(page.locator("#estimate")).to_be_hidden()
+                capture(page, "receipt")
+                # Test fixture: age the stored quote so the UI exercises a real
+                # server rejection; recovery must use the visible demo control.
+                with closing(sqlite3.connect(database)) as connection, connection:
+                    connection.execute(
+                        "UPDATE price_quote SET quoted_at = ?",
+                        ((datetime.now(timezone.utc) - timedelta(minutes=20)).isoformat(),),
+                    )
+                page.get_by_role("button", name="Preview order").click()
+                expect(page.locator("#order-error")).to_contain_text(
+                    "Price may be delayed. Generate demo quotes, then preview again.")
+                expect(page.locator("#order-status")).to_have_text(
+                    "Preview unavailable. Review the message below.")
+                expect(page.get_by_role("button", name="Confirm buy")).to_be_disabled()
+                capture(page, "stale-quote")
+                page.get_by_role("button", name="Generate demo quotes").click()
+                expect(page.get_by_role("button", name="Confirm buy")).to_be_enabled()
                 page.get_by_role("link", name="Market", exact=True).click()
                 page.get_by_role("button", name="Log out").click()
                 page.get_by_role("link", name="Log in", exact=True).click()
@@ -76,12 +112,22 @@ def main(loss_mode="disconnect"):
                 expect(page.locator("#order-error")).to_contain_text("Order result is unknown")
                 expect(page.get_by_role("button", name="Confirm buy")).to_be_disabled()
                 expect(page.get_by_role("button", name="Preview order")).to_be_disabled()
+                capture(page, "unknown-result")
                 assert not errors, errors
                 browser.close()
             with closing(sqlite3.connect(database)) as connection:
                 assert connection.execute("SELECT COUNT(*) FROM trade").fetchone()[0] == 2
                 assert connection.execute("SELECT cash_vnd FROM account").fetchone()[0] == 71_972_000
                 assert connection.execute("SELECT quantity FROM holding").fetchone()[0] == 1001
+            if evidence_dir is not None:
+                report = {"scenario": loss_mode, "passed": True, "observations": observations,
+                          "database_assertions": {"trades": 2, "cash_vnd": 71_972_000, "shares": 1001},
+                          "limitations": ["Author QA, not independent-machine acceptance.",
+                                          "Page captures exclude browser chrome/address bar; not M3 submission screenshots.",
+                                          "Stale quote is a controlled temporary-database fixture.",
+                                          "Portfolio transition remains pending #81."]}
+                (evidence_dir / f"buy-{loss_mode}.json").write_text(
+                    json.dumps(report, indent=2) + "\n", encoding="utf-8")
             print(f"PASS ({loss_mode}): real registration/login/logout, guest guard, shortage/correction, "
                   "persisted buy, demo refresh and ambiguous committed-order handling; "
                   "no fake auth, no provider calls, portfolio acceptance still pending #81.")
@@ -92,5 +138,8 @@ def main(loss_mode="disconnect"):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--evidence-dir", type=Path, help="Save page captures and sanitized QA results")
+    args = parser.parse_args()
     for loss_mode in ("disconnect", "gateway"):
-        main(loss_mode)
+        main(loss_mode, args.evidence_dir)

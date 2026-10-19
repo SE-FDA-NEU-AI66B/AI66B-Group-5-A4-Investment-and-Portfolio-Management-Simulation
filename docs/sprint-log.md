@@ -533,3 +533,14 @@ stored quotes across a controlled restart, but provider-board comparison and
 independent review remain pending. #60 and documentation PR #97 are refreshed
 against current main; neither is merged by this reconciliation. Main's reviewed
 wireframes, real auth and buy/simulation behavior must be retained during review.
+
+### Acceptance follow-up — 20 October 2026
+
+#75's final documentation checkbox is supported by the reviewed #91 diff, which
+updated design.md, api-contract.md and ui.md together; its closed state stands.
+#76's code was merged, but its recorded Portfolio/full-journey handoff remains
+unfinished. It is reopened for that acceptance work and the new buy UI fixes;
+the earlier closed-state notes describe GitHub's state on 19 October only.
+See [buy acceptance evidence](buy-acceptance.md). No additional points are added
+and no final velocity is inferred from this update. #59 still needs provider-board
+comparison and independent acceptance; #74's confirmed planning remains complete.

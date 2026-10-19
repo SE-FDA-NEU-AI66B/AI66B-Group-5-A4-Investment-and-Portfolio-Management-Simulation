@@ -45,6 +45,11 @@ to shared form/routes. The #75 contract is approved in #91. Vu owns market searc
 detail #85 and the dossier #86; no stock-detail implementation is claimed here.
 Do not close #76 or mark the entire M3 flow works before integration and review.
 
+The [20 October evidence](buy-acceptance.md) adds saved browser captures,
+machine-readable results, a stale-quote/recovery check, and fixes for the stuck
+preview-loading text and the obsolete cash estimate after a successful purchase.
+It retains the Portfolio and independent-acceptance boundaries above.
+
 ## Reproduce
 
 Follow docs/SETUP.md for a new simulation DB and real UI registration. Optional

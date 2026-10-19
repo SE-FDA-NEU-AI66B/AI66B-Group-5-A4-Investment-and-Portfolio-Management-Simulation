@@ -68,3 +68,9 @@ Updated `docs/ui.md` and traceability for US05; a Sell link from a holding still
 - @nguyentue110 — Brought the #78 grant display onto `main` after the earlier slice landed only on the old auth branch, keeping the one-time grant unchanged.
 Expanded the grant tests for client-supplied balance fields and captured a real-browser screenshot of the Market-header balance after registration and login.
 The Portfolio balance and independent verification remain pending #81/#83.
+
+## 2026-10-20
+
+- @bianh13 — Verified the reviewed and merged #75 contract against its remaining checklist and reconciled my outstanding acceptance work.
+Extended the real-auth buy browser checks with saved evidence and stale-quote recovery, then fixed the stuck loading status and obsolete cash estimate discovered during those checks.
+Synchronized the buy error documentation while retaining the remaining #81 Portfolio handoff, independent review and DNSE board-comparison requirements instead of claiming them complete.
