@@ -53,9 +53,18 @@ Reconciled PO planning and contract evidence, resolved the feed branch conflicts
 
 ## 2026-10-19
 
-- @bianh13 — Separated the browser QA email and randomly generated password assignments to remove a false positive from the existing credential scanner without changing its rules.
-Reran both browser scenarios through real registration, login and persisted simulated purchases, including disconnected and gateway-error responses after a committed order, and both passed.
-Portfolio integration and peer acceptance remain pending, so this correction does not close #76 or establish live DNSE quote verification for #59.
+- @bianh13 — Fixed the browser QA credential-scanner false positive in PR #92, reran both real-browser scenarios and verified passing GitHub checks.
+Observed real HPG/FPT ticks through the read-only DNSE worker, checked persisted quotes via the market API and verified data preservation across a controlled stop/reconnect and app recreation.
+After #92 and #96 merged, reconciled #60 and #97 against current main while retaining the provider module, buy/auth behavior and reviewed wireframes; provider-board comparison, final portfolio integration and independent acceptance remain pending.
+
+#### Existing teammate entry from PR #98
+
+- @nguyentue110 — Rebased the #79 sell slice onto `main` after #92 merged and retargeted PR #98 to `main`.
+Ran a real-browser sell journey through registration, a buy, a partial sale, an oversell warning and a full sale, saving both screenshots under `docs/images/ui/`.
+Updated `docs/ui.md` and traceability for US05; a Sell link from a holding still waits for the Portfolio screen in #81.
+
+#### Existing teammate entry from PR #99
+
 - @nguyentue110 — Brought the #78 grant display onto `main` after the earlier slice landed only on the old auth branch, keeping the one-time grant unchanged.
 Expanded the grant tests for client-supplied balance fields and captured a real-browser screenshot of the Market-header balance after registration and login.
 The Portfolio balance and independent verification remain pending #81/#83.

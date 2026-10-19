@@ -16,16 +16,17 @@ behavior not on `main`) and **open PR work**.
 | Story | Screen(s) | Route | Status | Issue | Notes |
 | ----- | --------- | ----- | ------ | ----- | ----- |
 | US01 - Register / sign in | Register, Login | `/register`, `/login` | partly works | [#77](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/77) | Implemented: both pages, session cookie, CSRF, lockout; both redirect to Market list today. Planned: return to the page the guest came from via a local `next` (proposed), otherwise Portfolio once #81 lands. Open PR: <add number or "none">. |
-| US02 - Initial virtual capital | Register | `/register` | partly works | [#78](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/78) | Implemented in #78: 100,000,000 VND granted once at registration and shown in the Market header (browser evidence `docs/images/ui/grant-balance.png`). Planned: the same balance on the Portfolio screen (#81). |
+| US02 - Initial virtual capital | Register, Trade | `/register`, `/trade` | partly works | [#78](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/78) | On main: 100,000,000 VND granted once at registration; Trade shows cash. Open PR #99: Market-header balance, additional tests and [author screenshot](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/blob/7dcd74f/docs/images/ui/grant-balance.png). Planned: Portfolio balance (#81). |
 | US03 - Find a stock and inspect its quote | Market list, Stock detail | `/market`, `/market/<symbol>` | partly works | [#85](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/85) | Implemented: Market list only. Planned (#85): search (`?q=`, proposed) and Stock detail. Open PR: <add number or "none">. |
-| US04 - Buy shares | Stock detail, Trade | `/market/<symbol>`, `/trade?side=buy&symbol=HPG` | not started | [#76](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/76) | Planned: Buy on Stock detail; a guest is sent to Login first. |
-| US05 - Sell shares | Portfolio, Trade | `/portfolio`, `/trade?side=sell&symbol=HPG` | not started | [#79](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/79) | Planned: Sell on each Portfolio holding, keeping the symbol in the link. Needs the shared order code from #76 and the Portfolio screen from #81. |
+| US04 - Buy shares | Market list, Trade | `/market`, `/trade` | partly works | [#76](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/76) | Implemented on main via #92: Market Buy shares link, guest guard, authenticated preview and purchase receipt. Planned: Stock detail entry and Portfolio transition (#81). |
+| US05 - Sell shares | Portfolio, Trade | `/portfolio`, `/trade?side=sell&symbol=HPG` | not started | [#79](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/79) | Open PR #98 (partly works on its branch): sell preview/confirm, partial/full sale and oversell warning; [author browser evidence](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/tree/28fe0ee/docs/images/ui) from 19 October. Planned: Sell entry from a Portfolio holding (#81). |
 | US06 - View portfolio | Portfolio | `/portfolio` | not started | [#81](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/81) | Planned: a "Portfolio" header link for signed-in users. |
-| US10 - Insufficient-balance warning | Trade | `/trade?side=buy&symbol=HPG` | not started | [#76](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/76) | Planned: inline warning on the buy preview. |
+| US10 - Insufficient-balance warning | Trade | `/trade` | partly works | [#76](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/76) | Implemented on main via #92: inline shortfall, disabled confirmation and correction. Final independent P0 journey evidence remains pending. |
 
 On `main` today: `/` redirects to Market list; Register, Login and Log out are
-reachable from the Market list header; there is no Portfolio link and no Trade
-screen. Everything else in this document is planned.
+reachable from the Market list header, which also links to the Trade screen for
+buying shares. There is no Portfolio link until #81 lands. Wireframes below show
+the target design; the table and flow distinguish implemented and planned paths.
 
 ### Screen flow (solid = on `main`, dashed = planned)
 
@@ -37,17 +38,22 @@ flowchart TD
     Login -->|success, today| Market
     Register -->|success, today| Market
     Market -->|Log out| Market
+    Market -->|Buy shares| Trade[Trade /trade]
+    Trade -->|guest: Log in| Login
+    Trade -->|guest: Register| Register
+    Trade -->|Market link| Market
+    Trade -->|saved buy: receipt on Trade| Trade
+    Trade -->|rejected or invalid: stay, fix input| Trade
 
     Market -. "header Portfolio, signed in" .-> Portfolio[Portfolio /portfolio]
     Market -. "header Portfolio, guest" .-> Login
     Market -. "select a stock" .-> Detail[Stock detail /market/symbol]
-    Detail -. "Buy, signed in" .-> Trade[Trade /trade]
+    Detail -. "Buy, signed in" .-> Trade
     Detail -. "Buy, guest" .-> Login
     Login -. "success, came from Buy: back to Trade (local next)" .-> Trade
     Login -. "success, no next" .-> Portfolio
     Register -. "same as Login" .-> Portfolio
     Trade -. "order saved (201)" .-> Portfolio
-    Trade -. "rejected or invalid: stay, fix input" .-> Trade
     Trade -. "result unknown: Check your portfolio" .-> Portfolio
     Portfolio -. "Sell on a holding" .-> Trade
     Portfolio -. "header Market" .-> Market
@@ -55,7 +61,8 @@ flowchart TD
     Portfolio -. "Buy more" .-> Trade
 ```
 
-Trade → Portfolio means an order that was **saved**, not a click on Confirm.
+The planned Trade → Portfolio path means an order that was **saved**, not a click
+on Confirm; the current buy implementation displays its receipt on Trade.
 A rejected order keeps the user on Trade with the error beside the input.
 The `next` value must be a local path (`/trade?...`), never an external URL.
 
@@ -239,9 +246,9 @@ show separate validation states; an invalid order cannot be confirmed.*
 ```
 
 After an order is saved, show its result on the Portfolio page. For example:
-"Sold 1,000 HPG at 30,000.  
-Proceeds 30,000,000 VND.  
-Realised P&L +2,000,000 VND."  
+"Sold 1,000 HPG at 30,000.\
+Proceeds 30,000,000 VND.\
+Realised P&L +2,000,000 VND."\
 Realised P&L appears only after the order is saved; the preview API does not return it.
 
 Shared states:
@@ -366,6 +373,6 @@ server-committed purchase whose response was lost, with submission locked afterw
 
 US04/US10 remain **partly works** until peer acceptance and the real #81 portfolio
 transition. `/portfolio` links appear only when that real GET route is registered;
-there is no placeholder portfolio. #86 wireframes remain Vu's PR #96 and are not
-claimed complete by this integration note. Auth error messages stay unchanged;
+there is no placeholder portfolio. Vu's #96 wireframes merged on 19 October;
+this integration note does not replace final browser evidence. Auth error messages stay unchanged;
 the buy UI adds separate recovery guidance for login, CSRF and disabled accounts.

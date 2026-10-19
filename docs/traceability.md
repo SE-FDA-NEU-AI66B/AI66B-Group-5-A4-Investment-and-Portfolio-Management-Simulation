@@ -8,19 +8,19 @@ implemented run; designed endpoints remain future work.
 | Story | Scenario steps | Acceptance checks | Screen / entry | Endpoint (proposed unless stated) | Tables | Work / history | Implementation / verification |
 |-------|----------------|-------------------|----------------|----------------------------------|--------|----------------|-------------------------------|
 | US01 P0 | S1.1 | Register, login, duplicate email, lockout | `/` | POST `/api/accounts`, POST `/api/sessions` | account | #46; history #13 | Auth implemented on main via #93; final independent UI evidence remains #82/#83 |
-| US02 P0 | S1.1 | 100,000,000 VND once | `/` registration | POST `/api/accounts` | account | #46; history #14 | One-time grant and Market-header balance implemented/tested in #78; Portfolio display pending #81 |
-| US03 P0 | S1.2, S2.1, S6.3 | Price, daily change, timestamp, delayed/unknown ticker | `/market` | GET `/market` **implemented**; GET `/api/market/quotes/{symbol}` designed; list JSON implemented in resumed PR #60 (Sprint 3), review pending | instrument, price_quote | #50; history #15 | Snapshot subset implemented and locally tested; search/detail and live feed pending |
-| US04 P0 | S1.3–S1.4 | Preview, valid fill, insufficient cash, invalid quantity | `/trade` | POST `/api/orders/preview`, POST `/api/orders/buy` | account, holding, trade, price_quote | #46/#49; history #16 | Real auth/buy integration tested in #92 on 18 October; portfolio transition and peer acceptance pending |
-| US05 P0 | S2.2–S2.3 | Fill, realised result, oversell, quote time | `/trade` | POST `/api/orders/preview`, POST `/api/orders/sell` | account, holding, trade, price_quote | #46/#49; history #17 | Specified; not implemented |
+| US02 P0 | S1.1 | 100,000,000 VND once | `/` registration | POST `/api/accounts` | account | #46; history #14 | One-time grant on main via #93; Market-header balance and additional grant tests are in open PR #99 for #78; Portfolio display pending #81 |
+| US03 P0 | S1.2, S2.1, S6.3 | Price, daily change, timestamp, delayed/unknown ticker | `/market` | GET `/market` **implemented**; GET `/api/market/quotes/{symbol}` designed; list JSON on main via merged #92; optional worker in #60 | instrument, price_quote | #50; history #15 | Snapshot subset implemented and locally tested; search/detail and live feed pending |
+| US04 P0 | S1.3–S1.4 | Preview, valid fill, insufficient cash, invalid quantity | `/trade` | POST `/api/orders/preview`, POST `/api/orders/buy` | account, holding, trade, price_quote | #46/#49; history #16 | Real auth/buy integration merged via #92 on 19 October; portfolio transition and final independent journey evidence pending |
+| US05 P0 | S2.2–S2.3 | Fill, realised result, oversell, quote time | `/trade` | POST `/api/orders/preview`, POST `/api/orders/sell` | account, holding, trade, price_quote | #46/#49; history #17 | Open PR #98: sell preview/confirm, exact allocation, oversell tests and author browser evidence (19 October); not on main at 97973d2; Portfolio entry pending #81 |
 | US06 P0 | S1.5, S2.1, S2.3 | Quantity, cost, P&L, NAV, empty portfolio | `/portfolio` | GET `/api/portfolio` | account, holding, instrument, price_quote | #46/#49; history #18 | Specified; not implemented |
-| US10 P0 | S1.3 | Inline warning, disable/re-enable confirmation | `/trade` | POST `/api/orders/preview`, GET `/api/portfolio`; POST `/api/orders/buy` independently enforces BR1 | account, price_quote | #46/#49; history #22 | Real auth/buy integration tested in #92 on 18 October; portfolio transition and peer acceptance pending |
+| US10 P0 | S1.3 | Inline warning, disable/re-enable confirmation | `/trade` | POST `/api/orders/preview`, GET `/api/portfolio`; POST `/api/orders/buy` independently enforces BR1 | account, price_quote | #46/#49; history #22 | Real auth/buy integration merged via #92 on 19 October; portfolio transition and final independent journey evidence pending |
 | US07 P1 | S3.1–S3.2 | Threshold trigger, no holding, single auto-close | `/trade` | Deferred | Future conditional-order storage; holding, trade | history #19 | Backlog; schema extension needed |
 | US08 P1 | S2.4, S3.2 | Newest first, empty state, paging, auto-order label | `/history` | Deferred | trade; rejected-attempt/trigger metadata needs extension | history #20 | Backlog; current trade table stores fills only |
 | US09 P2 | S4.1 | Time series, seven points, return, initial flat line | `/performance` | Deferred | Future daily valuation snapshots | history #21 | Backlog |
 | US11 P2 | S4.2 | Matched dates, shorter history, percentage-point gap | `/performance` | Deferred | Future benchmark and valuation snapshots | history #23 | Backlog |
 | US12 P2 | S4.3 | Top 10, own rank, timestamp tie-break | `/leaderboard` | Deferred | account; future performance-achievement timestamps | history #24 | Backlog |
 | US13 P1 | S5.1–S5.3 | Admin-only, disabled-account denial, audit, no regrant | `/admin/accounts` | PATCH `/api/admin/accounts/{id}/status` (designed) | account, audit_event | #46/#48 | Specified; schema present, service not implemented |
-| US14 P1 | S6.1–S6.3 | Valid/newer event only, deduplication, disconnect | DNSE adapter; external Machine User | Provider integration, not an app HTTP route | instrument, price_quote | #46/#48/#59 | Sprint 3 resumed; #59 Open; modular worker and list API tested; real authentication/subscription succeeded, but no tick/reference arrived in bounded probe; quote/unit comparison and review pending |
+| US14 P1 | S6.1–S6.3 | Valid/newer event only, deduplication, disconnect | DNSE adapter; external Machine User | Provider integration, not an app HTTP route | instrument, price_quote | #46/#48/#59 | Sprint 3 resumed; #59 Open; modular worker and list API tested; real HPG/FPT ticks persisted and reached the JSON API on 19 Oct; controlled stop/reconnect preserved data; reference events not observed; provider-board unit/value comparison and review pending |
 
 Access: market snapshot G/U (public read-only), trading/personal screens U,
 administration A, quote ingestion M. Implemented authentication gates are server-side; Admin remains planned.
@@ -30,11 +30,11 @@ administration A, quote ingestion M. Implemented authentication gates are server
 | Rule | Enforcement design | Evidence today |
 |------|--------------------|----------------|
 | BR1 | Atomic buy transaction rechecks cash; nonnegative cash CHECK is a second guard | Atomic buy revalidation, rollback and concurrency tests in #92 |
-| BR2 | Atomic sell transaction rechecks held quantity | Schema guards only; no sell service |
-| BR3 | Capture accepted quote inside the order transaction | Snapshot schema only |
+| BR2 | Atomic sell transaction rechecks held quantity | Atomic sell revalidation, rollback, oversell and concurrency tests in open PR #98 |
+| BR3 | Capture accepted quote inside the order transaction | Buy quote revalidation on main via #92; sell transaction equivalent in open PR #98 |
 | BR4 | Conditional-order monitor with idempotent execution | Deferred |
-| BR5 | Account creation grants 100,000,000 VND once; login/enable never grants again | Real account service and grant-once/no-regrant tests in #93/#78 |
-| BR6 | Exact total cost / quantity; partial-sale whole-VND allocation and final residual per money-rules.md | Integer cost storage; rounding contract ready for review, trading service pending |
+| BR5 | Account creation grants 100,000,000 VND once; login/enable never grants again | Real account service and grant-once tests in #93; client-balance/no-regrant tests extended in open PR #99 for #78 |
+| BR6 | Exact total cost / quantity; partial-sale whole-VND allocation and final residual per money-rules.md | Integer cost storage; partial-sale allocation implemented/tested in open PR #98 |
 | BR7 | Benchmark/performance service compares matching dates | Deferred |
 | BR8 | Ranking uses achievement timestamps to break ties | Deferred |
 | BR9 | Role check and atomic status-change/audit write | CHECKs/FKs only; service pending |
