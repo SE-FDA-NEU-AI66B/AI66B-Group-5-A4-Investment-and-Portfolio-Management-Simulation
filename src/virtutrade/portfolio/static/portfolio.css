@@ -1,0 +1,69 @@
+:root{font-family:Segoe UI,Arial,sans-serif;color:#172d32;background:#f6f8f7;font-size:15px}
+*{box-sizing:border-box}
+body{margin:0}
+header{min-height:76px;background:#fff;border-bottom:1px solid #dde5e2;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:0 5vw;flex-wrap:wrap}
+.brand{font-size:23px;font-weight:750;text-decoration:none;color:#173f39}
+.brand span{color:#3aab84;margin-right:10px}
+nav{display:flex;gap:18px}
+nav a{font-size:13px;font-weight:600;color:#50706a;text-decoration:none;padding:6px 2px;border-bottom:2px solid transparent}
+nav a:hover{color:#173f39}
+nav a[aria-current=page]{color:#173f39;border-bottom-color:#3aab84}
+nav a:focus-visible,.cta:focus-visible,.brand:focus-visible{outline:2px solid #3aab84;outline-offset:3px}
+.badge,.eyebrow{font-size:11px;font-weight:700;letter-spacing:1.7px}
+.badge{border:1px solid #cce1d8;padding:8px 12px;border-radius:5px;color:#306b55}
+main{max-width:1260px;margin:42px auto;padding:0 32px}
+.eyebrow{color:#548171}
+h1{font-size:38px;letter-spacing:-1.2px;line-height:1.15;margin:12px 0}
+p.intro{color:#60726d;margin:0 0 26px;font-size:17px}
+.totals{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:30px}
+.tile{background:#fff;border:1px solid #dce5df;border-radius:10px;padding:18px 20px}
+.tile .label{display:block;font-size:11px;font-weight:700;letter-spacing:1.2px;color:#6b7b74;text-transform:uppercase}
+.tile strong{display:block;margin-top:8px;font-size:24px;font-variant-numeric:tabular-nums;letter-spacing:-.5px}
+.tile strong.total{color:#173f39}
+.tile strong small{font-size:12px;font-weight:600;color:#73827b;letter-spacing:0}
+.tile small.warn{display:block;margin-top:8px}
+.warn{color:#99713c;font-size:11px}
+.section-heading{display:flex;align-items:center;justify-content:space-between;margin:8px 0 14px}
+.section-heading h2{font-size:20px;margin:0}
+.section-heading span{font-size:12px;color:#60726d}
+.table-wrap{position:relative;overflow:auto;border:1px solid #dce5df;border-radius:10px;background:#fff}
+table{border-collapse:collapse;width:100%;white-space:nowrap}
+th,td{text-align:left;padding:11px 20px;border-bottom:1px solid #edf1ee}
+th{font-size:11px;letter-spacing:.6px;color:#6b7b74;background:#fbfcfb;text-transform:uppercase}
+td{font-size:13px}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:#f8fbf9}
+.number{text-align:right;font-variant-numeric:tabular-nums}
+.price{font-size:16px;font-weight:650}
+td strong{font-size:14px;letter-spacing:.5px}
+small{display:block;font-size:11px;color:#73827b;margin-top:3px}
+.positive{color:#168153}
+.negative{color:#bc4052}
+.neutral{color:#687972}
+.unpriced{color:#a3aeaa}
+time{font-size:12px;color:#60726d}
+.delayed{color:#99713c}
+.empty{background:#fff;padding:35px;border:1px solid #dce5df;border-radius:10px}
+.empty h2{margin-top:0}
+.cta{display:inline-block;margin-top:6px;background:#1d6f55;color:#fff;text-decoration:none;font-size:13px;font-weight:650;padding:10px 18px;border-radius:6px}
+.cta:hover{background:#175844}
+footer{display:flex;justify-content:space-between;font-size:11px;color:#87928c;margin:24px 0}
+@media(max-width:650px){
+  header{padding:12px 16px}
+  nav{order:3;width:100%;gap:14px;overflow-x:auto}
+  main{padding:0 16px;margin-top:28px}
+  h1{font-size:29px}
+  th,td{padding:12px}
+  .tile strong{font-size:20px}
+  footer{display:block}
+  footer span{display:block;margin-top:6px}
+}
+.account{display:flex;align-items:center;gap:12px;font-size:13px;color:#50706a}
+.account form{margin:0}
+.account button{font:inherit;font-size:12px;background:#fff;border:1px solid #cce1d8;border-radius:5px;padding:6px 10px;color:#306b55;cursor:pointer}
+.account a{color:#306b55;font-weight:600;text-decoration:none}
+.secondary{margin-left:10px;font-size:13px;font-weight:600;color:#306b55}
+.row-action{font-size:12px;font-weight:650;color:#1d6f55;text-decoration:none;border:1px solid #cce1d8;border-radius:5px;padding:4px 9px;margin-right:4px}
+.row-action:hover{background:#eef6f1}
+.row-action:focus-visible{outline:2px solid #3aab84;outline-offset:2px}
+.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}

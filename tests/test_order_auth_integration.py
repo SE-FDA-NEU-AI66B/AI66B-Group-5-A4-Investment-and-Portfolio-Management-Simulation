@@ -129,8 +129,8 @@ def test_missing_auth_adapter_still_fails_closed(setup):
 
 def test_portfolio_navigation_is_available_only_with_registered_route(setup):
     app, _ = setup
-    # Route contract fixture, not a portfolio implementation or acceptance claim.
-    app.add_url_rule("/portfolio", "portfolio.index", lambda: "route fixture")
+    # The real /portfolio route from #81 now satisfies this contract; the
+    # earlier route fixture would collide with its endpoint name.
     client = app.test_client()
     register(client)
     assert b'href="/portfolio"' in client.get("/trade").data
