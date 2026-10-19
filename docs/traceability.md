@@ -11,7 +11,7 @@ implemented run; designed endpoints remain future work.
 | US02 P0 | S1.1 | 100,000,000 VND once | `/` registration | POST `/api/accounts` | account | #46; history #14 | One-time grant implemented/tested in #93; #95 display is not on main; portfolio pending |
 | US03 P0 | S1.2, S2.1, S6.3 | Price, daily change, timestamp, delayed/unknown ticker | `/market` | GET `/market` **implemented**; GET `/api/market/quotes/{symbol}` designed; list JSON implemented in resumed PR #60 (Sprint 3), review pending | instrument, price_quote | #50; history #15 | Snapshot subset implemented and locally tested; search/detail and live feed pending |
 | US04 P0 | S1.3–S1.4 | Preview, valid fill, insufficient cash, invalid quantity | `/trade` | POST `/api/orders/preview`, POST `/api/orders/buy` | account, holding, trade, price_quote | #46/#49; history #16 | Real auth/buy integration tested in #92 on 18 October; portfolio transition and peer acceptance pending |
-| US05 P0 | S2.2–S2.3 | Fill, realised result, oversell, quote time | `/trade` | POST `/api/orders/preview`, POST `/api/orders/sell` | account, holding, trade, price_quote | #46/#49; history #17 | Specified; not implemented |
+| US05 P0 | S2.2–S2.3 | Fill, realised result, oversell, quote time | `/trade` | POST `/api/orders/preview`, POST `/api/orders/sell` | account, holding, trade, price_quote | #46/#49; history #17 | Sell preview/confirm, exact allocation and oversell tests in #98; browser evidence 19 October; Portfolio entry pending #81 |
 | US06 P0 | S1.5, S2.1, S2.3 | Quantity, cost, P&L, NAV, empty portfolio | `/portfolio` | GET `/api/portfolio` | account, holding, instrument, price_quote | #46/#49; history #18 | Specified; not implemented |
 | US10 P0 | S1.3 | Inline warning, disable/re-enable confirmation | `/trade` | POST `/api/orders/preview`, GET `/api/portfolio`; POST `/api/orders/buy` independently enforces BR1 | account, price_quote | #46/#49; history #22 | Real auth/buy integration tested in #92 on 18 October; portfolio transition and peer acceptance pending |
 | US07 P1 | S3.1–S3.2 | Threshold trigger, no holding, single auto-close | `/trade` | Deferred | Future conditional-order storage; holding, trade | history #19 | Backlog; schema extension needed |
@@ -30,11 +30,11 @@ administration A, quote ingestion M. Implemented authentication gates are server
 | Rule | Enforcement design | Evidence today |
 |------|--------------------|----------------|
 | BR1 | Atomic buy transaction rechecks cash; nonnegative cash CHECK is a second guard | Atomic buy revalidation, rollback and concurrency tests in #92 |
-| BR2 | Atomic sell transaction rechecks held quantity | Schema guards only; no sell service |
-| BR3 | Capture accepted quote inside the order transaction | Snapshot schema only |
+| BR2 | Atomic sell transaction rechecks held quantity | Atomic sell revalidation, rollback, oversell and concurrency tests in #98 |
+| BR3 | Capture accepted quote inside the order transaction | Quote snapshot revalidated inside the buy/sell transaction in #92/#98 |
 | BR4 | Conditional-order monitor with idempotent execution | Deferred |
 | BR5 | Account creation grants 100,000,000 VND once; login/enable never grants again | Real account service and grant-once tests in #93 |
-| BR6 | Exact total cost / quantity; partial-sale whole-VND allocation and final residual per money-rules.md | Integer cost storage; rounding contract ready for review, trading service pending |
+| BR6 | Exact total cost / quantity; partial-sale whole-VND allocation and final residual per money-rules.md | Integer cost storage; partial-sale allocation implemented and tested in #98 |
 | BR7 | Benchmark/performance service compares matching dates | Deferred |
 | BR8 | Ranking uses achievement timestamps to break ties | Deferred |
 | BR9 | Role check and atomic status-change/audit write | CHECKs/FKs only; service pending |

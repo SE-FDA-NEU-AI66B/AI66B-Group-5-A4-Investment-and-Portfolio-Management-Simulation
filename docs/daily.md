@@ -56,3 +56,6 @@ Reconciled PO planning and contract evidence, resolved the feed branch conflicts
 - @bianh13 — Separated the browser QA email and randomly generated password assignments to remove a false positive from the existing credential scanner without changing its rules.
 Reran both browser scenarios through real registration, login and persisted simulated purchases, including disconnected and gateway-error responses after a committed order, and both passed.
 Portfolio integration and peer acceptance remain pending, so this correction does not close #76 or establish live DNSE quote verification for #59.
+- @nguyentue110 — Rebased the #79 sell slice onto `main` after #92 merged and retargeted PR #98 to `main`.
+Ran a real-browser sell journey through registration, a buy, a partial sale, an oversell warning and a full sale, saving both screenshots under `docs/images/ui/`.
+Updated `docs/ui.md` and traceability for US05; a Sell link from a holding still waits for the Portfolio screen in #81.

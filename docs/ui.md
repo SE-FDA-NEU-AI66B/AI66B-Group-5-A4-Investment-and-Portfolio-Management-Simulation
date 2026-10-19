@@ -18,14 +18,15 @@ behavior not on `main`) and **open PR work**.
 | US01 - Register / sign in | Register, Login | `/register`, `/login` | partly works | [#77](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/77) | Implemented: both pages, session cookie, CSRF, lockout; both redirect to Market list today. Planned: return to the page the guest came from via a local `next` (proposed), otherwise Portfolio once #81 lands. Open PR: <add number or "none">. |
 | US02 - Initial virtual capital | Register | `/register` | partly works | [#78](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/78) | Implemented: 100,000,000 VND granted when the account is created (tested). Planned: balance visible on Portfolio (#81); no screen shows it today. |
 | US03 - Find a stock and inspect its quote | Market list, Stock detail | `/market`, `/market/<symbol>` | partly works | [#85](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/85) | Implemented: Market list only. Planned (#85): search (`?q=`, proposed) and Stock detail. Open PR: <add number or "none">. |
-| US04 - Buy shares | Stock detail, Trade | `/market/<symbol>`, `/trade?side=buy&symbol=HPG` | not started | [#76](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/76) | Planned: Buy on Stock detail; a guest is sent to Login first. |
-| US05 - Sell shares | Portfolio, Trade | `/portfolio`, `/trade?side=sell&symbol=HPG` | not started | [#79](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/79) | Planned: Sell on each Portfolio holding, keeping the symbol in the link. Needs the shared order code from #76 and the Portfolio screen from #81. |
+| US04 - Buy shares | Stock detail, Trade | `/market/<symbol>`, `/trade?side=buy&symbol=HPG` | partly works | [#76](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/76) | Implemented on `main` via #92: `/trade?side=buy&symbol=HPG` preview and confirm. Planned: Buy on Stock detail and the Portfolio transition (#81). |
+| US05 - Sell shares | Portfolio, Trade | `/portfolio`, `/trade?side=sell&symbol=HPG` | partly works | [#79](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/79) | Implemented in #98: `/trade?side=sell&symbol=HPG` preview and confirm, partial and full sale, oversell warning; browser evidence in `docs/images/ui/sell-*.png` (19 October). Planned: a Sell link on each Portfolio holding (#81). |
 | US06 - View portfolio | Portfolio | `/portfolio` | not started | [#81](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/81) | Planned: a "Portfolio" header link for signed-in users. |
-| US10 - Insufficient-balance warning | Trade | `/trade?side=buy&symbol=HPG` | not started | [#76](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/76) | Planned: inline warning on the buy preview. |
+| US10 - Insufficient-balance warning | Trade | `/trade?side=buy&symbol=HPG` | partly works | [#76](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/76) | Implemented on `main` via #92: inline warning disables Confirm buy. Planned: Stock detail entry (#85). |
 
 On `main` today: `/` redirects to Market list; Register, Login and Log out are
-reachable from the Market list header; there is no Portfolio link and no Trade
-screen. Everything else in this document is planned.
+reachable from the Market list header. Trade is reachable at `/trade?side=buy`
+or `?side=sell`; there is no Portfolio screen or link until #81. Everything else
+in this document is planned.
 
 ### Screen flow (solid = on `main`, dashed = planned)
 
