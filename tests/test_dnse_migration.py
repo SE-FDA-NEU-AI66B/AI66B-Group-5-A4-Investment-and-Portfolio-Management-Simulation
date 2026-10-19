@@ -34,7 +34,7 @@ def test_migration_failure_rolls_back_ddl_and_preserves_auth_version(tmp_path):
     init_database(path)
     with closing(sqlite3.connect(path)) as connection:
         assert connection.execute('PRAGMA user_version').fetchone()[0] == 2
-        assert connection.execute('SELECT name FROM feature_migration').fetchall() == [('dnse-reference-v1',)]
+        assert set(connection.execute('SELECT name FROM feature_migration').fetchall()) == {('dnse-reference-v1',), ('simulation-source-v1',)}
 
 
 def test_initial_error_page_keeps_refresh_target_for_recovery(tmp_path):
@@ -47,15 +47,12 @@ def test_initial_error_page_keeps_refresh_target_for_recovery(tmp_path):
     assert client.get('/market/static/market.js').status_code == 200
 
 
-def test_worker_cannot_overwrite_a_future_simulation_database(tmp_path):
+def test_worker_cannot_overwrite_a_simulation_database(tmp_path):
     from virtutrade.dnse.repository import write_dnse_event
     from virtutrade.dnse.worker import Event
     path = tmp_path / 'simulation.db'
-    init_database(path)
-    with closing(sqlite3.connect(path)) as connection, connection:
-        # Stand in for the source enum migration proposed in #75.
-        connection.execute('PRAGMA ignore_check_constraints = ON')
-        connection.execute("UPDATE price_quote SET source='simulation'")
+    from virtutrade.simulation.repository import init_demo
+    init_demo(path)
     with pytest.raises(sqlite3.IntegrityError, match='simulation'):
         write_dnse_event(path, Event('sd', 'HPG', 100, '2099-01-01T00:00:00.000000000Z'))
     with closing(sqlite3.connect(path)) as connection:

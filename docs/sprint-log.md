@@ -359,8 +359,7 @@ and report the denominator explicitly rather than invent two extra days.
 
 Planning baseline on **10 October**: **committed 52 points**, **completed 0**,
 **velocity 0** for these newly planned deliveries; final velocity is recorded at
-close. This is the PO's published plan pending team capacity review, not evidence
-of a meeting or unanimous agreement. Each member has **13/52 points = 25%** and
+close. The PO subsequently confirmed that all four members agreed to this allocation; no meeting attendance is inferred. Each member has **13/52 points = 25%** and
 four planned issue deliveries. Estimates describe work; equal points do not
 guarantee equal effort or actual contribution. Re-estimate transparently if needed.
 The original Sprint 2 commitment of 45 is unchanged; #59 adds no completed S2 points.
@@ -376,25 +375,25 @@ Issue register:
 
 | Issue | Outcome | Owner | Points | Status |
 |-------|---------|-------|--------|--------|
-| [#59](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/59) | [US14] Integrate DNSE realtime stock quotes | @bianh13 | 5 | Todo |
-| [#74](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/74) | [Chore] Refine backlog for Sprint 3 | @bianh13 | 2 | In progress; planning PR pending |
-| [#75](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/75) | [Task] Agree shared buy/sell interfaces and simulation quote policy | @bianh13 | 1 | Todo |
-| [#76](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/76) | [US04/US10] Complete buy preview, balance warning and virtual order UI | @bianh13 | 5 | Todo |
-| [#77](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/77) | [US01] Implement registration, login and logout through the UI | @nguyentue110 | 5 | Todo |
-| [#78](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/78) | [US02] Grant initial virtual capital exactly once | @nguyentue110 | 2 | Todo |
+| [#59](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/59) | [US14] Integrate DNSE realtime stock quotes | @bianh13 | 5 | In progress; draft #60, live quotes unverified |
+| [#74](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/74) | [Chore] Refine backlog for Sprint 3 | @bianh13 | 2 | Done; #89 approved/merged, team capacity confirmed |
+| [#75](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/75) | [Task] Agree shared buy/sell interfaces and simulation quote policy | @bianh13 | 1 | Done; #91 approved/merged |
+| [#76](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/76) | [US04/US10] Complete buy preview, balance warning and virtual order UI | @bianh13 | 5 | In progress; draft #92, real auth integrated, portfolio pending |
+| [#77](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/77) | [US01] Implement registration, login and logout through the UI | @nguyentue110 | 5 | Closed; #93 approved/merged, final cross-feature demo pending |
+| [#78](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/78) | [US02] Grant initial virtual capital exactly once | @nguyentue110 | 2 | Open; #95 merged to auth branch, not main |
 | [#79](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/79) | [US05] Complete virtual sell preview and confirmation UI | @nguyentue110 | 5 | Todo |
-| [#80](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/80) | [Task] Document and verify account-state schema migration | @nguyentue110 | 1 | Todo |
-| [#81](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/81) | [US06] Implement private portfolio API and screen | @longbk761-bot | 5 | Todo |
+| [#80](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/80) | [Task] Document and verify account-state schema migration | @nguyentue110 | 1 | Done; #90 approved/merged |
+| [#81](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/81) | [US06] Implement private portfolio API and screen | @longbk761-bot | 5 | In progress; portfolio model branch, no PR yet |
 | [#82](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/82) | [Task] Verify every P0 journey and business-rule error through the browser | @longbk761-bot | 5 | Todo |
 | [#83](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/83) | [Task] Verify M3 SETUP on an independent clean machine | @longbk761-bot | 2 | Todo |
 | [#84](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/84) | [Chore] Sprint 3 wrap-up | @longbk761-bot | 1 | Todo |
 | [#85](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/85) | [US03] Complete searchable market and stock-detail UI | @VuSiSi | 5 | Todo |
-| [#86](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/86) | [Task] Draw all P0 wireframes and maintain the M3 UI dossier | @VuSiSi | 3 | Todo |
+| [#86](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/86) | [Task] Draw all P0 wireframes and maintain the M3 UI dossier | @VuSiSi | 3 | In review; #96 awaits revisions and formal review |
 | [#87](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/87) | [Task] Fix verified usability issues and standardize user-facing errors | @VuSiSi | 2 | Todo |
 | [#88](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/88) | [Task] Prepare Team05_M3.pdf from reviewed and merged UI documentation | @VuSiSi | 3 | Todo |
 
 #59 remains P1, with original acceptance criteria and pending live verification;
-PR #60 stays closed until that work resumes. Required P0 stories come first. If
+PR #60 was reopened on 10 October; it remains draft pending live quote verification and review. Required P0 stories come first. If
 capacity cannot cover 52 points, negotiate scope before dropping P0 acceptance
 criteria: defer optional work explicitly and rebalance genuine tasks, never
 inflate teammates' estimates just to retain 25%. Historic completed M2 PRs are
@@ -481,3 +480,54 @@ five pre-existing trading placeholders skipped. Real DNSE authentication and
 subscription acknowledgement succeeded; no tick/reference event arrived in
 the bounded probe, so provider-price verification, peer review and acceptance
 remain pending. Completed points and velocity do not increase for #59 yet.
+
+
+### 10 October — #76 partial implementation
+
+Buy preview/transaction/form and explicit simulation quotes are implemented on
+a branch based on resumed #60. 115 tests pass and three deferred auth/sell cases
+remain skipped; the browser flow was checked with a clearly test-only session.
+Real #77 authentication/CSRF and #81 portfolio integration are still required.
+US04/US10 are partly works; #76 stays open and contributes no completed points yet.
+
+### Progress reconciliation — 18 October 2026
+
+Committed remains **52 points**, 13 per member. The PO has confirmed that all four
+members accepted the allocation. #74's planning was reviewed and merged in #89;
+#75's interface agreement was approved and merged in #91. Their old pending notes
+are historical, not unresolved capacity or contract decisions.
+
+Accepted closed-issue tally: #74 (2), #75 (1), #77 (5), #80 (1) = **9 completed
+points; velocity to date 9**. Final velocity and the eight process metrics remain
+Long's #84 reconciliation; #59/#76/#78 and other open issues add zero completed
+points. Team agreement does not waive feature acceptance or peer review.
+
+Six PRs have merged in this window: #89/#90/#91/#93 into main, #94 into the buy
+branch and #95 into the old auth branch. #95 has no formal review recorded and
+its grant-display commit is not on main; it must receive a reviewed integration
+PR. #94 is reviewed but reaches main only with the buy work. The #96 comment is
+not a formal Review changes submission. Long and Vu still need a merged S3 PR
+and an accepted closed issue each; their branch work must not be described as zero effort.
+
+The independent-machine SETUP record, full portfolio/sell journeys, merged UI
+wireframes, final screenshots/PDF and actual LMS receipt remain pending. Do not
+replace TESTER placeholders with the author's local run. Deadline remains
+21 October 00:00 UTC+7 (submit during 20 October).
+
+
+### Integration reconciliation — 19 October 2026
+
+PR #96 (UI dossier) and PR #92 (authenticated buy/simulation) have now merged
+into main at `97973d2`; #94's extraction is included through #92. The 18 October
+paragraphs above record the situation at that time and do not describe current
+merge status. Issues #76 and #86 are now closed on GitHub; final independent
+journey evidence and accepted-point reconciliation remain the SM's #84 audit.
+Commitment stays 52 points, 13 per member; this conflict-resolution update does
+not recalculate acceptance or award points automatically from issue closure.
+
+The grant display has a new integration PR #99; sell is PR #98. Both are open.
+Provider branch #60 received real HPG/FPT ticks on 19 October and preserved
+stored quotes across a controlled restart, but provider-board comparison and
+independent review remain pending. #60 and documentation PR #97 are refreshed
+against current main; neither is merged by this reconciliation. Main's reviewed
+wireframes, real auth and buy/simulation behavior must be retained during review.

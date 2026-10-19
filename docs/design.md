@@ -1,6 +1,7 @@
 # Milestone 2 — VirtuTrade design
 
-Team 05 · Topic A4 · Updated 4 October 2026.
+Team 05 · Topic A4 · Updated 4 October 2026; M3 UI notes added 17 October 2026.
+
 PO / lead developer: @bianh13. Scrum Master: @nguyentue110.
 
 **Working document, not final submission.** Architecture/ADRs (#47) and the
@@ -68,6 +69,45 @@ rules or secrets. This is an architecture/design change for M3, not a claim that
 these screens or authentication work on the M2 baseline. Owners implement and
 test these boundaries under #77, #81 and #85; #86 supplies the wireframes.
 
+**Search, detail, sign-in and navigation decisions (#85/#86, M3).** Drawing
+the P0 wireframes in [ui.md](ui.md) exposed gaps in the M2 design. `/register`,
+`/login` and `/logout` now exist in the accounts module (#77); the routes below
+remain **designed** unless section 3 marks them implemented.
+
+- **Search (proposed).** A beginner must be able to find a stock by ticker or
+  company name. `GET /market?q=<text>` filters the existing snapshot,
+  case-insensitively, by symbol or name. The filter lives in
+  `market/service.py`; the route only passes `q` and the repository still
+  returns every quote. The entered text is echoed back in the search box,
+  including on the 503 error page, so a retry does not lose it. An empty or
+  absent `q` shows all quotes. The parameter name awaits confirmation by #85
+  and the quote-API owners (#59/#75).
+- **Stock detail.** `GET /market/<symbol>` renders one quote: price, change
+  versus previous close, quote time, source and the delayed or "Reference
+  unavailable" state. The symbol is trimmed and uppercased as in the JSON API.
+  An unknown symbol returns HTTP 404 with "Ticker not found". It reads through
+  the same market service as the list, so there is no second query path; its
+  JSON counterpart stays `GET /api/market/quotes/{symbol}`.
+- **Private pages and return path (proposed).** Trade and Portfolio are private
+  HTML pages. A guest who requests one, for example by pressing Buy on Stock
+  detail, receives a 302 to `/login?next=<URL-encoded local path>`; the JSON API
+  keeps returning 401 `AUTH_REQUIRED`. After a successful login or registration
+  the server redirects to `next` only when it is a local path: it must start
+  with a single `/`, must not start with `//`, and must contain no scheme,
+  backslash or control character. Anything else is ignored. The default
+  destination is `/market` until #81 lands, then `/portfolio`. This extends the
+  rule that redirect targets must remain local and does not replace server-side
+  authorization. Owned by #77 with #76; not implemented.
+- **After an order.** Trade leads to Portfolio only for a saved order (201). A
+  rejected or invalid order keeps the user on Trade with the error beside the
+  input. If the outcome is unknown, the page links to Portfolio and never
+  retries the POST automatically (see api-contract.md section 5).
+- **Sell entry point.** Each Portfolio holding links to
+  `/trade?side=sell&symbol=<SYMBOL>`, so the selected symbol is preserved.
+
+At the time of this change the header is inlined in the market template; the
+shared `base.html` described above is still to be extracted.
+
 Sprint 3 Scrum Master is @longbk761-bot; the M2 role header above records history.
 The proposed #75 [shared order/simulation contract](api-contract.md#7-m3-shared-order-and-simulation-contract--75)
 defines one transaction owner for preview/buy/sell integration and a separate
@@ -113,7 +153,7 @@ SQLite type affinity alone is not an input validator.
 |-----------------|-------------------|------------------------------|
 | account: identity, role, state, virtual cash | id INTEGER; email TEXT COLLATE NOCASE; password_hash TEXT; role TEXT DEFAULT investor; status TEXT DEFAULT active; cash_vnd INTEGER DEFAULT 100000000; created_at TEXT | PK id; UNIQUE email (US01); role investor/admin and status active/disabled (BR9); cash >=0 (BR1 guard); default capital (BR5). Hashing, single grant and authorization need service code. |
 | instrument: ticker identity | id INTEGER; symbol TEXT; name TEXT; reference_price_vnd INTEGER NULL; reference_at TEXT NULL | PK id; UNIQUE symbol (US03/BR10). |
-| price_quote: latest snapshot per ticker | id INTEGER; instrument_id INTEGER; price_vnd INTEGER; previous_close_vnd INTEGER NULL; quoted_at TEXT; source TEXT | PK id; UNIQUE FK instrument_id → instrument.id; price >0; reference positive when present; source seed/dnse (BR10). One snapshot, no tick history; newer-event ordering is enforced by the DNSE repository. |
+| price_quote: latest snapshot per ticker | id INTEGER; instrument_id INTEGER; price_vnd INTEGER; previous_close_vnd INTEGER NULL; quoted_at TEXT; source TEXT | PK id; UNIQUE FK instrument_id → instrument.id; price >0; reference positive when present; source seed/dnse/simulation (BR10). One snapshot, no tick history; newer-event ordering is enforced by the DNSE repository. |
 | holding: shares and remaining cost basis | id INTEGER; account_id INTEGER; instrument_id INTEGER; quantity INTEGER; cost_basis_vnd INTEGER | PK id; FKs account_id → account.id, instrument_id → instrument.id; UNIQUE(account_id, instrument_id); quantity >0, cost_basis_vnd >=0 (BR2/BR6 guards). Remove holding after full sale. |
 | trade: executed fill | id INTEGER; account_id INTEGER; instrument_id INTEGER; side TEXT; quantity INTEGER; fill_price_vnd INTEGER; realised_pnl_vnd INTEGER NULL; executed_at TEXT | PK id; FKs account_id → account.id, instrument_id → instrument.id; side buy/sell; quantity/fill price >0 (BR2/BR3 guards). Realised P&L is set for sales; buys may use NULL. Rejected attempts/conditional metadata require later extension. |
 | audit_event: account-status change | id INTEGER; admin_id INTEGER; target_account_id INTEGER; previous_status TEXT; new_status TEXT; occurred_at TEXT | PK id; both FKs → account.id; both statuses active/disabled (BR9). Future service checks admin role and writes status/audit atomically; FK alone cannot authorize. |
@@ -148,9 +188,11 @@ authentication/authorization, validation, errors, transaction boundaries and
 the external DNSE protocol boundary. [Traceability](traceability.md) maps each
 story to its scenario, screen, endpoint, tables and implementation status.
 
-Only GET `/` (302 redirect) and GET `/market` run on main. The quote JSON
-endpoint and worker are in resumed PR #60; all account/trade/portfolio/Admin APIs are designed,
-not implemented. M2 requires these contracts, not a complete trading engine.
+M2 originally exposed GET `/` and GET `/market`. Current main also includes
+auth HTML/API routes from #93 and buy/simulation plus shared quote JSON from #92.
+The optional provider worker is PR #60; sell (#98), grant display (#99), portfolio,
+stock detail and Admin remain separate deliveries. The table below retains the
+M2 design baseline; current behavior is recorded in ui.md and api-contract.md.
 
 | Method | Path | Access / story | Input | Success output | Error codes | Status |
 |--------|------|----------------|-------|----------------|-------------|--------|
@@ -172,6 +214,18 @@ and details. Buy/sell reject cash/share shortages, stale/changed quotes and
 invalid quantities without partial writes. US10 preview does not replace
 the backend's atomic BR1 validation. Refer to the full contract for exact
 messages, example balances, initial grant and partial-sale allocation.
+
+**HTML page routes.** These serve the browser and are not part of the JSON
+contract above; each uses the same service as its API counterpart.
+
+| Method | Path | Access | Input | Success | Errors | Status |
+|--------|------|--------|-------|---------|--------|--------|
+| GET | `/market` | G/U | optional `q` | 200 HTML list; "No stocks match" when a search finds nothing | 503 HTML unavailable page | List implemented; `q` proposed (#85) |
+| GET | `/market/<symbol>` | G/U | path symbol | 200 HTML detail | 404 "Ticker not found"; 503 HTML unavailable page | Designed (#85) |
+| GET, POST | `/register`, `/login` | G | form fields, `csrf_token`, optional `next` | 302 to `/market` with session cookie today; to `next` or `/portfolio` once designed | Page re-rendered with the API message and status (409, 401, 429, 403, 422) | Pages and sessions implemented (#77); `next` and `/portfolio` redirect designed; browser verification pending |
+| POST | `/logout` | U | `csrf_token` | 302 to `/market`, cookie expired | Redirect to `/login` | Implemented (#77); browser verification pending |
+| GET | `/trade` | U | `side`, `symbol` | 200 HTML preview and confirm form | 302 to `/login?next=...` for a guest | Designed (#76/#79) |
+| GET | `/portfolio` | U | none | 200 HTML cash, holdings, total | 302 to `/login?next=...` for a guest | Designed (#81) |
 
 ## 4. Walking skeleton
 
@@ -353,3 +407,37 @@ and ERD now show those nullable fields. Existing M2 fixed seed fixtures stay int
 Live verification reached authenticated/subscribed state but received no events
 in its bounded observation window. Price-unit comparison remains pending and
 #59 stays open; local WebSocket/regression tests are not proof of live accuracy.
+
+
+### M3 partial buy/simulation implementation — #76
+
+The order Blueprint adds `/trade`, preview and buy JSON plus simulation refresh.
+Routes handle HTTP; services enforce rules; one repository unit of work commits
+cash, holding and trade atomically with in-transaction session/quote validation.
+See [the auth/ownership handoff](order-implementation.md). No real auth adapter is
+installed yet; missing integration fails closed. Auth/sell/portfolio remain with
+their assigned owners and US04/US10 remain partly works.
+
+The price_quote source CHECK now includes `simulation`; the feature ledger adds
+`simulation-source-v1` without altering the auth schema version. `init-demo`
+exclusively creates a new DB and explicitly generated quotes; it refuses to reset
+an existing DB. A manual refresh checks auth, mode, sources and clock advancement
+before writing, preserves financial rows and never changes seed fixtures/DNSE
+timestamps. The source labels and separate DB boundary are part of the UI design.
+
+
+### Auth/buy integration and independent demo — 18 October 2026
+
+The application factory registers accounts, market/list JSON and orders, then
+installs the account module's real session/CSRF callbacks. Controllers translate
+AuthError to the same code/message/status envelope; domain services do not know
+HTTP. Guest trade pages offer visible login/register links and never request a
+private token. Financial writes revalidate session idle/absolute expiry, revocation
+and account status inside the same transaction as cash/holding/trade changes.
+
+Quote schema/API and explicit simulation are shared local infrastructure. The
+provider worker, stream command and websockets dependency are excluded from this
+buy branch and remain in #60, so provider verification cannot block the P0 demo.
+Auth and quote migrations have distinct ledgers/version ownership; seed reruns
+preserve grants, quotes and holdings. Portfolio links are exposed only after the
+real /portfolio GET route is registered by #81; no placeholder UI is presented.

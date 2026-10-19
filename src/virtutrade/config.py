@@ -20,4 +20,4 @@ def load_config():
     # sessions from a previous boot stop validating, which is the safe
     # default). Never ship a public placeholder: forgeable CSRF tokens follow.
     secret = os.environ.get('SECRET_KEY') or secrets.token_hex(32)
-    return {'DATABASE': str(database), 'SECRET_KEY': secret}
+    return {'DATABASE': str(database), 'SECRET_KEY': secret, 'QUOTE_MODE': os.environ.get('QUOTE_MODE', 'seed')}

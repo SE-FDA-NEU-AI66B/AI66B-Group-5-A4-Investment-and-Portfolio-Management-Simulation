@@ -43,7 +43,7 @@ Strengthened the market layers and moved the application into src/virtutrade wit
 
 - @bianh13 — Refined the M3 backlog into sixteen deliveries totalling 52 points, with 13 points per member and Long as Sprint 3 Scrum Master.
 Mapped every P0 story to an owner and UI entry point, drafted the four-section UI dossier and documented the shared navigation design change while keeping unbuilt features marked incomplete.
-After drafting #75, I resumed #59 in the src modules and verified real DNSE authentication/subscription; no live quote arrived during the bounded probe, so quote comparison and peer review remain pending.
+After drafting #75, I resumed #59 and verified DNSE authentication/subscription, then implemented and tested buy transactions, the preview form and explicit simulation quotes; live quote comparison, actual auth integration and peer reviews remain pending.
 
 ## 2026-10-18
 
@@ -53,6 +53,6 @@ Reconciled PO planning and contract evidence, resolved the feed branch conflicts
 
 ## 2026-10-19
 
-- @bianh13 — Fixed the browser QA credential-scanner false positive in PR #92, reran both browser scenarios and verified that its GitHub CI passed.
-Observed real HPG/FPT ticks through the read-only DNSE worker, verified persisted quotes through the market API and checked data preservation across a controlled stop/reconnect and app recreation.
-Recorded sanitized evidence while leaving provider-board comparison, independent review and portfolio integration pending, so #59 and #76 remain open.
+- @bianh13 — Fixed the browser QA credential-scanner false positive in PR #92, reran both real-browser scenarios and verified passing GitHub checks.
+Observed real HPG/FPT ticks through the read-only DNSE worker, checked persisted quotes via the market API and verified data preservation across a controlled stop/reconnect and app recreation.
+After #92 and #96 merged, reconciled #60 and #97 against current main while retaining the provider module, buy/auth behavior and reviewed wireframes; provider-board comparison, final portfolio integration and independent acceptance remain pending.
