@@ -153,10 +153,17 @@ async def control_message(socket, message):
     action = message.get("action") or message.get("a")
     if action == "ping":
         await socket.send(json.dumps({"action": "pong"}))
-    if action in ("auth_error", "error"):
+    if action == "auth_error":
         # Provider error text may echo credentials. Only report a fixed local message.
         raise FeedError(
-            "DNSE rejected authentication/subscription; check credentials and access."
+            "DNSE rejected authentication; check credentials and access."
+        )
+    if action == "error":
+        # No verified retryable-code contract: stop on an explicit provider error,
+        # including after subscription, rather than retrying an unknown rejection.
+        raise FeedError(
+            "DNSE reported a provider error; check access, subscriptions and "
+            "provider status before restarting the worker."
         )
     return action
 
@@ -209,6 +216,7 @@ async def session(socket, settings, database):
 
 
 async def run_feed(settings, database, *, connector=connect, sleep=asyncio.sleep):
+    """Retry transport loss; explicit provider/protocol/storage errors stay fatal."""
     delay = 1
     while True:
         started = time.monotonic()

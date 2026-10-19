@@ -319,3 +319,54 @@ def test_network_retry_backoff_is_capped_and_does_not_rewrite_prices(database):
         )
     assert calls == [1, 2, 4, 8, 16, 32, 60, 60]
     assert read_market(database) == before
+
+
+@pytest.mark.parametrize("action,after_subscription", [
+    ("auth_error", False), ("error", False), ("error", True),
+])
+def test_explicit_provider_errors_stop_feed_without_retry(
+    database, caplog, action, after_subscription,
+):
+    before = read_market(database)
+    connections, delays = [], []
+
+    class Socket:
+        def __init__(self):
+            messages = [{"sid": "local-test"}]
+            if after_subscription:
+                messages.extend([{"action": "auth_success"}, {"action": "subscribed"}])
+            messages.append({"action": action, "message": "private-provider-payload"})
+            self.messages = iter(json.dumps(message) for message in messages)
+
+        async def recv(self):
+            return next(self.messages)
+
+        async def send(self, value):
+            pass
+
+        def __aiter__(self):
+            return self
+
+        async def __anext__(self):
+            return await self.recv()
+
+    @asynccontextmanager
+    async def connector(*args, **kwargs):
+        connections.append(True)
+        yield Socket()
+
+    async def sleep(delay):
+        delays.append(delay)
+        raise AssertionError("An explicit provider rejection must not auto-retry")
+
+    with pytest.raises(FeedError) as error:
+        asyncio.run(run_feed(
+            Settings("test-key", "test-secret", ("HPG",)), database,
+            connector=connector, sleep=sleep,
+        ))
+    assert len(connections) == 1
+    assert delays == []
+    assert read_market(database) == before
+    assert "private-provider-payload" not in str(error.value) + caplog.text
+    if action == "error":
+        assert "provider status before restarting" in str(error.value)
