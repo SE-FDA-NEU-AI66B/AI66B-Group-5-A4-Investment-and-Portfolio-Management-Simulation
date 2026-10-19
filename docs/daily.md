@@ -43,4 +43,16 @@ Strengthened the market layers and moved the application into src/virtutrade wit
 
 - @bianh13 — Refined the M3 backlog into sixteen deliveries totalling 52 points, with 13 points per member and Long as Sprint 3 Scrum Master.
 Mapped every P0 story to an owner and UI entry point, drafted the four-section UI dossier and documented the shared navigation design change while keeping unbuilt features marked incomplete.
-After PR #89 was reviewed and merged, I drafted the shared buy/sell interfaces, atomic transaction and explicitly labelled simulation-quote workflow for #75; Tue's contract review and team capacity confirmation remain pending.
+After drafting #75, I resumed #59 and verified DNSE authentication/subscription, then implemented and tested buy transactions, the preview form and explicit simulation quotes; live quote comparison, actual auth integration and peer reviews remain pending.
+
+## 2026-10-18
+
+- @bianh13 — Integrated the current auth module with the buy branch, preserved quote/financial checks and separated the optional DNSE worker from the simulation demo.
+Verified real registration/login, CSRF/session rejection, persisted purchases and ambiguous-response handling with automated tests and a real browser, while portfolio acceptance remains with #81.
+Reconciled PO planning and contract evidence, resolved the feed branch conflicts and repeated a read-only DNSE probe that authenticated/subscribed but received no quote, leaving live price comparison and peer acceptance pending.
+
+## 2026-10-19
+
+- @bianh13 — Separated the browser QA email and randomly generated password assignments to remove a false positive from the existing credential scanner without changing its rules.
+Reran both browser scenarios through real registration, login and persisted simulated purchases, including disconnected and gateway-error responses after a committed order, and both passed.
+Portfolio integration and peer acceptance remain pending, so this correction does not close #76 or establish live DNSE quote verification for #59.

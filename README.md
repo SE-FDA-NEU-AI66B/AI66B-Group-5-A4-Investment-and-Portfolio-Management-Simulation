@@ -9,25 +9,24 @@ submit before the end of 20 October. [Issues](https://github.com/SE-FDA-NEU-AI66
 · [Sprint plan](docs/sprint-log.md#sprint-3---milestone-3)
 · [UI dossier](docs/ui.md) · [SETUP](docs/SETUP.md).
 
-Current implementation baseline: only the public database-backed market snapshot
-runs. The entry points below are the M3 navigation plan, **not a claim that the
-unbuilt screens work**. Start the app using SETUP and open its documented home URL;
-all P0 journeys must eventually be reachable by visible links/buttons.
+Current checkout: real registration/login/logout and the database-backed market are implemented.
+This buy integration branch also supports authenticated previews, virtual purchases and explicit simulation quotes.
+Search/detail, sell and portfolio are still pending; see the table and linked evidence.
 
 | P0 story | Where the user starts | Current status |
 |----------|-----------------------|----------------|
-| US01 — Register / sign in | Landing page → Register / Sign in | not started |
-| US02 — Initial virtual capital | Register → portfolio balance | not started |
+| US01 — Register / sign in | Market header → Register / Log in | partly works |
+| US02 — Initial virtual capital | Register; balance presentation/portfolio integration pending | partly works |
 | US03 — Find a stock and inspect its quote | Market → search → stock detail | partly works |
-| US04 — Buy shares | Market detail → Buy | not started |
+| US04 — Buy shares | Market → Buy shares | partly works |
 | US05 — Sell shares | Portfolio holding → Sell | not started |
 | US06 — View portfolio | Navigation → Portfolio | not started |
-| US10 — Insufficient-balance warning | Buy form → change quantity → preview | not started |
+| US10 — Insufficient-balance warning | Buy form → change quantity → preview | partly works |
 
-No login or seeded test account exists on the current baseline. Fake local test
-accounts and their setup instructions must be added with authentication; never
-put real credentials in README or SETUP. Live DNSE data (#59) is P1; the instructor's
-P0 demonstration must also work with clearly labelled simulation data in the DB.
+Register a disposable local account through the visible Register link; no shared or real credentials are committed.
+Auth is on main via #93; independent M3 SETUP and final story acceptance remain pending.
+Live DNSE data (#59) is P1 and is not required for the labelled simulation demo.
+
 
 
 ## Introduction
@@ -36,7 +35,7 @@ A **"paper trading"** application: Users can buy and sell stocks using **virtual
 
 **Sprint 2 / Milestone 2:** [Assigned issues](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/milestone/1) · [Sprint plan](docs/sprint-log.md#sprint-2---milestone-2). Submission deadline: **5 October 2026, 00:00 (UTC+7)**.
 
-**Run the M2 walking skeleton:** [New-machine setup guide](docs/SETUP.md). `/market` reads 12 demo quotes from SQLite; live DNSE integration and trading are backlog work. [Design draft](docs/design.md) · [API contract](docs/api-contract.md).
+**Run the M2 walking skeleton:** [New-machine setup guide](docs/SETUP.md). `/market` reads 12 demo quotes from SQLite; the optional [DNSE worker](docs/DNSE.md) is under Sprint 3 verification and buy/simulation runs on this branch; sell and portfolio remain pending. [Design draft](docs/design.md) · [API contract](docs/api-contract.md).
 
 **Code modules:** The market page's routes, service, query, HTML and CSS live in
 [src/virtutrade/market/](src/virtutrade/market/); shared schema/seed code lives in

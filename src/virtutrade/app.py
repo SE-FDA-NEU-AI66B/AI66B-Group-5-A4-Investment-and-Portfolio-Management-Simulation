@@ -7,6 +7,8 @@ from virtutrade.accounts.routes import init_auth
 from virtutrade.config import load_config
 from virtutrade.market import blueprint as market_blueprint
 from virtutrade.market.repository import SQLiteQuoteRepository
+from virtutrade.market.routes import api_blueprint
+from virtutrade.orders.routes import blueprint as orders_blueprint
 
 
 def create_app(config=None):
@@ -18,7 +20,15 @@ def create_app(config=None):
     app.extensions['market_reader_factory'] = lambda: SQLiteQuoteRepository(app.config['DATABASE'])
     app.register_blueprint(accounts_blueprint)
     app.register_blueprint(market_blueprint, url_prefix='/market')
+    app.register_blueprint(api_blueprint, url_prefix='/api/market')
+    app.register_blueprint(orders_blueprint)
     init_auth(app)
+
+    @app.context_processor
+    def feature_navigation():
+        # Long owns /portfolio. Expose a link only when the real GET route lands.
+        return {'portfolio_url': next((rule.rule for rule in app.url_map.iter_rules()
+                                       if rule.rule == '/portfolio' and 'GET' in rule.methods), None)}
 
     @app.get('/')
     def home():

@@ -354,3 +354,18 @@ retimestamp historical provider data. The proposed source constraint/migration,
 endpoint and ownership change is documented in design.md in this same PR;
 implementation belongs to #76, review/agreement to #75, wireframes to #86.
 All story statuses above remain unchanged until the UI actually works.
+
+### Integration evidence — 18 October 2026 (PR #92 branch)
+
+Real browser navigation, without typed deep links: Home → Market → Buy shares
+(guest guard) → Register → Market → Buy shares → shortage/correction → confirmed
+purchase → Market → Logout → Login → Market → Buy shares. The test used real
+account services, cookie sessions, CSRF and a temporary SQLite simulation DB;
+no auth callbacks were replaced. It also verified manual quote refresh and a
+server-committed purchase whose response was lost, with submission locked afterward.
+
+US04/US10 remain **partly works** until peer acceptance and the real #81 portfolio
+transition. `/portfolio` links appear only when that real GET route is registered;
+there is no placeholder portfolio. #86 wireframes remain Vu's PR #96 and are not
+claimed complete by this integration note. Auth error messages stay unchanged;
+the buy UI adds separate recovery guidance for login, CSRF and disabled accounts.
