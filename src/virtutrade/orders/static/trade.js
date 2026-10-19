@@ -57,7 +57,12 @@
       byId("order-error").textContent = data.warning || "";
       byId("order-status").textContent = data.can_submit ? "Check the quote, then confirm." : "Adjust the quantity to continue.";
       confirm.disabled = !data.can_submit;
-    } catch (e) { if (sequence === generation) byId("order-error").textContent = e.rejected ? e.message : "Could not load a preview. Try Preview order again."; }
+    } catch (e) {
+      if (sequence === generation) {
+        byId("order-error").textContent = e.rejected ? e.message : "Could not load a preview. Try Preview order again.";
+        byId("order-status").textContent = "Preview unavailable. Review the message below.";
+      }
+    }
   }
   form.addEventListener("input", () => { invalidate(); clearTimeout(timer); timer = setTimeout(refreshPreview, 300); });
   form.addEventListener("submit", e => { e.preventDefault(); clearTimeout(timer); refreshPreview(); });
@@ -68,6 +73,7 @@
     byId("order-status").textContent = "Submitting virtual order…";
     try {
       const result = await request("/api/orders/" + side, {...accepted.input, expected_quote_at:accepted.data.quote.quoted_at});
+      byId("estimate").hidden = true;
       byId("result").textContent = orderCopy(result);
       byId("order-status").textContent = "Order completed. Preview again before another order.";
     } catch (e) {
