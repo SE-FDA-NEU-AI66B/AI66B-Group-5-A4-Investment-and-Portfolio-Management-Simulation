@@ -270,41 +270,60 @@ Result unknown:  "Result unknown. Check your portfolio." (link; no retry)
 
 ## 3. Error messages
 
-Messages are grouped by how far they have actually been built. "Today" is the
-exact string produced by `src/virtutrade/accounts/errors.py` and
-`src/virtutrade/accounts/service.py`. The **hint** column is a proposal for #87:
-the API `message` stays unchanged (it matches US01 and `docs/api-contract.md`,
-and existing tests assert it), and the UI may add one recovery line beside it.
-API error codes never change.
+Every row separates two things: the **API message**, which is the exact string
+in `docs/api-contract.md` and `src/virtutrade/accounts/errors.py`, and the
+**UI hint**, a recovery line shown beside it. The API message never changes;
+HTML pages and the JSON API share the same string (`accounts/routes.py`,
+`_fail`), and the contract and `tests/test_auth.py` depend on it. API error
+codes never change either.
+
+**How the hint is added (proposal, implemented under #87 with #77).**
+`_fail()` in `accounts/routes.py` currently passes only `exc.message` to the
+template. It also passes `exc.code`. The template shows `error` in the alert as
+today, and below it the hint looked up by code from one mapping kept in the
+module that owns the page (for example a dict in the accounts module). The JSON
+envelope built by `_envelope()` is untouched, so JSON clients never receive a
+hint. Required tests: the JSON `message` for each implemented code still equals
+the contract string and the body has no hint field; the HTML page contains both
+the message and its hint. This section documents the design; none of it is
+implemented yet.
+
+Test coverage today: `tests/test_auth.py` asserts the message of
+`EMAIL_IN_USE`, `INVALID_CREDENTIALS` and `LOGIN_LOCKED`. It asserts only the
+code of `ACCOUNT_DISABLED`, and the `VALIDATION_ERROR` messages have no test.
 
 ### 3.1 Implemented and reachable through the UI
 
-| API error code | Business rule | Exact message the user sees today | Recovery hint (proposal, #87) |
-| -------------- | ------------- | --------------------------------- | ----------------------------- |
+| API error code | Business rule | API message (unchanged) | UI hint (proposal, #87) |
+| -------------- | ------------- | ----------------------- | ----------------------- |
 | 409 `EMAIL_IN_USE` | US01 - an email can register only once | Email already in use | Sign in with this email, or register with another one. |
 | 401 `INVALID_CREDENTIALS` | US01 - wrong password and unknown email give the same answer | Invalid email or password | Check both fields and try again. |
-| 429 `LOGIN_LOCKED` | US01 - five wrong passwords lock the account for 15 minutes | Account locked. Try again in N seconds. (N is the remaining time from the server) | Show the remaining time in minutes and seconds; sign-in works again when it reaches zero. |
+| 429 `LOGIN_LOCKED` | US01 - five wrong passwords lock the account for 15 minutes | Account locked. Try again in N seconds. (N is the remaining time from the server) | You can sign in again when the countdown ends. |
 
-### 3.2 Implemented, verified by tests only
+### 3.2 Implemented, not reachable as visible text today
 
-| API error code | Business rule | Exact message today | Why it is not shown in the UI |
-| ---------------- | --------------- | --------------------- | ------------------------------- |
-| 403 `ACCOUNT_DISABLED` | BR9 - disabled accounts cannot sign in or trade | Account is disabled | No Admin screen exists yet (US13, P1); only a database edit triggers it. |
-| 422 `VALIDATION_ERROR` | US01 - email format, password 8..128 characters | Enter a valid email address. / Password must be 8..128 characters. | The browser's own form validation blocks these first; the server message appears only for direct API calls. |
+| API error code | Business rule | API message (unchanged) | UI hint (proposal, #87) | Why it is not shown today |
+| -------------- | ------------- | ----------------------- | ----------------------- | ------------------------- |
+| 403 `ACCOUNT_DISABLED` | BR9 - disabled accounts cannot sign in or trade | Account is disabled | This account is disabled and cannot be used to sign in or trade. | No Admin screen exists yet (US13, P1); only a database edit triggers it. The message itself has no test. |
+| 422 `VALIDATION_ERROR` | US01 - email format, password 8..128 characters | Enter a valid email address. / Password must be 8..128 characters. | None: the message already states the rule. | The browser's form validation blocks these first; the server message appears only for direct API calls. No test asserts these strings. |
+| 403 `CSRF_FAILED` | Every state-changing request needs a valid CSRF token | Invalid or missing CSRF token | Reload the page and try again. | Appears only when a form stays open past its token lifetime (pre-auth tokens last about one to two hours). |
+| 401 `AUTH_REQUIRED` | Private routes need a valid session | Authentication required | Sign in again to continue. | Browser pages redirect a guest to Login instead of showing text; the message reaches JSON clients, and the Trade and Portfolio pages once built if a session expires mid-use. |
 
 ### 3.3 Proposed - not implemented until #76 and #79 merge
 
-| API error code | Business rule | The user sees (target) |
-| ---------------- | --------------- | ------------------------ |
-| 409 `INSUFFICIENT_CASH` | BR1 - an order may not cost more than the available cash | Insufficient cash: this order needs 360,000,000 VND but only 72,000,000 VND is available. Reduce the quantity and preview again. |
-| 409 `INSUFFICIENT_SHARES` | BR2 - a sale may not exceed the shares held | You hold 500 HPG; the maximum you can sell is 500. Reduce the quantity and preview again. |
-| 422 `INVALID_QUANTITY` | US04/US05 - quantity is a whole number of at least 1 | Quantity must be a whole number of at least 1 share. Enter a valid quantity and preview again. |
-| 409 `QUOTE_CHANGED` | BR3 - the fill uses the quote accepted at submission | Price changed; refresh the preview. Check the new price before confirming your order. |
+Amounts below are the acceptance fixtures; the screen shows the user's own numbers.
+
+| API error code | Business rule | API message (contract) | UI hint (proposal) |
+| -------------- | ------------- | ---------------------- | ------------------ |
+| 409 `INSUFFICIENT_CASH` | BR1 - an order may not cost more than the available cash | Insufficient cash: this order needs 360,000,000 VND but only 72,000,000 VND is available | Reduce the quantity and preview again. |
+| 409 `INSUFFICIENT_SHARES` | BR2 - a sale may not exceed the shares held | You hold 500 HPG; the maximum you can sell is 500 | Reduce the quantity and preview again. |
+| 422 `INVALID_QUANTITY` | US04/US05 - quantity is a whole number of at least 1 | Quantity must be a whole number of at least 1 share | Enter a whole number of 1 or more and preview again. |
+| 409 `QUOTE_CHANGED` | BR3 - the fill uses the quote accepted at submission | Price changed; refresh the preview | Check the new price before confirming your order. |
+| 409 `QUOTE_STALE` | US03/US14 - a quote older than 15 minutes cannot authorize a trade | Price may be delayed; refresh before trading | Simulation mode: generate demo quotes, then preview again. DNSE mode: wait for a fresh quote, then preview again. |
 
 Rows in 3.3 move to 3.1 only after someone has reproduced them in a browser.
-Show lockout time beside the lockout message, place errors next to the relevant
-input or in an accessible alert, and never show stack traces, credentials or
-session tokens.
+Place errors next to the relevant input or in an accessible alert, and never
+show stack traces, credentials or session tokens.
 
 ## 4. What changed since M2
 
