@@ -22,7 +22,8 @@ def main(loss_mode="disconnect"):
         server = make_server("127.0.0.1", 0, app, threaded=True)
         thread = Thread(target=server.serve_forever, daemon=True)
         thread.start()
-        email, password = "ui@example.test", secrets.token_urlsafe(16)
+        email = "ui@example.test"
+        password = secrets.token_urlsafe(16)
         try:
             with sync_playwright() as playwright:
                 browser = playwright.chromium.launch(channel="msedge", headless=True)

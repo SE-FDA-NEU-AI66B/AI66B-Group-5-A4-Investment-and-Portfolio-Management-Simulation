@@ -50,3 +50,9 @@ After drafting #75, I resumed #59 and verified DNSE authentication/subscription,
 - @bianh13 — Integrated the current auth module with the buy branch, preserved quote/financial checks and separated the optional DNSE worker from the simulation demo.
 Verified real registration/login, CSRF/session rejection, persisted purchases and ambiguous-response handling with automated tests and a real browser, while portfolio acceptance remains with #81.
 Reconciled PO planning and contract evidence, resolved the feed branch conflicts and repeated a read-only DNSE probe that authenticated/subscribed but received no quote, leaving live price comparison and peer acceptance pending.
+
+## 2026-10-19
+
+- @bianh13 — Separated the browser QA email and randomly generated password assignments to remove a false positive from the existing credential scanner without changing its rules.
+Reran both browser scenarios through real registration, login and persisted simulated purchases, including disconnected and gateway-error responses after a committed order, and both passed.
+Portfolio integration and peer acceptance remain pending, so this correction does not close #76 or establish live DNSE quote verification for #59.
