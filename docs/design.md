@@ -188,9 +188,11 @@ authentication/authorization, validation, errors, transaction boundaries and
 the external DNSE protocol boundary. [Traceability](traceability.md) maps each
 story to its scenario, screen, endpoint, tables and implementation status.
 
-Only GET `/` (302 redirect) and GET `/market` run on main. The quote JSON
-endpoint and worker are in resumed PR #60; all account/trade/portfolio/Admin APIs are designed,
-not implemented. M2 requires these contracts, not a complete trading engine.
+M2 originally exposed GET `/` and GET `/market`. Current main also includes
+auth HTML/API routes from #93 and buy/simulation plus shared quote JSON from #92.
+The optional provider worker is PR #60; sell (#98), grant display (#99), portfolio,
+stock detail and Admin remain separate deliveries. The table below retains the
+M2 design baseline; current behavior is recorded in ui.md and api-contract.md.
 
 | Method | Path | Access / story | Input | Success output | Error codes | Status |
 |--------|------|----------------|-------|----------------|-------------|--------|
