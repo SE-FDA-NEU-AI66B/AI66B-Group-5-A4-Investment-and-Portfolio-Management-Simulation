@@ -471,6 +471,25 @@ Planning attendance, Sprint Review, retrospective feedback, completed points,
 formal review evidence and LMS receipt: **pending actual events**. Daily entries
 contain three truthful sentences per member and are committed on the date written.
 
+
+### 10 October — #59 resumed implementation
+
+Ported the original worker into src modules and merged current main history;
+the original PR #60 age remains visible. Local regression result: 95 passed,
+five pre-existing trading placeholders skipped. Real DNSE authentication and
+subscription acknowledgement succeeded; no tick/reference event arrived in
+the bounded probe, so provider-price verification, peer review and acceptance
+remain pending. Completed points and velocity do not increase for #59 yet.
+
+
+### 10 October — #76 partial implementation
+
+Buy preview/transaction/form and explicit simulation quotes are implemented on
+a branch based on resumed #60. 115 tests pass and three deferred auth/sell cases
+remain skipped; the browser flow was checked with a clearly test-only session.
+Real #77 authentication/CSRF and #81 portfolio integration are still required.
+US04/US10 are partly works; #76 stays open and contributes no completed points yet.
+
 ### Progress reconciliation — 18 October 2026
 
 Committed remains **52 points**, 13 per member. The PO has confirmed that all four
@@ -494,3 +513,21 @@ The independent-machine SETUP record, full portfolio/sell journeys, merged UI
 wireframes, final screenshots/PDF and actual LMS receipt remain pending. Do not
 replace TESTER placeholders with the author's local run. Deadline remains
 21 October 00:00 UTC+7 (submit during 20 October).
+
+
+### Integration reconciliation — 19 October 2026
+
+PR #96 (UI dossier) and PR #92 (authenticated buy/simulation) have now merged
+into main at `97973d2`; #94's extraction is included through #92. The 18 October
+paragraphs above record the situation at that time and do not describe current
+merge status. Issues #76 and #86 are now closed on GitHub; final independent
+journey evidence and accepted-point reconciliation remain the SM's #84 audit.
+Commitment stays 52 points, 13 per member; this conflict-resolution update does
+not recalculate acceptance or award points automatically from issue closure.
+
+The grant display has a new integration PR #99; sell is PR #98. Both are open.
+Provider branch #60 received real HPG/FPT ticks on 19 October and preserved
+stored quotes across a controlled restart, but provider-board comparison and
+independent review remain pending. #60 and documentation PR #97 are refreshed
+against current main; neither is merged by this reconciliation. Main's reviewed
+wireframes, real auth and buy/simulation behavior must be retained during review.

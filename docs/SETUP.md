@@ -52,7 +52,7 @@ credentials, `.env` or database files; `.gitignore` excludes local state.
 One command, `python -m virtutrade init-db`, creates six tables and seeds **12 instruments and
 12 price_quote rows**. It prints `Database ready: 12 price_quote rows (12 on a
 fresh database).` The four other tables stay empty. Re-running preserves current
-prices and inserts missing demo entries; it does not reset data or migrate schemas.
+prices and inserts missing demo entries; it does not reset data. Account and quote migrations are applied idempotently.
 
 Schema upgrades (proposed contract in `docs/account-migration.md`, implemented
 under #77): copy the database file first and migrate the copy, never a live
@@ -108,7 +108,7 @@ macOS / Linux:
 .venv/bin/python -m pytest -q
 ```
 
-Expected on this src-layout revision: `43 passed` (the suite may grow in later PRs). Tests use temporary databases and do not change the
+Run the full suite; auth and buy tests use real temporary SQLite databases and do not change the
 running demo's data. CI installs `pytest`, `pytest-cov` and `ruff` separately
 and runs on Python 3.12.
 
@@ -138,17 +138,51 @@ See [handoff evidence](m2-po-handoff.md). A local author check does not satisfy
 the independent-machine condition above.
 
 
-## M3 auth update — 18 October 2026
+## Local simulation and authenticated buy (PR #92)
 
-The main checkout now includes real registration, login and logout from #93.
-Open the market page and use its Register/Log in links. Register a disposable
-local email such as learner@example.test and choose your own 8–128-character
-password; no real or shared password is supplied. Account creation grants
-100,000,000 virtual VND once. The separate grant-display PR #95 is not yet on main.
+Set `QUOTE_MODE=simulation` and `DATABASE_PATH=instance/simulation.db` in the
+ignored local `.env`, choosing a NEW database path. Then run:
 
-`init-db` now applies the idempotent account/session migration as well as seeding;
-the earlier six-table count describes M2. `SECRET_KEY` can be empty locally and
-will be generated at each boot; set a private random value in ignored .env if
-stable CSRF across restarts is needed. Never commit the value. Buy/simulation
-instructions belong to PR #92 until it merges. The independent-machine table
-above is still pending #83; an author test must not fill those placeholders.
+```powershell
+.\.venv\Scripts\python.exe -m virtutrade init-demo
+.\.venv\Scripts\python.exe -m virtutrade run
+```
+
+On macOS/Linux use `.venv/bin/python` for the same commands. `init-demo` refuses
+existing files; to continue an existing simulation, run the server and use
+Generate demo quotes. Do not delete a database that holds work you need.
+Open http://127.0.0.1:5000/ and click Register. For a disposable classroom account
+use `learner@example.test` with a password of your own choice (8–128 characters);
+no preset password or real account is required. The initial grant is 100,000,000 VND.
+
+Click Buy shares, enter HPG and 1000 shares, and preview 28,000,000 VND. If stale,
+click Generate demo quotes and preview again. Confirm once: cash becomes
+72,000,000 VND and the receipt shows 1,000 shares with a 28,000,000 VND cost basis.
+For the initial balance, 4,000 HPG shows a 12,000,000 VND shortfall and disables
+confirmation. All quotes are labelled Simulation / generated, never live DNSE.
+Logout/Login are visible from Market; the grant is not repeated on login.
+
+The real Portfolio screen and Sell are still separate #81/#79 deliveries. The
+buy receipt is not a portfolio substitute. A missing /portfolio link means that
+module has not landed; never type a missing URL as an acceptance workaround.
+If an order result is unknown, do not resubmit: reconcile the database with the
+operator (or Portfolio when available). No automatic order retry is performed.
+
+`SECRET_KEY` may be empty for local use: a fresh signing key is generated each
+boot. For stable CSRF across restarts generate a private value locally and put
+it only in `.env`: `python -c "import secrets; print(secrets.token_hex(32))"`.
+Registration/login still require same-origin requests and CSRF tokens.
+
+Optional author browser smoke: install `playwright==1.63.0` in the dev venv and
+run `python scripts/check_buy_ui.py` on Windows with Microsoft Edge installed.
+It uses a temporary DB/server and real registration/login with a random disposable
+password; it does not replace the independent-machine verification under #83.
+
+## Optional provider work — separate PR #60
+
+The optional worker, `stream` command and provider tests are maintained in PR #60.
+For a checkout containing that worker, follow [DNSE.md](DNSE.md) and keep its database
+separate from the simulation database. The labelled simulation workflow above
+needs no provider keys. The 19 October probe on the provider branch received real
+ticks; provider-board price/unit comparison and independent review remain pending.
+Repeat independent-machine SETUP on the final merged revision under #83.

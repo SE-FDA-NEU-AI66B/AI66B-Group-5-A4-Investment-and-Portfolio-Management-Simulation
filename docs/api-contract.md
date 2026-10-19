@@ -5,8 +5,11 @@ Owner: @bianh13. M3 reviewer: @nguyentue110; agreement approved in PR #91 on 12 
 
 This contract separates implemented routes from planned work. Auth HTML/API
 routes and the public seeded market are on main via #93. Portfolio, sell and
-stock detail are still planned. The buy/simulation integration is PR #92;
+stock detail are still planned. The buy/simulation integration is on main via merged PR #92;
 the optional provider worker is PR #60, with live price acceptance pending.
+On this checkout, real auth, GET /trade, POST /api/orders/preview,
+POST /api/orders/buy, POST /api/simulation/quotes/refresh and the quote
+list JSON endpoint run. Optional DNSE worker integration is tracked separately in PR #60.
 
 ## 1. Conventions and access
 
@@ -49,7 +52,7 @@ All errors below also use the shared validation/authorization rules above.
 | POST | `/api/sessions` | G; US01 | email, password | 200 account id/role; session cookie | 401 INVALID_CREDENTIALS; 429 LOGIN_LOCKED; 403 ACCOUNT_DISABLED | Designed |
 | DELETE | `/api/sessions/current` | U/A; US01 support | CSRF header; no body | 204; cookie expired, server session revoked | 401 AUTH_REQUIRED; 403 CSRF_FAILED | Designed |
 | GET | `/market` | G/U; US03 | none | 200 HTML with quotes, including empty state | 503 HTML unavailable page | Implemented on main |
-| GET | `/api/market/quotes` | G/U; US03 | no parameters | 200 quotes array; price/reference/time/source/stale/change | 503 MARKET_UNAVAILABLE | Implemented only in draft #60 |
+| GET | `/api/market/quotes` | G/U; US03 | no parameters | 200 quotes array; price/reference/time/source/stale/change | 503 MARKET_UNAVAILABLE | Implemented in resumed #60; review pending |
 | GET | `/api/market/quotes/{symbol}` | G/U; US03 | ticker path parameter | 200 one quote object; stale prices remain viewable | 404 TICKER_NOT_FOUND; 503 QUOTE_UNAVAILABLE | Designed |
 | POST | `/api/orders/preview` | U; US04/US05/US10 | side=buy/sell, symbol, quantity | 200 estimate_vnd, available quantity/cash, shortfall, can_submit, warning and quote time/source; no writes | 422 INVALID_QUANTITY/VALIDATION_ERROR; 404 TICKER_NOT_FOUND; 409 QUOTE_STALE; 503 QUOTE_UNAVAILABLE | Designed |
 | POST | `/api/orders/buy` | U; US04/US10 | symbol, quantity, expected_quote_at | 201 trade, cash and updated holding | 409 INSUFFICIENT_CASH/QUOTE_CHANGED/QUOTE_STALE; 422 INVALID_QUANTITY; 404 TICKER_NOT_FOUND; 503 QUOTE_UNAVAILABLE | Designed |
@@ -249,6 +252,19 @@ no screenshot or mock response here is evidence that they exist.
 Auth design reference: [OWASP session management](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html).
 
 
+## Order implementation status — #76
+
+The buy branch implements `/trade`, POST `/api/orders/preview`, POST
+`/api/orders/buy` and POST `/api/simulation/quotes/refresh`. They require the
+real #77 session/CSRF adapter, now installed and tested. Guest requests return
+401; missing CSRF returns 403; a missing server adapter still fails closed with 503.
+The real login-to-buy slice is verified; the portfolio transition remains pending. See
+[concrete interfaces and remaining integration](order-implementation.md).
+Simulation refresh returns 200 source/generated_at/updated; it accepts `{}`
+only. Shared auth errors still apply, with 403 SIMULATION_DISABLED for wrong
+mode/source, 409 SIMULATION_CLOCK_NOT_ADVANCED, 422 VALIDATION_ERROR and 503
+SERVICE_UNAVAILABLE. No broker API is called. Existing exact-money and no-auto-retry
+contracts remain binding; sell execution belongs to #79.
 ## 7. M3 shared order and simulation contract — #75
 
 **Design handoff, not implemented behavior.** This section adds an explicit
