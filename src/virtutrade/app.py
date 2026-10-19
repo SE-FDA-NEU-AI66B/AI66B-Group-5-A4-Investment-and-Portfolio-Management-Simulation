@@ -9,6 +9,9 @@ from virtutrade.market import blueprint as market_blueprint
 from virtutrade.market.repository import SQLiteQuoteRepository
 from virtutrade.market.routes import api_blueprint
 from virtutrade.orders.routes import blueprint as orders_blueprint
+from virtutrade.portfolio import api_blueprint as portfolio_api_blueprint
+from virtutrade.portfolio import blueprint as portfolio_blueprint
+from virtutrade.portfolio.repository import SQLitePortfolioRepository
 
 
 def create_app(config=None):
