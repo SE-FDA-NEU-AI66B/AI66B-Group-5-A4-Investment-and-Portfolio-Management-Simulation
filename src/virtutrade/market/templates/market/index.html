@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="{{ url_for('market.static', filename='market.css') }}">
 </head>
 <body>
-  <header><a class="brand" href="/market">V<span>■</span> VirtuTrade</a><nav style="display:inline-block;margin-left:18px;font-size:14px">{% if g.current_account %}<span>{{ g.current_account.email }}</span><form method="post" action="/logout" style="display:inline;margin-left:12px"><input type="hidden" name="csrf_token" value="{{ g.csrf_token }}"><button type="submit">Log out</button></form>{% else %}<a href="/login">Log in</a><a href="/register" style="margin-left:12px">Register</a>{% endif %}</nav><span class="badge">PAPER TRADING</span></header>
+  <header><a class="brand" href="/market">V<span>■</span> VirtuTrade</a><nav style="display:inline-block;margin-left:18px;font-size:14px">{% if g.current_account %}<span>{{ g.current_account.email }} · {{ g.current_account.cash_vnd|vnd }} VND</span><form method="post" action="/logout" style="display:inline;margin-left:12px"><input type="hidden" name="csrf_token" value="{{ g.csrf_token }}"><button type="submit">Log out</button></form>{% else %}<a href="/login">Log in</a><a href="/register" style="margin-left:12px">Register</a>{% endif %}</nav><span class="badge">PAPER TRADING</span></header>
   <main>
     <nav aria-label="Main"><a href="/trade">Buy shares</a>
     {% if portfolio_url and g.current_account %}<a href="{{ portfolio_url }}">Portfolio</a>{% endif %}</nav>
