@@ -53,3 +53,17 @@ metadata and receipt behavior are preserved for integration; the buy-only
 controller still renders buy mode until the sell implementation is merged.
 The DNSE worker remains in #60; simulation screenshots do not verify live prices.
 No sector categories, fake charts or unsupported portfolio navigation are added.
+
+Local integration check `e783753` combines this UI with PR #60 `c044b9e`, #98
+`561eb7c` and #99 `32119d3`. It passes **193 tests, 2 existing skips**. The
+existing sell browser scenario also passes registration, buy, partial sale,
+oversell rejection and full sale; its old single-sentence summary selector was
+adapted to the structured Shares held row (still asserts 1,000). The grant
+scenario passes registration/login with exactly one 100,000,000 VND grant.
+Integration captures are kept separately from the teammates' original evidence.
+
+Two shared-file conflicts need the same resolutions when these branches are
+combined: retain the side-aware new trade template/handler, and carry #99's
+Market balance into the shared header only on Market (not a stale balance on
+Trade). These checks do not approve or merge the teammates' PRs, or establish a
+visible Portfolio-to-Sell entry; the sell scenario explicitly visits its route.
