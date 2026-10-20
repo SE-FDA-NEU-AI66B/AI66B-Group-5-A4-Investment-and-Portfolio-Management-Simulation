@@ -1,39 +1,28 @@
 <!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Market overview · VirtuTrade</title>
-  <link rel="stylesheet" href="{{ url_for('market.static', filename='market.css') }}">
-</head>
-<body>
-  <header><a class="brand" href="/market">V<span>■</span> VirtuTrade</a><nav style="display:inline-block;margin-left:18px;font-size:14px">{% if g.current_account %}<span>{{ g.current_account.email }}</span><form method="post" action="/logout" style="display:inline;margin-left:12px"><input type="hidden" name="csrf_token" value="{{ g.csrf_token }}"><button type="submit">Log out</button></form>{% else %}<a href="/login">Log in</a><a href="/register" style="margin-left:12px">Register</a>{% endif %}</nav><span class="badge">PAPER TRADING</span></header>
-  <main>
-    <nav aria-label="Main"><a href="/trade">Buy shares</a>
-    {% if portfolio_url and g.current_account %}<a href="{{ portfolio_url }}">Portfolio</a>{% endif %}</nav>
-    <div class="eyebrow">MARKET OVERVIEW</div>
-    <h1>A place to start exploring.</h1>
-    <p class="intro">Reference prices for your virtual investment journey.</p>
-    <aside id="data-notice">{% if quotes|selectattr('source', 'equalto', 'simulation')|list %}<strong>Simulation / generated</strong> · Scenario prices generated locally, not live DNSE quotes.{% elif quotes|selectattr('source', 'equalto', 'dnse')|list %}<strong>DNSE market data</strong> · The last received prices are shown below. Check each timestamp and source; some rows may still contain demo data.{% else %}<strong>Demo data</strong> · These are seeded example prices, not live DNSE quotes.{% endif %} No real money or market orders.</aside>
-    <p id="refresh-status" class="intro" role="status">Quotes refresh every 3 seconds. Check each quote's timestamp for freshness.</p>
-    {% if error %}
-      <section id="market-error" class="empty" role="alert"><h2>Market data is unavailable</h2><p>Please ask the project operator to check the database setup; this page will retry automatically.</p></section>
-    {% endif %}
-      <section aria-labelledby="quotes-heading">
-        <div class="section-heading"><h2 id="quotes-heading">Market snapshot</h2><span id="symbol-count">{{ quotes|length }} symbols · VND</span></div>
-        <div class="table-wrap"><table>
-          <thead><tr><th scope="col">Symbol / Company</th><th scope="col" class="number">Price (VND)</th><th scope="col" class="number">Change vs reference</th><th scope="col">Last quote (UTC)</th><th scope="col">Source / Status</th></tr></thead>
-          <tbody id="quote-rows">{% for quote in quotes %}<tr>
-            <td><strong>{{ quote.symbol }}</strong><small>{{ quote.name }}</small></td>
-            <td class="number price">{{ quote.price_vnd|vnd }}</td>
-            <td class="number {{ 'positive' if quote.change is not none and quote.change|float > 0 else 'negative' if quote.change is not none and quote.change|float < 0 else 'neutral' }}">{% if quote.change is none %}—<small>Reference unavailable</small>{% else %}{{ '+' if quote.change|float > 0 else '' }}{{ quote.change }}%{% endif %}</td>
-            <td><time datetime="{{ quote.quoted_at }}">{{ quote.quoted_at }}</time></td>
-            <td><span class="source">{{ 'Simulation / generated' if quote.source == 'simulation' else 'Demo / seed' if quote.source == 'seed' else 'DNSE' }}</span>{% if quote.stale %}<small class="delayed">Price may be delayed</small>{% endif %}</td>
-          </tr>{% else %}<tr><td colspan="5"><h2>No quotes yet</h2><p>Market prices will appear here when data is available.</p></td></tr>{% endfor %}</tbody>
-        </table></div>
-      </section>
-    <footer>VirtuTrade · Team 05 <span>Investment &amp; Portfolio Management Simulation</span></footer>
-  </main>
-  <script src="{{ url_for('market.static', filename='market.js') }}" defer></script>
-</body>
-</html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Market overview &middot; VirtuTrade</title><link rel="stylesheet" href="{{ url_for('market.static', filename='market.css') }}"></head>
+<body>{% set current_page = 'market' %}{% include 'market/_header.html' %}
+<main>
+  <div class="page-heading"><div><div class="eyebrow">YOUR PRACTICE STARTS HERE</div><h1>Explore the market.</h1><p class="intro">Get to know the stocks. Build confidence with virtual trades.</p></div><span class="page-note">Vietnam equities <span>Prices in VND</span></span></div>
+  <div class="market-summary" aria-label="Market overview">
+    <div class="metric"><span>Available instruments</span><strong id="instrument-total">{{ quotes|length }}</strong><small>Symbols in this database</small></div>
+    <div class="metric"><span>Your trading environment</span><strong>Paper trading</strong><small>Virtual balances. No broker orders.</small></div>
+    <div class="metric metric-accent"><span>A simple place to begin</span><strong>Choose. Preview. Confirm.</strong><small>Check the price and cost before every order.</small></div>
+  </div>
+  <aside id="data-notice">{% if quotes|selectattr('source', 'equalto', 'simulation')|list %}<strong>Simulation / generated</strong> &middot; Scenario prices generated locally, not live DNSE quotes.{% elif quotes|selectattr('source', 'equalto', 'dnse')|list %}<strong>DNSE market data</strong> &middot; Last received prices. Some rows may still contain demo data; check each source and timestamp.{% else %}<strong>Demo data</strong> &middot; Seeded example prices, not live DNSE quotes.{% endif %}</aside>
+  <section class="market-panel" aria-labelledby="quotes-heading">
+    <div class="section-heading"><div><h2 id="quotes-heading">Market snapshot</h2><p id="refresh-status" role="status">Quotes refresh every 3 seconds. Check each timestamp for freshness.</p></div><span id="symbol-count">{{ quotes|length }} symbols &middot; VND</span></div>
+    {% if error %}<section id="market-error" class="empty" role="alert"><h2>Market data is unavailable</h2><p>Please ask the project operator to check the database setup; this page will retry automatically.</p></section>{% endif %}
+    <div class="table-wrap" tabindex="0" role="region" aria-label="Stock quotes; scroll horizontally on small screens"><table>
+      <thead><tr><th scope="col">Symbol / Company</th><th scope="col" class="number">Price (VND)</th><th scope="col" class="number">Change vs reference</th><th scope="col">Last quote (UTC+7)</th><th scope="col">Source / Status</th><th scope="col"><span class="sr-only">Trade</span></th></tr></thead>
+      <tbody id="quote-rows">{% for quote in quotes %}<tr>
+        <td><strong>{{ quote.symbol }}</strong><small>{{ quote.name }}</small></td><td class="number price">{{ quote.price_vnd|vnd }}</td>
+        <td class="number {{ 'positive' if quote.change is not none and quote.change|float > 0 else 'negative' if quote.change is not none and quote.change|float < 0 else 'neutral' }}">{% if quote.change is none %}?<small>Reference unavailable</small>{% else %}{{ '+' if quote.change|float > 0 else '' }}{{ quote.change }}%{% endif %}</td>
+        <td><time datetime="{{ quote.quoted_at }}">{{ quote.quoted_at }}</time></td>
+        <td><span class="source">{{ 'Simulation / generated' if quote.source == 'simulation' else 'Demo / seed' if quote.source == 'seed' else 'DNSE' }}</span>{% if quote.stale %}<small class="delayed">Price may be delayed</small>{% endif %}</td>
+        <td><a class="row-action" href="{{ url_for('orders.trade_form', symbol=quote.symbol) }}" aria-label="Buy {{ quote.symbol }}">Buy <span aria-hidden="true">&#8599;</span></a></td>
+      </tr>{% else %}<tr><td colspan="6"><h2>No quotes yet</h2><p>Market prices will appear here when data is available.</p></td></tr>{% endfor %}</tbody>
+    </table></div>
+  </section>
+  <footer><strong>VirtuTrade &middot; Team 05</strong><span>Learn with virtual capital. Every trade here is simulated.</span></footer>
+</main><script src="{{ url_for('market.static', filename='market.js') }}" defer></script></body></html>

@@ -1,0 +1,47 @@
+{
+  "passed": true,
+  "observations": [
+    {
+      "state": "market-desktop",
+      "at_utc": "2026-10-20T03:30:09.316346+00:00"
+    },
+    {
+      "state": "stock-picker-desktop",
+      "at_utc": "2026-10-20T03:30:13.005255+00:00"
+    },
+    {
+      "state": "buy-preview-desktop",
+      "at_utc": "2026-10-20T03:30:13.202980+00:00"
+    },
+    {
+      "state": "buy-preview-mobile",
+      "at_utc": "2026-10-20T03:30:13.327558+00:00"
+    },
+    {
+      "state": "buy-shortfall-mobile",
+      "at_utc": "2026-10-20T03:30:14.217049+00:00"
+    },
+    {
+      "state": "picker-error-mobile",
+      "at_utc": "2026-10-20T03:30:14.444417+00:00"
+    },
+    {
+      "state": "picker-empty-mobile",
+      "at_utc": "2026-10-20T03:30:14.751539+00:00"
+    },
+    {
+      "state": "picker-loading-mobile",
+      "at_utc": "2026-10-20T03:30:14.845084+00:00"
+    },
+    {
+      "state": "market-mobile",
+      "at_utc": "2026-10-20T03:30:15.178224+00:00"
+    }
+  ],
+  "limitations": [
+    "Author QA; not independent review or machine verification.",
+    "GET failures/empty/loading are explicit browser test fixtures.",
+    "Simulation quotes, not DNSE acceptance.",
+    "Page captures exclude browser address bar."
+  ]
+}

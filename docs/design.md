@@ -441,3 +441,20 @@ buy branch and remain in #60, so provider verification cannot block the P0 demo.
 Auth and quote migrations have distinct ledgers/version ownership; seed reruns
 preserve grants, quotes and holdings. Portfolio links are exposed only after the
 real /portfolio GET route is registered by #81; no placeholder UI is presented.
+
+
+### Market-to-Buy UI refinement - #101, 20 October 2026
+
+The trade screen's raw symbol entry is supplemented by a keyboard-accessible
+picker calling the existing GET /api/market/quotes. Each market row links to the
+existing GET /trade?symbol=... route. The server still validates symbols, exact
+integer money, freshness, funds and session/CSRF; the browser cannot approve an
+order from its cached list. No new API or ERD entity is introduced.
+
+Presentation code stays in market/static and orders/static. Market/Trade share
+market/_header.html; stock-picker.js owns discovery and its read failure states,
+while trade.js owns preview/confirmation feedback. The structured preview uses
+server-supplied values, retains uncertain-POST locking and makes no automatic
+trade retries. Existing #98 sell metadata/receipt behavior is retained for
+integration, without implementing or taking ownership of the sell service.
+Portfolio, market search/detail and DNSE acceptance remain with #81/#85/#59.
