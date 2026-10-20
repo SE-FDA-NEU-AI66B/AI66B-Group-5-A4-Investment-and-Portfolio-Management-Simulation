@@ -1,0 +1,383 @@
+{
+  "meta": {
+    "commit": "5a51b29",
+    "run_at_utc": "2026-10-20T09:19:54+00:00",
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "browser": "msedge 155.0.4283.45",
+    "passed": 32,
+    "failed": 5
+  },
+  "results": [
+    {
+      "id": "US01-1",
+      "story": "US01",
+      "check": "Guest landing offers register and sign in",
+      "expected": "Documented landing / shows Log in and Register",
+      "observed": "/ opens /market with Log in and Register links",
+      "result": "PASS",
+      "screenshot": "US01-1-landing.png",
+      "seconds": 0.43
+    },
+    {
+      "id": "US01-2",
+      "story": "US01",
+      "check": "Invalid email is rejected",
+      "expected": "Enter a valid email address.",
+      "observed": "Enter a valid email address.",
+      "result": "PASS",
+      "screenshot": "US01-2-invalid-email.png",
+      "seconds": 0.28
+    },
+    {
+      "id": "US01-3",
+      "story": "US01",
+      "check": "Password shorter than 8 is rejected",
+      "expected": "Password must be 8..128 characters.",
+      "observed": "Password must be 8..128 characters.",
+      "result": "PASS",
+      "screenshot": "US01-3-short-password.png",
+      "seconds": 0.18
+    },
+    {
+      "id": "US01-4",
+      "story": "US01",
+      "check": "Valid registration signs the user in",
+      "expected": "Account created and logged-in home shown",
+      "observed": "Account created; landed on /market signed in as investor@example.test",
+      "result": "PASS",
+      "screenshot": "US01-4-registered.png",
+      "seconds": 0.38
+    },
+    {
+      "id": "US02-1",
+      "story": "US02",
+      "check": "New account receives exactly 100,000,000 VND",
+      "expected": "Balance shows 100,000,000 VND",
+      "observed": "Header shows 100,000,000 VND; database cash 100,000,000",
+      "result": "PASS",
+      "screenshot": "US02-1-grant.png",
+      "seconds": 0.08
+    },
+    {
+      "id": "US01-5",
+      "story": "US01",
+      "check": "Duplicate email is rejected",
+      "expected": "Email already in use",
+      "observed": "Email already in use (same email in upper case)",
+      "result": "PASS",
+      "screenshot": null,
+      "seconds": 0.46
+    },
+    {
+      "id": "US01-6",
+      "story": "US01",
+      "check": "Five wrong passwords lock the account for 15 minutes",
+      "expected": "Locked after the 5th wrong password; 900 s",
+      "observed": "Attempts 1-4: 'Invalid email or password'; attempt 5 and correct password: 'Account locked. Try again in 900 seconds.'",
+      "result": "PASS",
+      "screenshot": null,
+      "seconds": 2.31
+    },
+    {
+      "id": "US03-1",
+      "story": "US03",
+      "check": "Market lists price, daily change and last update",
+      "expected": "Price, % change and timestamp per ticker",
+      "observed": "12 rows with price, change, UTC timestamp and source; first: ACB Asia Commercial Bank  25,000 +2.04% 2026-10-20T09:19:41.487613Z Simulation / generated",
+      "result": "PASS",
+      "screenshot": "US03-1-market.png",
+      "seconds": 0.15
+    },
+    {
+      "id": "US03-2",
+      "story": "US03",
+      "check": "Quote older than 15 minutes is flagged",
+      "expected": "Price may be delayed",
+      "observed": "HPG row shows 'Price may be delayed' (quote aged 20 min by fixture)",
+      "result": "PASS",
+      "screenshot": "US03-2-stale.png",
+      "seconds": 0.13
+    },
+    {
+      "id": "US03-3",
+      "story": "US03",
+      "check": "Search a ticker and open its detail page",
+      "expected": "Search + detail view with price, change, time",
+      "observed": "No ticker search box or detail page on /market (pending #85)",
+      "result": "FAIL",
+      "screenshot": null,
+      "seconds": 0.05
+    },
+    {
+      "id": "US03-4",
+      "story": "US03",
+      "check": "Unknown ticker search shows 'Ticker not found'",
+      "expected": "Ticker not found",
+      "observed": "No market search, so 'Ticker not found' cannot be shown on /market (pending #85); /trade shows it on preview (US04-4)",
+      "result": "FAIL",
+      "screenshot": null,
+      "seconds": 0.05
+    },
+    {
+      "id": "US04-1",
+      "story": "US04",
+      "check": "Guest cannot trade",
+      "expected": "Sign-in guidance; API 401",
+      "observed": "Preview disabled; 'Sign in before trading. Log in or Register, then select Buy shares from Market.'; direct API buy -> 401",
+      "result": "PASS",
+      "screenshot": null,
+      "seconds": 0.21
+    },
+    {
+      "id": "US04-2",
+      "story": "US04",
+      "check": "Buy form reachable from Market without typing a URL",
+      "expected": "Visible link from /market to /trade",
+      "observed": "Market -> Buy shares link -> /trade; demo quotes regenerated",
+      "result": "PASS",
+      "screenshot": null,
+      "seconds": 0.2
+    },
+    {
+      "id": "US04-3",
+      "story": "US04",
+      "check": "Preview 1,000 HPG costs 28,000,000 and writes nothing",
+      "expected": "28,000,000 VND; no trade",
+      "observed": "Estimate 28,000,000 VND for 1,000 HPG at 28,000; 0 trades recorded",
+      "result": "PASS",
+      "screenshot": "US04-3-buy-preview.png",
+      "seconds": 0.11
+    },
+    {
+      "id": "US04-4",
+      "story": "US04",
+      "check": "Unknown ticker on the order form",
+      "expected": "Ticker not found",
+      "observed": "Ticker not found. Choose a stock from Market.",
+      "result": "PASS",
+      "screenshot": "US04-4-buy-unknown.png",
+      "seconds": 0.12
+    },
+    {
+      "id": "US04-5",
+      "story": "US04",
+      "check": "Buy 0 shares is rejected with the AC message",
+      "expected": "Quantity must be a whole number of at least 1 share",
+      "observed": "Visible text is 'Enter a symbol and a whole number of at least 1 share. (browser hint: 'Value must be greater than or equal to 1.')', not the AC wording 'Quantity must be a whole number of at least 1 share'",
+      "result": "FAIL",
+      "screenshot": "US04-5-buy-zero.png",
+      "seconds": 0.42
+    },
+    {
+      "id": "US10-1",
+      "story": "US10",
+      "check": "Over-budget order shows the inline warning and disables confirm",
+      "expected": "Exceeds available balance by 12,000,000 VND; confirm disabled",
+      "observed": "Exceeds available balance by 12,000,000 VND. Reduce the quantity. Confirm disabled.",
+      "result": "PASS",
+      "screenshot": "US10-1-us10-warning.png",
+      "seconds": 0.12
+    },
+    {
+      "id": "US10-2",
+      "story": "US10",
+      "check": "Correcting the quantity clears the warning",
+      "expected": "Warning disappears; confirm re-enabled",
+      "observed": "Warning cleared and Confirm buy re-enabled at 1,000 shares",
+      "result": "PASS",
+      "screenshot": null,
+      "seconds": 0.06
+    },
+    {
+      "id": "US04-6",
+      "story": "US04",
+      "check": "Buy 1,000 HPG fills at 28,000",
+      "expected": "Cash 72,000,000 VND; holding 1,000 HPG",
+      "observed": "Bought 1000 HPG. Cash remaining: 72,000,000 VND. Holding: 1000 shares; cost basis: 28,000,000 VND. Order #1.",
+      "result": "PASS",
+      "screenshot": "US04-6-buy-receipt.png",
+      "seconds": 0.11
+    },
+    {
+      "id": "US04-7",
+      "story": "US04",
+      "check": "3,000 FPT with 72,000,000 cash is rejected (BR1)",
+      "expected": "Insufficient cash: this order needs 360,000,000 VND but only 72,000,000 VND is available",
+      "observed": "Form: 'Exceeds available balance by 288,000,000 VND. Reduce the quantity.' (confirm disabled). Server on bypass: 409 'Insufficient cash: this order needs 360,000,000 VND but only 72,000,000 VND is available. Reduce the quantity and preview again.'",
+      "result": "PASS",
+      "screenshot": "US04-7-buy-insufficient.png",
+      "seconds": 0.22
+    },
+    {
+      "id": "US06-1",
+      "story": "US06",
+      "check": "Portfolio shows the bought holding and total value",
+      "expected": "Quantity, average cost, market value, total = cash + holdings",
+      "observed": "Market -> Portfolio: HPG 1,000 @ 28,000.00; total = cash + holdings = 100,000,000",
+      "result": "PASS",
+      "screenshot": "US06-1-portfolio.png",
+      "seconds": 0.18
+    },
+    {
+      "id": "US05-1",
+      "story": "US05",
+      "check": "Sell reachable from the holding row",
+      "expected": "Visible Sell link; unrealised +2,000,000 at 30,000",
+      "observed": "Portfolio shows +2,000,000 unrealised; Sell link -> /trade?side=sell&symbol=HPG",
+      "result": "PASS",
+      "screenshot": "US05-1-sell-form.png",
+      "seconds": 0.21
+    },
+    {
+      "id": "US05-2",
+      "story": "US05",
+      "check": "Selling 800 while holding 500 is rejected (BR2)",
+      "expected": "You hold 500 HPG; the maximum you can sell is 500",
+      "observed": "After selling 500: You hold 500 HPG; the maximum you can sell is 500. Confirm disabled.",
+      "result": "PASS",
+      "screenshot": "US05-2-oversell.png",
+      "seconds": 0.2
+    },
+    {
+      "id": "US05-3",
+      "story": "US05",
+      "check": "Selling all 1,000 HPG at 30,000 realises +2,000,000",
+      "expected": "Proceeds 30,000,000; realised +2,000,000; holding 0",
+      "observed": "Sold 500 HPG for 15,000,000 VND. Realised P&L: 1,000,000 VND. Cash now: 102,000,000 VND. Holding fully sold. Order #3. Two sales of 500 at 30,000: total realised +2,000,000; cash +30,000,000",
+      "result": "PASS",
+      "screenshot": "US05-3-sell-full.png",
+      "seconds": 0.12
+    },
+    {
+      "id": "US05-4",
+      "story": "US05",
+      "check": "Quote change after submit still fills at the submitted price",
+      "expected": "Filled at the previewed price (BR3)",
+      "observed": "Order rejected: 'Price changed; refresh the preview before confirming.'. AC expects a fill at the previewed 30,000; the API contract instead returns 409 QUOTE_CHANGED (documented deviation)",
+      "result": "FAIL",
+      "screenshot": "US05-4-quote-changed.png",
+      "seconds": 0.38
+    },
+    {
+      "id": "US06-2",
+      "story": "US06",
+      "check": "Empty account shows 'No positions yet'; accounts are isolated",
+      "expected": "No positions yet; total = cash",
+      "observed": "Second account: 'No positions yet', total 100,000,000, none of the first account's HPG",
+      "result": "PASS",
+      "screenshot": null,
+      "seconds": 0.53
+    },
+    {
+      "id": "US01-7",
+      "story": "US01",
+      "check": "Sign-in reaches the user's own portfolio",
+      "expected": "/portfolio after login",
+      "observed": "Login lands on /market; AC says the user reaches their own portfolio. Portfolio is one click away in the header",
+      "result": "FAIL",
+      "screenshot": null,
+      "seconds": 0.37
+    },
+    {
+      "id": "US02-2",
+      "story": "US02",
+      "check": "Balance changes only through trades",
+      "expected": "No re-grant on login",
+      "observed": "After logout/login cash is 101,970,000 VND = 100,000,000 +1,970,000 from trades; no second grant",
+      "result": "PASS",
+      "screenshot": null,
+      "seconds": 0.06
+    },
+    {
+      "id": "US06-3",
+      "story": "US06",
+      "check": "Portfolio loads within 2 seconds",
+      "expected": "< 2 s",
+      "observed": "Loaded in 48 ms (target 2,000 ms)",
+      "result": "PASS",
+      "screenshot": null,
+      "seconds": 0.05
+    },
+    {
+      "id": "US06-4",
+      "story": "US06",
+      "check": "Guest cannot open a portfolio",
+      "expected": "401 with sign-in guidance",
+      "observed": "401 page 'Sign in to see your portfolio.' with Log in / Create an account",
+      "result": "PASS",
+      "screenshot": null,
+      "seconds": 0.18
+    },
+    {
+      "id": "S03",
+      "story": "US04",
+      "check": "Loading state is announced",
+      "expected": "Visible aria-live loading status",
+      "observed": "While the request is held: 'Loading preview…' in an aria-live status; then the preview",
+      "result": "PASS",
+      "screenshot": null,
+      "seconds": 0.19
+    },
+    {
+      "id": "X01",
+      "story": "Auth",
+      "check": "Logged-out session cannot trade",
+      "expected": "401; form disabled",
+      "observed": "After logout the old token gets 401 'Authentication required'",
+      "result": "PASS",
+      "screenshot": null,
+      "seconds": 0.32
+    },
+    {
+      "id": "S01",
+      "story": "US03",
+      "check": "Empty state: market without quotes",
+      "expected": "No quotes yet",
+      "observed": "/market with no quotes: 'No quotes yet'",
+      "result": "PASS",
+      "screenshot": "S01-market-empty.png",
+      "seconds": 0.14
+    },
+    {
+      "id": "S02",
+      "story": "US03",
+      "check": "Error state: market database unavailable",
+      "expected": "Visible error, no stack trace",
+      "observed": "HTTP 503: 'Market data is unavailable' (missing database)",
+      "result": "PASS",
+      "screenshot": "S02-market-error.png",
+      "seconds": 0.12
+    },
+    {
+      "id": "X02",
+      "story": "All",
+      "check": "Narrow viewport (390 px)",
+      "expected": "scrollWidth <= 390 on every page",
+      "observed": "No page-level horizontal scroll at 390 px: {'/market': 390, '/trade': 390, '/portfolio': 390, '/login': 390, '/register': 390}",
+      "result": "PASS",
+      "screenshot": "X02-narrow-portfolio.png",
+      "seconds": 0.31
+    },
+    {
+      "id": "X03",
+      "story": "All",
+      "check": "Keyboard navigation and labels",
+      "expected": "Tab reaches every control",
+      "observed": "Tab order on /trade: ['VirtuTrade', 'Market', 'Portfolio', 'symbol', 'quantity', 'preview-button', 'View portfolio', 'generate-quotes']; inputs labelled",
+      "result": "PASS",
+      "screenshot": null,
+      "seconds": 0.11
+    },
+    {
+      "id": "X04",
+      "story": "All",
+      "check": "No uncaught JavaScript errors",
+      "expected": "Zero page errors",
+      "observed": "No uncaught JavaScript errors during the audit",
+      "result": "PASS",
+      "screenshot": null,
+      "seconds": 0.0
+    }
+  ]
+}
