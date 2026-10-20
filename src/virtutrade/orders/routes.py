@@ -122,7 +122,8 @@ def preview():
     result = preview_order(
         session_id,
         **data,
-        unit_of_work=partial(order_unit_of_work, current_app.config["DATABASE"]),
+        unit_of_work=partial(order_unit_of_work, current_app.config["DATABASE"],
+                             provider_only=current_app.config.get("QUOTE_MODE") == "dnse"),
     )
     return jsonify(result)
 
@@ -134,7 +135,8 @@ def buy():
     result = execute_buy(
         session_id,
         **data,
-        unit_of_work=partial(order_unit_of_work, current_app.config["DATABASE"]),
+        unit_of_work=partial(order_unit_of_work, current_app.config["DATABASE"],
+                             provider_only=current_app.config.get("QUOTE_MODE") == "dnse"),
     )
     return jsonify(result), 201
 
@@ -146,7 +148,8 @@ def sell():
     result = execute_sell(
         session_id,
         **data,
-        unit_of_work=partial(order_unit_of_work, current_app.config["DATABASE"]),
+        unit_of_work=partial(order_unit_of_work, current_app.config["DATABASE"],
+                             provider_only=current_app.config.get("QUOTE_MODE") == "dnse"),
     )
     return jsonify(result), 201
 

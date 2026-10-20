@@ -1,0 +1,179 @@
+{
+  "observed_at_utc": "2026-10-20T15:46:49.206797+00:00",
+  "branch": "fix/dnse-latest-quotes",
+  "base_main": "3cb08ce",
+  "official_endpoint": "GET https://openapi.dnse.com.vn/price/{symbol}/trades/latest?boardId=G1",
+  "api_version": "2026-07-23",
+  "provider_time_zone": "GMT+7",
+  "price_conversion": "G1 matchPrice (thousands of VND) * 1000 using Decimal",
+  "rest_api_html_price_and_timestamp_match": true,
+  "all_12_sources_dnse": true,
+  "private_account_session_holdings_trades_unchanged": true,
+  "websocket": {
+    "authenticated_local_time": "2026-10-20 22:44:21 +07:00",
+    "both_subscriptions_acknowledged": true,
+    "new_evening_ticks_claimed": false,
+    "prior_live_tick_evidence": "dnse-live-2026-10-19.json"
+  },
+  "quotes": [
+    {
+      "change": null,
+      "name": "Asia Commercial Bank",
+      "previous_close_vnd": null,
+      "price_vnd": 20250,
+      "quoted_at": "2026-10-20T07:45:01.600000000Z",
+      "reference_at": null,
+      "source": "dnse",
+      "stale": true,
+      "symbol": "ACB"
+    },
+    {
+      "change": null,
+      "name": "BIDV",
+      "previous_close_vnd": null,
+      "price_vnd": 33650,
+      "quoted_at": "2026-10-20T07:45:01.720000000Z",
+      "reference_at": null,
+      "source": "dnse",
+      "stale": true,
+      "symbol": "BID"
+    },
+    {
+      "change": null,
+      "name": "FPT Corporation",
+      "previous_close_vnd": null,
+      "price_vnd": 57400,
+      "quoted_at": "2026-10-20T07:45:02.408000000Z",
+      "reference_at": null,
+      "source": "dnse",
+      "stale": true,
+      "symbol": "FPT"
+    },
+    {
+      "change": null,
+      "name": "PetroVietnam Gas",
+      "previous_close_vnd": null,
+      "price_vnd": 76400,
+      "quoted_at": "2026-10-20T07:45:02.464000000Z",
+      "reference_at": null,
+      "source": "dnse",
+      "stale": true,
+      "symbol": "GAS"
+    },
+    {
+      "change": null,
+      "name": "Hoa Phat Group",
+      "previous_close_vnd": null,
+      "price_vnd": 21100,
+      "quoted_at": "2026-10-20T07:45:03.006000000Z",
+      "reference_at": null,
+      "source": "dnse",
+      "stale": true,
+      "symbol": "HPG"
+    },
+    {
+      "change": null,
+      "name": "Military Bank",
+      "previous_close_vnd": null,
+      "price_vnd": 19650,
+      "quoted_at": "2026-10-20T07:45:03.297000000Z",
+      "reference_at": null,
+      "source": "dnse",
+      "stale": true,
+      "symbol": "MBB"
+    },
+    {
+      "change": null,
+      "name": "Masan Group",
+      "previous_close_vnd": null,
+      "price_vnd": 73600,
+      "quoted_at": "2026-10-20T07:45:03.394000000Z",
+      "reference_at": null,
+      "source": "dnse",
+      "stale": true,
+      "symbol": "MSN"
+    },
+    {
+      "change": null,
+      "name": "Mobile World",
+      "previous_close_vnd": null,
+      "price_vnd": 74900,
+      "quoted_at": "2026-10-20T07:45:03.431000000Z",
+      "reference_at": null,
+      "source": "dnse",
+      "stale": true,
+      "symbol": "MWG"
+    },
+    {
+      "change": null,
+      "name": "SSI Securities",
+      "previous_close_vnd": null,
+      "price_vnd": 19950,
+      "quoted_at": "2026-10-20T07:45:04.256000000Z",
+      "reference_at": null,
+      "source": "dnse",
+      "stale": true,
+      "symbol": "SSI"
+    },
+    {
+      "change": null,
+      "name": "Techcombank",
+      "previous_close_vnd": null,
+      "price_vnd": 33950,
+      "quoted_at": "2026-10-20T07:45:04.480000000Z",
+      "reference_at": null,
+      "source": "dnse",
+      "stale": true,
+      "symbol": "TCB"
+    },
+    {
+      "change": null,
+      "name": "Vietcombank",
+      "previous_close_vnd": null,
+      "price_vnd": 55800,
+      "quoted_at": "2026-10-20T07:45:04.695000000Z",
+      "reference_at": null,
+      "source": "dnse",
+      "stale": true,
+      "symbol": "VCB"
+    },
+    {
+      "change": null,
+      "name": "Vinamilk",
+      "previous_close_vnd": null,
+      "price_vnd": 57700,
+      "quoted_at": "2026-10-20T07:45:05.227000000Z",
+      "reference_at": null,
+      "source": "dnse",
+      "stale": true,
+      "symbol": "VNM"
+    }
+  ],
+  "provider_board_comparison": {
+    "method": "PO checked the official DNSE board and confirmed the three requested values in chat",
+    "reported_by": "bianh13",
+    "confirmation": "chu\u1ea9n r\u1ed3i",
+    "confirmation_received_date": "2026-10-20",
+    "exact_board_observation_time": null,
+    "board_url": "https://banggia.dnse.com.vn/",
+    "values_in_thousands_vnd": {
+      "MWG": 74.9,
+      "FPT": 57.4,
+      "HPG": 21.1
+    },
+    "automated_board_capture": false,
+    "independent_review_of_followup": false
+  },
+  "limitations": [
+    "Latest afternoon trades remain stale tonight; no timestamp is refreshed artificially.",
+    "Daily references remain unavailable when no verified same-date stream reference exists.",
+    "Provider-board comparison is PO-reported, not an automated browser observation.",
+    "Follow-up code still requires peer review and merge before issue closure."
+  ],
+  "validation": {
+    "pytest_passed": 222,
+    "existing_skips": 2,
+    "ruff": "pass",
+    "javascript_syntax": "pass"
+  }
+}

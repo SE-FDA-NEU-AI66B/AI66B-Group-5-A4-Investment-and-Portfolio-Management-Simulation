@@ -30,11 +30,12 @@ def main():
         import logging
         import sqlite3
 
-        from virtutrade.dnse.worker import FeedError, Settings, run_feed
+        from virtutrade.dnse.snapshot import run_market_feed
+        from virtutrade.dnse.worker import FeedError, Settings
         logging.basicConfig(level=logging.INFO)
         try:
             settings = Settings.from_environment(application.config['DATABASE'])
-            asyncio.run(run_feed(settings, application.config['DATABASE']))
+            asyncio.run(run_market_feed(settings, application.config['DATABASE']))
         except FeedError as exc:
             parser.exit(1, str(exc) + '\n')
         except sqlite3.Error:

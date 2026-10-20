@@ -18,12 +18,14 @@ ORDER BY i.symbol"""
 class SQLiteQuoteRepository:
     """Map stored rows to quote models and hide SQLite-specific read errors."""
 
-    def __init__(self, path):
+    def __init__(self, path, *, provider_only=False):
         self.path = path
+        self.provider_only = provider_only
 
     def fetch_quotes(self) -> list[Quote]:
         try:
-            return [Quote(**row) for row in read_market(self.path)]
+            return [Quote(**row) for row in read_market(self.path)
+                    if not self.provider_only or row['source'] == 'dnse']
         except sqlite3.Error as exc:
             raise MarketDataUnavailable('The market snapshot could not be read.') from exc
 

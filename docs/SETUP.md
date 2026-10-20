@@ -178,11 +178,17 @@ run `python scripts/check_buy_ui.py` on Windows with Microsoft Edge installed.
 It uses a temporary DB/server and real registration/login with a random disposable
 password; it does not replace the independent-machine verification under #83.
 
-## Optional provider work — separate PR #60
+## Optional DNSE market data — #59
 
-The optional worker, `stream` command and provider tests are maintained in PR #60.
-For a checkout containing that worker, follow [DNSE.md](DNSE.md) and keep its database
-separate from the simulation database. The labelled simulation workflow above
-needs no provider keys. The 19 October probe on the provider branch received real
-ticks; provider-board price/unit comparison and independent review remain pending.
+PR #60's WebSocket worker is merged. Follow [DNSE.md](DNSE.md), set
+`QUOTE_MODE=dnse`, use a separate `DATABASE_PATH=instance/dnse.db`, and keep keys
+in the ignored `.env`. Leave `DNSE_SYMBOLS` empty for all known instruments.
+Run `python -m virtutrade init-db`, then `python -m virtutrade stream`;
+run `python -m virtutrade run` in another terminal with the same configuration.
+The stream worker also fetches latest matched prices at startup and every
+60 seconds, so an evening startup does not require waiting for tomorrow's tick.
+The website preserves actual trade timestamps and excludes demo prices in DNSE mode.
+The labelled simulation workflow above needs no provider keys.
+The PO confirmed the three-symbol provider-board comparison on 20 October;
+independent follow-up review and merge remain pending.
 Repeat independent-machine SETUP on the final merged revision under #83.
