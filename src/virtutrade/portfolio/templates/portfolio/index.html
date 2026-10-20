@@ -3,83 +3,62 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Portfolio · VirtuTrade</title>
+  <title>Portfolio &middot; VirtuTrade</title>
+  <link rel="stylesheet" href="{{ url_for('market.static', filename='market.css') }}">
   <link rel="stylesheet" href="{{ url_for('portfolio.static', filename='portfolio.css') }}">
 </head>
-<body>
-  <header>
-    <a class="brand" href="{{ url_for('market.index') }}">V<span>■</span> VirtuTrade</a>
-    <nav aria-label="Main">
-      <a href="{{ url_for('market.index') }}">Market</a>
-      <a href="/trade">Buy</a>
-      <a href="{{ url_for('portfolio.index') }}" aria-current="page">Portfolio</a>
-    </nav>
-    <div class="account">
-      {% if g.current_account %}
-        <span>{{ g.current_account.email }}</span>
-        <form method="post" action="/logout">
-          <input type="hidden" name="csrf_token" value="{{ g.csrf_token }}">
-          <button type="submit">Log out</button>
-        </form>
-      {% else %}
-        <a href="/login">Log in</a>
-      {% endif %}
-    </div>
-  </header>
-  <main>
-    <div class="eyebrow">YOUR PORTFOLIO</div>
+<body>{% set current_page = 'portfolio' %}{% include 'market/_header.html' %}
+<main>
+  {% if error == 401 %}
+    <div class="page-heading"><div><div class="eyebrow">VIRTUTRADE / PORTFOLIO</div><h1>Sign in to see your portfolio.</h1><p class="intro">Your holdings are private to your account.</p></div></div>
+    <section class="market-panel empty" role="alert">
+      <h2>You are not signed in</h2>
+      <p>Log in, or create an account to start with virtual cash.</p>
+      <p class="portfolio-actions"><a class="row-action" href="/login">Log in</a><a class="header-button" href="/register">Create an account</a></p>
+    </section>
+  {% elif error == 404 %}
+    <div class="page-heading"><div><div class="eyebrow">VIRTUTRADE / PORTFOLIO</div><h1>Account not found.</h1></div></div>
+    <section class="market-panel empty" role="alert">
+      <h2>This account no longer exists</h2>
+      <p>Sign in again, or ask the project operator to check the database.</p>
+      <p class="portfolio-actions"><a class="row-action" href="/login">Log in</a></p>
+    </section>
+  {% elif error == 503 %}
+    <div class="page-heading"><div><div class="eyebrow">VIRTUTRADE / PORTFOLIO</div><h1>Portfolio unavailable.</h1></div></div>
+    <section class="market-panel empty" role="alert">
+      <h2>The portfolio could not be read</h2>
+      <p>Please ask the project operator to check the database setup, then reload.</p>
+    </section>
+  {% else %}
+    <div class="page-heading"><div><div class="eyebrow">VIRTUTRADE / PORTFOLIO</div><h1>What you hold today.</h1><p class="intro">Virtual money, reference prices.</p></div><span class="page-note">Valued at the latest quote <span>VND</span></span></div>
 
-    {% if error == 401 %}
-      <h1>Sign in to see your portfolio.</h1>
-      <section class="empty" role="alert">
-        <h2>You are not signed in</h2>
-        <p>Your holdings are private to your account.</p>
-        <p><a class="cta" href="/login">Log in</a> <a class="secondary" href="/register">Create an account</a></p>
-      </section>
-    {% elif error == 404 %}
-      <h1>Account not found.</h1>
-      <section class="empty" role="alert">
-        <h2>This account no longer exists</h2>
-        <p>Sign in again, or ask the project operator to check the database.</p>
-        <p><a class="cta" href="/login">Log in</a></p>
-      </section>
-    {% elif error == 503 %}
-      <h1>Portfolio unavailable.</h1>
-      <section class="empty" role="alert">
-        <h2>The portfolio could not be read</h2>
-        <p>Please ask the project operator to check the database setup, then reload.</p>
-      </section>
-    {% else %}
-      <h1>What you hold today.</h1>
-      <p class="intro">Virtual money, reference prices.</p>
+    <section class="market-summary" aria-label="Account totals">
+      <div class="metric metric-accent">
+        <span>Total value</span>
+        <strong class="total">{{ portfolio.total_value_vnd|vnd }} VND</strong>
+        {% if portfolio.unpriced_count %}
+          <small class="warn">Incomplete: {{ portfolio.unpriced_count }} holding{{ '' if portfolio.unpriced_count == 1 else 's' }} without a price</small>
+        {% elif portfolio.stale_count %}
+          <small class="warn">{{ portfolio.stale_count }} price{{ '' if portfolio.stale_count == 1 else 's' }} may be delayed</small>
+        {% else %}
+          <small>Cash plus holdings</small>
+        {% endif %}
+      </div>
+      <div class="metric">
+        <span>Cash</span>
+        <strong>{{ portfolio.cash_vnd|vnd }} VND</strong>
+      </div>
+      <div class="metric">
+        <span>Holdings</span>
+        <strong>{{ portfolio.holdings_value_vnd|vnd }} VND</strong>
+      </div>
+    </section>
 
-      <section class="totals" aria-label="Account totals">
-        <div class="tile">
-          <span class="label">Total value</span>
-          <strong class="total">{{ portfolio.total_value_vnd|vnd }} <small>VND</small></strong>
-          {% if portfolio.unpriced_count %}
-            <small class="warn">Incomplete — {{ portfolio.unpriced_count }} holding{{ '' if portfolio.unpriced_count == 1 else 's' }} without a price</small>
-          {% elif portfolio.stale_count %}
-            <small class="warn">{{ portfolio.stale_count }} price{{ '' if portfolio.stale_count == 1 else 's' }} may be delayed</small>
-          {% endif %}
-        </div>
-        <div class="tile">
-          <span class="label">Cash</span>
-          <strong>{{ portfolio.cash_vnd|vnd }} <small>VND</small></strong>
-        </div>
-        <div class="tile">
-          <span class="label">Holdings</span>
-          <strong>{{ portfolio.holdings_value_vnd|vnd }} <small>VND</small></strong>
-        </div>
-      </section>
-
-      {% if portfolio.positions %}
-        <div class="section-heading">
-          <h2 id="positions-heading">Positions</h2>
-          <span>{{ portfolio.positions|length }} symbol{{ '' if portfolio.positions|length == 1 else 's' }} · VND</span>
-        </div>
-        <div class="table-wrap">
-          <table aria-labelledby="positions-heading">
+    {% if portfolio.positions %}
+      <section class="market-panel" aria-labelledby="positions-heading">
+        <div class="section-heading"><div><h2 id="positions-heading">Positions</h2><p>Unrealised P&amp;L against your average cost.</p></div><span>{{ portfolio.positions|length }} symbol{{ '' if portfolio.positions|length == 1 else 's' }} &middot; VND</span></div>
+        <div class="table-wrap" tabindex="0" role="region" aria-label="Positions; scroll horizontally on small screens">
+          <table>
             <thead>
               <tr>
                 <th scope="col">Symbol / Company</th>
@@ -88,8 +67,8 @@
                 <th scope="col" class="number">Price</th>
                 <th scope="col" class="number">Market value</th>
                 <th scope="col" class="number">Unrealised P&amp;L</th>
-                <th scope="col">Status</th>
-                <th scope="col"><span class="visually-hidden">Actions</span></th>
+                <th scope="col">Last quote</th>
+                <th scope="col"><span class="sr-only">Actions</span></th>
               </tr>
             </thead>
             <tbody>
@@ -99,12 +78,13 @@
                 <td class="number">{{ position.quantity|vnd }}</td>
                 <td class="number">{{ position.average_cost_vnd|avg }}</td>
                 {% if position.priced %}
+                  {% set tone = 'positive' if position.unrealised_pnl_vnd > 0 else 'negative' if position.unrealised_pnl_vnd < 0 else 'neutral' %}
                   <td class="number price">{{ position.price_vnd|vnd }}</td>
                   <td class="number">{{ position.market_value_vnd|vnd }}</td>
-                  <td class="number {{ 'positive' if position.unrealised_pnl_vnd > 0 else 'negative' if position.unrealised_pnl_vnd < 0 else 'neutral' }}">
+                  <td class="number {{ tone }}">
                     {{ '+' if position.unrealised_pnl_vnd > 0 else '' }}{{ position.unrealised_pnl_vnd|vnd }}
                     {% if position.unrealised_pnl_percent is not none %}
-                      <small>{{ '+' if position.unrealised_pnl_percent > 0 else '' }}{{ position.unrealised_pnl_percent }}%</small>
+                      <small class="{{ tone }}">{{ '+' if position.unrealised_pnl_percent > 0 else '' }}{{ position.unrealised_pnl_percent }}%</small>
                     {% endif %}
                   </td>
                   <td>
@@ -112,30 +92,30 @@
                     {% if position.stale %}<small class="delayed">Price may be delayed</small>{% endif %}
                   </td>
                 {% else %}
-                  <td class="number unpriced">—</td>
-                  <td class="number unpriced">—</td>
-                  <td class="number unpriced">—</td>
-                  <td><small class="warn">No quote available — not counted in the total</small></td>
+                  <td class="number unpriced">&mdash;</td>
+                  <td class="number unpriced">&mdash;</td>
+                  <td class="number unpriced">&mdash;</td>
+                  <td><small class="warn">No quote available &mdash; not counted in the total</small></td>
                 {% endif %}
-                <td>
-                  <a class="row-action" href="/trade?side=buy&amp;symbol={{ position.symbol|urlencode }}">Buy</a>
-                  <a class="row-action" href="/trade?side=sell&amp;symbol={{ position.symbol|urlencode }}">Sell</a>
+                <td class="portfolio-row-actions">
+                  <a class="row-action" href="/trade?side=buy&amp;symbol={{ position.symbol|urlencode }}" aria-label="Buy {{ position.symbol }}">Buy</a>
+                  <a class="row-action" href="/trade?side=sell&amp;symbol={{ position.symbol|urlencode }}" aria-label="Sell {{ position.symbol }}">Sell</a>
                 </td>
               </tr>
               {% endfor %}
             </tbody>
           </table>
         </div>
-      {% else %}
-        <section class="empty">
-          <h2>No positions yet</h2>
-          <p>Your total is your cash balance of {{ portfolio.cash_vnd|vnd }} VND.</p>
-          <p><a class="cta" href="{{ url_for('market.index') }}">Browse the market</a></p>
-        </section>
-      {% endif %}
+      </section>
+    {% else %}
+      <section class="market-panel empty">
+        <h2>No positions yet</h2>
+        <p>Your total is your cash balance of {{ portfolio.cash_vnd|vnd }} VND.</p>
+        <p class="portfolio-actions"><a class="row-action" href="{{ url_for('market.index') }}">Browse the market</a></p>
+      </section>
     {% endif %}
-
-    <footer>VirtuTrade · Team 05 <span>Investment &amp; Portfolio Management Simulation</span></footer>
-  </main>
+  {% endif %}
+  <footer><strong>VirtuTrade &middot; Team 05</strong><span>Learn with virtual capital. Every trade here is simulated.</span></footer>
+</main>
 </body>
 </html>
