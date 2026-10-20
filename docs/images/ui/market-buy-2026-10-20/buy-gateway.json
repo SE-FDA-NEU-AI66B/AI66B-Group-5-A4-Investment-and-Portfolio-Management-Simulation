@@ -5,31 +5,31 @@
     {
       "state": "guest-guard",
       "screenshot": "buy-gateway-guest-guard.png",
-      "observed_at_utc": "2026-10-20T03:28:45.987386+00:00",
+      "observed_at_utc": "2026-10-20T03:55:59.750421+00:00",
       "route": "/trade"
     },
     {
       "state": "shortfall",
       "screenshot": "buy-gateway-shortfall.png",
-      "observed_at_utc": "2026-10-20T03:28:46.957007+00:00",
+      "observed_at_utc": "2026-10-20T03:56:01.282297+00:00",
       "route": "/trade"
     },
     {
       "state": "receipt",
       "screenshot": "buy-gateway-receipt.png",
-      "observed_at_utc": "2026-10-20T03:28:47.983581+00:00",
+      "observed_at_utc": "2026-10-20T03:56:02.252149+00:00",
       "route": "/trade"
     },
     {
       "state": "stale-quote",
       "screenshot": "buy-gateway-stale-quote.png",
-      "observed_at_utc": "2026-10-20T03:28:48.135208+00:00",
+      "observed_at_utc": "2026-10-20T03:56:02.410658+00:00",
       "route": "/trade"
     },
     {
       "state": "unknown-result",
       "screenshot": "buy-gateway-unknown-result.png",
-      "observed_at_utc": "2026-10-20T03:28:49.922054+00:00",
+      "observed_at_utc": "2026-10-20T03:56:03.625497+00:00",
       "route": "/trade"
     }
   ],

@@ -428,3 +428,16 @@ and the picker remain within their feature modules. No business rule, schema,
 new API or investment recommendation is added. Section 2 records the observed
 branch behavior; P0 statuses remain conservative until integration and review.
 The corresponding architecture note is updated in design.md in this same PR.
+
+
+### Price-board presentation follow-up - 20 October, #101
+
+At the PO's request, Market/Trade use a charcoal/red theme and a denser quote
+board inspired by the public DNSE board layout. The existing quote snapshot
+also supplies a six-symbol watchboard, counts of advancing/declining/unchanged
+and unclassified rows, and a table of the five largest absolute percentage moves
+among displayed rows. These are not exchange indices or investment advice.
+Missing reference/change stays unavailable and is excluded from the movement
+table; source labels distinguish DNSE, seed and simulation. No order-book depth,
+volume, ceiling/floor or historical chart is fabricated. US03 remains partly
+works pending #85 search/detail; this presentation stays under #101's 2 points.
