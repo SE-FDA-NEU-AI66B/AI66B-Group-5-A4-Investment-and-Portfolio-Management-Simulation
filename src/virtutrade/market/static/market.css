@@ -33,7 +33,6 @@ time{font-size:12px;color:#60726d}
 .delayed{color:#99713c}
 .empty{background:white;padding:35px;border:1px solid #dce5df;border-radius:10px}
 footer{display:flex;justify-content:space-between;font-size:11px;color:#87928c;margin:24px 0}
-
 form[role=search]{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 20px}
 form[role=search] label{font-size:13px;color:#60726d;flex-basis:100%}
 form[role=search] input{flex:1 1 220px;max-width:420px;padding:10px 12px;font-size:15px;border:1px solid #b9c9c2;border-radius:6px}
