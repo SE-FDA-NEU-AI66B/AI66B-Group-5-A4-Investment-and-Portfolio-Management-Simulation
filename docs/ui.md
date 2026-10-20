@@ -331,16 +331,11 @@ HTML pages and the JSON API share the same string (`accounts/routes.py`,
 `_fail`), and the contract and `tests/test_auth.py` depend on it. API error
 codes never change either.
 
-**How the hint is added (proposal, implemented under #87 with #77).**
-`_fail()` in `accounts/routes.py` currently passes only `exc.message` to the
-template. It also passes `exc.code`. The template shows `error` in the alert as
-today, and below it the hint looked up by code from one mapping kept in the
-module that owns the page (for example a dict in the accounts module). The JSON
-envelope built by `_envelope()` is untouched, so JSON clients never receive a
-hint. Required tests: the JSON `message` for each implemented code still equals
-the contract string and the body has no hint field; the HTML page contains both
-the message and its hint. This section documents the design; none of it is
-implemented yet.
+**Implemented by #87.** `_fail()` passes the unchanged API message, code and a
+code-specific HTML recovery hint to the template. The alert has a stable id and
+the relevant fields reference it with `aria-describedby`/`aria-invalid`. The
+JSON envelope built by `_envelope()` remains unchanged: JSON clients receive no
+hint field and retain the exact public `message` and `code`.
 
 Test coverage today: `tests/test_auth.py` asserts the message of
 `EMAIL_IN_USE`, `INVALID_CREDENTIALS` and `LOGIN_LOCKED`. It asserts only the
@@ -348,7 +343,7 @@ code of `ACCOUNT_DISABLED`, and the `VALIDATION_ERROR` messages have no test.
 
 ### 3.1 Implemented and reachable through the UI
 
-| API error code | Business rule | API message (unchanged) | UI hint (proposal, #87) |
+| API error code | Business rule | API message (unchanged) | UI hint |
 | -------------- | ------------- | ----------------------- | ----------------------- |
 | 409 `EMAIL_IN_USE` | US01 - an email can register only once | Email already in use | Sign in with this email, or register with another one. |
 | 401 `INVALID_CREDENTIALS` | US01 - wrong password and unknown email give the same answer | Invalid email or password | Check both fields and try again. |
@@ -370,7 +365,7 @@ See [acceptance evidence](order-acceptance-followup.md).
 
 ### 3.2 Implemented, not reachable as visible text today
 
-| API error code | Business rule | API message (unchanged) | UI hint (proposal, #87) | Why it is not shown today |
+| API error code | Business rule | API message (unchanged) | UI hint | Why it is not shown today |
 | -------------- | ------------- | ----------------------- | ----------------------- | ------------------------- |
 | 403 `ACCOUNT_DISABLED` | BR9 - disabled accounts cannot sign in or trade | Account is disabled | This account is disabled and cannot be used to sign in or trade. | No Admin screen exists yet (US13, P1); only a database edit triggers it. The message itself has no test. |
 | 422 `VALIDATION_ERROR` | US01 - email format, password 8..128 characters | Enter a valid email address. / Password must be 8..128 characters. | None: the message already states the rule. | The browser's form validation blocks these first; the server message appears only for direct API calls. No test asserts these strings. |
