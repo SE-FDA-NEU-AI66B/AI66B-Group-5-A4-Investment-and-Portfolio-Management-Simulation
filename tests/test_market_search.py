@@ -67,6 +67,32 @@ def test_search_by_company_name(client):
     assert b'<strong>HPG</strong>' not in response.data
 
 
+def test_quote_list_api_filters_by_the_same_symbol_or_company_query(client):
+    agent, _ = client
+    response = agent.get('/api/market/quotes?q=vinamilk')
+    assert response.status_code == 200
+    assert response.headers['Cache-Control'] == 'no-store'
+    assert [quote['symbol'] for quote in response.get_json()['quotes']] == ['VNM']
+
+
+def test_quote_detail_api_uses_the_stored_quote_and_reports_unknown_symbols(client):
+    agent, _ = client
+    response = agent.get('/api/market/quotes/hpg')
+    assert response.status_code == 200
+    assert response.get_json()['quote']['symbol'] == 'HPG'
+    assert response.get_json()['quote']['price_vnd'] == 28000
+
+    missing = agent.get('/api/market/quotes/XYZ')
+    assert missing.status_code == 404
+    assert missing.get_json()['error']['code'] == 'TICKER_NOT_FOUND'
+
+
+def test_quote_detail_api_reports_a_transient_read_failure(broken_client):
+    response = broken_client.get('/api/market/quotes/HPG')
+    assert response.status_code == 503
+    assert response.get_json()['error']['code'] == 'QUOTE_UNAVAILABLE'
+
+
 def test_search_without_match_shows_empty_state_and_recovery(client):
     agent, _ = client
     response = agent.get('/market?q=XYZ')

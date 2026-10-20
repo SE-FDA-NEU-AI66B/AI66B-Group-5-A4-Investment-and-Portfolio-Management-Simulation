@@ -45,6 +45,13 @@ def load_quotes():
     return market_snapshot(reader)
 
 
+def quote_payload(quote):
+    """Keep list and detail JSON on one public quote representation."""
+    value = asdict(quote)
+    value['change'] = None if quote.change is None else format(quote.change, '.2f')
+    return value
+
+
 @blueprint.get('')
 def index():
     query = normalize_query(request.args.get('q'))
@@ -71,14 +78,9 @@ def detail(symbol):
 
 @api_blueprint.get('/quotes')
 def quotes_json():
+    query = normalize_query(request.args.get('q'))
     try:
-        reader = current_app.extensions['market_reader_factory']()
-        quotes = []
-        for quote in market_snapshot(reader):
-            value = asdict(quote)
-            value['change'] = None if quote.change is None else format(quote.change, '.2f')
-            quotes.append(value)
-        response = jsonify(quotes=quotes)
+        response = jsonify(quotes=[quote_payload(quote) for quote in filter_quotes(load_quotes(), query)])
     except MarketDataUnavailable:
         response = jsonify(error={
             'code': 'MARKET_UNAVAILABLE',
@@ -86,5 +88,31 @@ def quotes_json():
             'details': {}
         })
         response.status_code = 503
+    response.headers['Cache-Control'] = 'no-store'
+    return response
+
+
+@api_blueprint.get('/quotes/<symbol>')
+def quote_json(symbol):
+    symbol = symbol.strip().upper()[:20]
+    try:
+        quote = find_quote(load_quotes(), symbol)
+    except MarketDataUnavailable:
+        response = jsonify(error={
+            'code': 'QUOTE_UNAVAILABLE',
+            'message': 'Quote data is temporarily unavailable. Try again.',
+            'details': {},
+        })
+        response.status_code = 503
+    else:
+        if quote is None:
+            response = jsonify(error={
+                'code': 'TICKER_NOT_FOUND',
+                'message': 'Ticker not found',
+                'details': {'symbol': symbol},
+            })
+            response.status_code = 404
+        else:
+            response = jsonify(quote=quote_payload(quote))
     response.headers['Cache-Control'] = 'no-store'
     return response
