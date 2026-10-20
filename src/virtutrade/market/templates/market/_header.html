@@ -6,7 +6,7 @@
     {% if portfolio_url and g.current_account %}<a href="{{ portfolio_url }}">Portfolio</a>{% endif %}
   </nav>
   <div class="account-nav"><span class="badge">PAPER TRADING</span>
-    {% if g.current_account %}<span class="account-email">{{ g.current_account.email }}</span>
+    {% if g.current_account %}<span class="account-email">{{ g.current_account.email }}</span><span class="account-balance">{{ g.current_account.cash_vnd|vnd }} VND</span>
     <form method="post" action="/logout"><input type="hidden" name="csrf_token" value="{{ g.csrf_token }}"><button type="submit" class="header-button">Log out</button></form>
     {% else %}<a href="/login">Log in</a><a class="header-button" href="/register">Register</a>{% endif %}
   </div>
