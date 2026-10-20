@@ -9,6 +9,7 @@ from typing import Protocol
 from virtutrade.market.models import MarketQuote, Quote
 
 VIETNAM = timezone(timedelta(hours=7))
+MAX_QUERY_LENGTH = 50
 
 
 class QuoteReader(Protocol):
@@ -50,3 +51,19 @@ def market_snapshot(reader: QuoteReader, *, now=None) -> list[MarketQuote]:
         values['previous_close_vnd'] = reference
         result.append(MarketQuote(**values, change=change, stale=stale))
     return result
+
+def normalize_query(query):
+    """Trim the search text and cap its length. None becomes an empty string."""
+    return (query or '').strip()[:MAX_QUERY_LENGTH]
+
+def filter_quotes(quotes, query): 
+    """Case-insensitive match on symbol or company name; empty query keeps all."""
+    needle = normalize_query(query).casefold()
+    if not needle:
+        return list(quotes)
+    return [quote for quote in quotes if needle in quote.symbol.casefold() or needle in quote.name.casefold()]
+
+def find_quote(quotes, symbol):
+    """Linearly seach and return the quote whose symbol matches (trimmed, uppercased), or None."""
+    target = (symbol or '').strip().upper()
+    return next((quote for quote in quotes if quote.symbol.upper() == target), None)
