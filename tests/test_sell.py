@@ -226,6 +226,40 @@ def test_sell_revalidates_a_stale_quote(database):
     assert snapshot(database) == before
 
 
+@pytest.mark.parametrize("next_price", [27_500, 28_000])
+def test_changed_sell_snapshot_requires_repreview_and_later_tick_keeps_fill(database, next_price):
+    """#106: a new timestamp invalidates preview even if the price is unchanged."""
+    buy(database, 1000)
+    accepted = preview(database, "sell")["quote"]["quoted_at"]
+    next_stamp = (NOW + timedelta(seconds=1)).isoformat()
+    with closing(sqlite3.connect(database)) as connection, connection:
+        connection.execute(
+            "UPDATE price_quote SET price_vnd=?, quoted_at=? WHERE instrument_id="
+            "(SELECT id FROM instrument WHERE symbol='HPG')",
+            (next_price, next_stamp),
+        )
+    before = snapshot(database)
+    with pytest.raises(OrderError) as error:
+        sell(database, stamp=accepted)
+    assert error.value.code == "QUOTE_CHANGED"
+    assert error.value.message == "Price changed; refresh the preview before confirming."
+    assert snapshot(database) == before
+
+    result = sell(database)  # Explicitly preview the new observation first.
+    assert result["trade"]["fill_price_vnd"] == next_price
+    assert result["cash_vnd"] == 72_000_000 + 1000 * next_price
+    assert result["holding"] is None
+    with closing(sqlite3.connect(database)) as connection, connection:
+        recorded = connection.execute("SELECT * FROM trade WHERE id=?",
+                                      (result["trade"]["id"],)).fetchone()
+        connection.execute(
+            "UPDATE price_quote SET price_vnd=29000, quoted_at=?",
+            ((NOW + timedelta(seconds=2)).isoformat(),),
+        )
+        assert connection.execute("SELECT * FROM trade WHERE id=?",
+                                  (result["trade"]["id"],)).fetchone() == recorded
+
+
 def test_concurrent_sells_cannot_oversell(database):
     buy(database, 1)
     stamp = preview(database, "sell", 1)["quote"]["quoted_at"]
