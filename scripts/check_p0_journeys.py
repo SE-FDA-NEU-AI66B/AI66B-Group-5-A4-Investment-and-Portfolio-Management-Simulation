@@ -410,7 +410,7 @@ def _journeys(audit, browser, page, base, database, investor, second, locked):
         row = page.locator("tbody tr", has_text="HPG")
         expect(row).to_contain_text("1,000")
         expect(row).to_contain_text("28,000.00")
-        expect(page.locator(".totals")).to_contain_text("100,000,000")
+        expect(page.get_by_label("Account totals")).to_contain_text("100,000,000")
         return "Market -> Portfolio: HPG 1,000 @ 28,000.00; total = cash + holdings = 100,000,000"
     check("US06-1", "US06", "Portfolio shows the bought holding and total value",
           "Quantity, average cost, market value, total = cash + holdings",
@@ -484,7 +484,7 @@ def _journeys(audit, browser, page, base, database, investor, second, locked):
         _register(other, base, *second)
         other.get_by_role("link", name="Portfolio", exact=True).click()
         expect(other.get_by_text("No positions yet")).to_be_visible()
-        expect(other.locator(".totals")).to_contain_text("100,000,000")
+        expect(other.get_by_label("Account totals")).to_contain_text("100,000,000")
         assert other.locator("tbody tr", has_text="HPG").count() == 0
         audit.snap(other, "US06-2-empty")
         other.close()
@@ -509,7 +509,7 @@ def _journeys(audit, browser, page, base, database, investor, second, locked):
                         " * quantity * fill_price_vnd), 0) FROM trade JOIN account"
                         " ON account.id = trade.account_id WHERE email = ?", (email,))
         assert cash == 100_000_000 + flows, (cash, flows)
-        expect(page.locator(".totals")).to_contain_text(f"{cash:,}")
+        expect(page.get_by_label("Account totals")).to_contain_text(f"{cash:,}")
         return (f"After logout/login cash is {cash:,} VND = 100,000,000 {flows:+,} from trades; "
                 "no second grant")
     check("US02-2", "US02", "Balance changes only through trades",
@@ -518,7 +518,7 @@ def _journeys(audit, browser, page, base, database, investor, second, locked):
     def portfolio_speed():
         started = time.perf_counter()
         page.goto(f"{base}/portfolio")
-        expect(page.locator(".totals")).to_be_visible()
+        expect(page.get_by_label("Account totals")).to_be_visible()
         elapsed = time.perf_counter() - started
         assert elapsed < 2, elapsed
         return f"Loaded in {elapsed * 1000:.0f} ms (target 2,000 ms)"
@@ -607,7 +607,7 @@ def _layout_and_keyboard(audit, page, base):
         page.set_viewport_size({"width": 1280, "height": 900})
         page.goto(f"{base}/trade")
         reached = []
-        for _ in range(8):
+        for _ in range(14):
             page.keyboard.press("Tab")
             reached.append(page.evaluate("document.activeElement.id || document.activeElement.innerText"))
         for needed in ("symbol", "quantity", "preview-button"):

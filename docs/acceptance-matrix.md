@@ -56,15 +56,14 @@ partly working because of the four defects below.
 
 | ID | Story | Owner | Steps to reproduce | Expected (AC) | Observed |
 |---|---|---|---|---|---|
-| D1 | US03 | @VuSiSi (#85) | Open `/market` and look for a ticker search or detail view | Search ticker X and open its detail page; an unknown ticker shows "Ticker not found" | There is no search box or detail page. "Ticker not found" appears only on `/trade` preview. Already tracked by #85, so no new issue was filed. |
+| D1 | US03 | @VuSiSi (#85) | Open `/market` and look for a ticker search or detail view | Search ticker X and open its detail page; an unknown ticker shows "Ticker not found" | `/market` has no search box or detail page. `/trade` now has a stock picker ("Search by symbol or company name", #102), but there is no detail view, and "Ticker not found" appears only on preview. Already tracked by #85, so no new issue was filed. |
 | D2 | US01 | @nguyentue110 (#77) | Register, log out, then log in through the form | "I reach my own portfolio" | Redirects to `/market`. The JSON API already returns `redirect_to: /portfolio`. Now that #81 adds `/portfolio`, the form login can redirect there. |
 | D3 | US05 | @bianh13 (PO) with @nguyentue110 (#79) | Preview a sell, let the quote move, then confirm | The order fills at the price quoted when it was submitted (BR3) | 409 "Price changed; refresh the preview before confirming." `docs/api-contract.md` documents this as QUOTE_CHANGED. Either the AC or the contract must change, so this needs a PO decision. |
 | D4 | US04 | @bianh13 (#76) | On `/trade`, enter HPG and 0 shares | "Quantity must be a whole number of at least 1 share" | The page says "Enter a symbol and a whole number of at least 1 share." and the browser hint says "Value must be greater than or equal to 1." The server returns the AC wording (verified in CI), but the form never shows it. |
 
 Observations that do not break an AC, recorded for the backlog:
-- `/trade` has no account name or Log out in its header.
 - Market has no direct Sell entry; Sell is reached from the Portfolio row.
-- Quote times are shown as raw ISO UTC strings.
+- Portfolio shows quote times as raw ISO strings, while Market formats them in UTC+7.
 - The browser console shows expected 4xx responses for rejected previews.
 
 ## Limits of this evidence
