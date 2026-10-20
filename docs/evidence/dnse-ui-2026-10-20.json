@@ -1,0 +1,58 @@
+{
+  "checked_at_utc": "2026-10-20T03:34:27.602311+00:00",
+  "authenticated": true,
+  "subscription_acknowledged": true,
+  "tick_events": 6,
+  "reference_events": 0,
+  "end": "bounded timeout",
+  "persisted_dnse_quotes": [
+    {
+      "symbol": "FPT",
+      "price_vnd": 57100,
+      "quoted_at": "2026-10-20T03:34:49.976000000Z",
+      "source": "dnse"
+    },
+    {
+      "symbol": "HPG",
+      "price_vnd": 20800,
+      "quoted_at": "2026-10-20T03:34:48.161000000Z",
+      "source": "dnse"
+    }
+  ],
+  "application_commit": "e783753",
+  "ui_commit": "c8bebe4",
+  "purpose": "Local integration verification of #101 with #59/#79/#78; not independent acceptance.",
+  "http_status": 200,
+  "api_observed_at_utc": "2026-10-20T03:36:51.756747+00:00",
+  "api_dnse_quotes": [
+    {
+      "change": null,
+      "name": "FPT Corporation",
+      "previous_close_vnd": null,
+      "price_vnd": 57100,
+      "quoted_at": "2026-10-20T03:36:48.807000000Z",
+      "reference_at": null,
+      "source": "dnse",
+      "stale": false,
+      "symbol": "FPT"
+    },
+    {
+      "change": null,
+      "name": "Hoa Phat Group",
+      "previous_close_vnd": null,
+      "price_vnd": 20850,
+      "quoted_at": "2026-10-20T03:36:51.418000000Z",
+      "reference_at": null,
+      "source": "dnse",
+      "stale": false,
+      "symbol": "HPG"
+    }
+  ],
+  "limitations": [
+    "Provider-board unit/value comparison remains pending.",
+    "No reference events observed; change remains null.",
+    "Only HPG/FPT are subscribed; other rows remain labelled seed.",
+    "The separate review feed is bounded to 10 minutes; a stopped stream does not imply continuing live updates.",
+    "Not an independent review, M3 portfolio acceptance or address-bar screenshot."
+  ]
+}
