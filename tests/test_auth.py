@@ -436,6 +436,16 @@ def test_html_guest_nav_shows_login_register(client):
     assert b'/register' in market.data
 
 
+def test_stale_session_cookie_does_not_break_public_market_read_failure(tmp_path):
+    app = create_app({'TESTING': True, 'DATABASE': str(tmp_path / 'missing.db')})
+    agent = app.test_client()
+    agent.set_cookie('vt_session', 'stale-cookie')
+    response = agent.get('/market?q=HPG')
+    assert response.status_code == 503
+    assert b'Market data is unavailable' in response.data
+    assert b'Try again' in response.data
+
+
 def test_html_form_error_status(client):
     agent, _app, _db = client
     register(agent)

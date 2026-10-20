@@ -4,6 +4,8 @@ API paths (/api/*) speak strict JSON; page paths speak HTML forms. Both share
 the service layer. Every state-changing request needs CSRF: pre-auth tokens
 for login/register, session-bound tokens afterwards.
 """
+import sqlite3
+
 from flask import Blueprint, current_app, g, jsonify, redirect, render_template, request
 from werkzeug.exceptions import BadRequest
 
@@ -38,7 +40,9 @@ def init_auth(app):
         try:
             account, session_id = service.resolve_with_id(
                 current_app.config['DATABASE'], session_token=token)
-        except errors.AuthError:
+        except (errors.AuthError, sqlite3.Error):
+            # A stale session cookie must not turn a public page's own
+            # recoverable storage state into an HTTP 500.
             return
         g.current_account = account
         g.current_session_id = session_id
