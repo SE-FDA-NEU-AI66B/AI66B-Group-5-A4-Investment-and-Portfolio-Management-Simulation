@@ -95,7 +95,7 @@
       byId("order-status").textContent = "Order completed. Preview again before another order.";
     } catch (e) {
       uncertain = !e.rejected;
-      byId("order-error").textContent = e.rejected ? e.message : "Order result is unknown. Do not submit again; check your portfolio or contact the operator before making another order.";
+      byId("order-error").textContent = e.rejected ? e.message : "Order result is unknown. Do not submit again; check your portfolio or contact the operator before trading again.";
     } finally {
       submitting = false;
       for (const element of form.elements) element.disabled = uncertain;

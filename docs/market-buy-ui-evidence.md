@@ -49,8 +49,9 @@ market search/detail remain pending #85. Keep the P0 statuses in ui.md honest.
 
 The picker reads the existing API and the order summary uses server-returned
 money. It does not set balances or authorize trades. Existing #98 sell side
-metadata and receipt behavior are preserved for integration; the buy-only
-controller still renders buy mode until the sell implementation is merged.
+metadata and receipt behavior are preserved. After synchronizing main at
+`50ff313`, the controller renders both buy and sell; the Portfolio entry remains
+pending #81.
 The DNSE worker remains in #60; simulation screenshots do not verify live prices.
 No sector categories, fake charts or unsupported portfolio navigation are added.
 
@@ -62,8 +63,7 @@ adapted to the structured Shares held row (still asserts 1,000). The grant
 scenario passes registration/login with exactly one 100,000,000 VND grant.
 Integration captures are kept separately from the teammates' original evidence.
 
-Two shared-file conflicts need the same resolutions when these branches are
-combined: retain the side-aware new trade template/handler, and carry #99's
+The earlier integration identified two shared-file resolution requirements: retain the side-aware new trade template/handler, and carry #99's
 Market balance into the shared header only on Market (not a stale balance on
 Trade). These checks do not approve or merge the teammates' PRs, or establish a
 visible Portfolio-to-Sell entry; the sell scenario explicitly visits its route.
@@ -79,3 +79,18 @@ panels use the same stored snapshot; they are not VNINDEX/VN30 data. Browser QA
 also verifies that two quotes with missing references count as unclassified and
 are excluded from movers. This explicit read-response fixture is not provider
 verification. The two buy scenarios remain covered under the revised theme.
+
+## Synchronization with merged sell and grant work
+
+Before pushing the follow-up, main `50ff313` was merged locally. Three conflicts
+were resolved in the Market template, Trade template and trade handler. The new
+layout retains sell-side previews and receipts, the uncertain-order lock and
+main's recovery wording. The one-time grant balance remains visible in the
+Market header; it is not duplicated as stale cash on Trade. The sell browser
+check now reads the structured Shares held row and still requires exactly 1,000.
+
+The combined tree passes **161 tests, 2 existing skips**, Ruff, JavaScript
+syntax and whitespace checks. Browser QA passes Market/picker/mobile states,
+both real-auth buy scenarios, partial/full sale with oversell rejection, and
+registration/login with exactly one grant. New sell/grant captures are stored
+in the author's local QA folder to preserve the original teammate evidence.

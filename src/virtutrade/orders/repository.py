@@ -58,6 +58,44 @@ class OrderRepository:
         )
         return cursor.lastrowid
 
+    def save_sell(self, account, quote, quantity, result, timestamp):
+        """Apply one completed sale: credit cash, shrink or delete the holding
+        and record the sell trade with its realised P&L, all in the caller's
+        transaction."""
+        self.connection.execute(
+            "UPDATE account SET cash_vnd=? WHERE id=?",
+            (account.cash_vnd + result.proceeds_vnd, account.id),
+        )
+        if result.remaining_quantity:
+            self.connection.execute(
+                "UPDATE holding SET quantity=?, cost_basis_vnd=?"
+                " WHERE account_id=? AND instrument_id=?",
+                (
+                    result.remaining_quantity,
+                    result.remaining_cost_vnd,
+                    account.id,
+                    quote.instrument_id,
+                ),
+            )
+        else:
+            self.connection.execute(
+                "DELETE FROM holding WHERE account_id=? AND instrument_id=?",
+                (account.id, quote.instrument_id),
+            )
+        cursor = self.connection.execute(
+            "INSERT INTO trade(account_id,instrument_id,side,quantity,fill_price_vnd,"
+            "realised_pnl_vnd,executed_at) VALUES(?,?,'sell',?,?,?,?)",
+            (
+                account.id,
+                quote.instrument_id,
+                quantity,
+                quote.price_vnd,
+                result.realised_pnl_vnd,
+                timestamp,
+            ),
+        )
+        return cursor.lastrowid
+
 
 @contextmanager
 def order_unit_of_work(path, *, write=False):

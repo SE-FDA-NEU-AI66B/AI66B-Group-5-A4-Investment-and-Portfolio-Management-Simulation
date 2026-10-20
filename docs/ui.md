@@ -6,6 +6,8 @@ wireframes, implemented journeys and browser evidence are still required.
 
 ## 1. P0 stories and status
 
+Merged-state refresh: 20 October 2026, `main` at `50ff313` (#98/#99/#100 merged).
+
 Statuses describe the implementation observed on `main`, not the ambition of an
 issue or the existence of a schema. Old M1/M2 issue closure does not prove a
 working M3 journey. Screen names are used consistently below: **Register,
@@ -16,16 +18,16 @@ behavior not on `main`) and **open PR work**.
 | Story | Screen(s) | Route | Status | Issue | Notes |
 | ----- | --------- | ----- | ------ | ----- | ----- |
 | US01 - Register / sign in | Register, Login | `/register`, `/login` | partly works | [#77](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/77) | Implemented: both pages, session cookie, CSRF, lockout; both redirect to Market list today. Planned: return to the page the guest came from via a local `next` (proposed), otherwise Portfolio once #81 lands. No additional implementation PR is listed in this snapshot. |
-| US02 - Initial virtual capital | Register, Trade | `/register`, `/trade` | partly works | [#78](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/78) | On main: 100,000,000 VND granted once at registration; Trade shows cash. Open PR #99: Market-header balance, additional tests and [author screenshot](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/blob/7dcd74f/docs/images/ui/grant-balance.png). Planned: Portfolio balance (#81). |
+| US02 - Initial virtual capital | Register, Market list, Trade | `/register`, `/market`, `/trade` | partly works | [#78](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/78) | On main: 100,000,000 VND granted once at registration; Trade shows cash. Merged PR #99: Market-header balance, additional tests and [author screenshot](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/blob/7dcd74f/docs/images/ui/grant-balance.png). Planned: Portfolio balance (#81). |
 | US03 - Find a stock and inspect its quote | Market list, Stock detail | `/market`, `/market/<symbol>` | partly works | [#85](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/85) | Implemented: Market list only. Planned (#85): search (`?q=`, proposed) and Stock detail. No additional implementation PR is listed in this snapshot. |
 | US04 - Buy shares | Market list, Trade | `/market`, `/trade` | partly works | [#76](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/76) | Implemented on main via #92: Market Buy shares link, guest guard, authenticated preview and purchase receipt. Planned: Stock detail entry and Portfolio transition (#81). |
-| US05 - Sell shares | Portfolio, Trade | `/portfolio`, `/trade?side=sell&symbol=HPG` | not started | [#79](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/79) | Open PR #98 (partly works on its branch): sell preview/confirm, partial/full sale and oversell warning; [author browser evidence](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/tree/28fe0ee/docs/images/ui) from 19 October. Planned: Sell entry from a Portfolio holding (#81). |
+| US05 - Sell shares | Portfolio, Trade | `/portfolio`, `/trade?side=sell&symbol=HPG` | partly works | [#79](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/79) | Merged PR #98: sell preview/confirm, partial/full sale and oversell warning; [author browser evidence](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/tree/28fe0ee/docs/images/ui) from 19 October. Planned: Sell entry from a Portfolio holding (#81). |
 | US06 - View portfolio | Portfolio | `/portfolio` | not started | [#81](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/81) | Planned: a "Portfolio" header link for signed-in users. |
 | US10 - Insufficient-balance warning | Trade | `/trade` | partly works | [#76](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/76) | Implemented on main via #92: inline shortfall, disabled confirmation and correction. Final independent P0 journey evidence remains pending. |
 
 On `main` today: `/` redirects to Market list; Register, Login and Log out are
 reachable from the Market list header, which also links to the Trade screen for
-buying shares. There is no Portfolio link until #81 lands. Wireframes below show
+buying shares. The sell form is available directly at `/trade?side=sell&symbol=HPG`; its Portfolio entry remains pending #81. There is no Portfolio link until #81 lands. Wireframes below show
 the target design; the table and flow distinguish implemented and planned paths.
 
 ### Screen flow (solid = on `main`, dashed = planned)
@@ -42,7 +44,7 @@ flowchart TD
     Trade -->|guest: Log in| Login
     Trade -->|guest: Register| Register
     Trade -->|Market link| Market
-    Trade -->|saved buy: receipt on Trade| Trade
+    Trade -->|saved buy or sell: receipt on Trade| Trade
     Trade -->|rejected or invalid: stay, fix input| Trade
 
     Market -. "header Portfolio, signed in" .-> Portfolio[Portfolio /portfolio]
@@ -356,9 +358,9 @@ throwaway test database. DNSE/seed mode uses `Price may be delayed. Wait for a f
 | 403 `CSRF_FAILED` | Every state-changing request needs a valid CSRF token | Invalid or missing CSRF token | Reload the page and try again. | Appears only when a form stays open past its token lifetime (pre-auth tokens last about one to two hours). |
 | 401 `AUTH_REQUIRED` | Private routes need a valid session | Authentication required | Sign in again to continue. | Browser pages redirect a guest to Login instead of showing text; the message reaches JSON clients, and the Trade and Portfolio pages once built if a session expires mid-use. |
 
-### 3.3 Other order errors ? buy implemented; sell integration pending #98
+### 3.3 Other order errors - buy and sell implemented
 
-Buy handling below is implemented via #92, with service/route coverage; this table alone does not prove each browser trigger. Sell remains in open PR #98. Amounts are acceptance fixtures; the screen shows the user's own numbers.
+Buy handling below is implemented via #92, with service/route coverage; this table alone does not prove each browser trigger. Sell handling is on main via #98; the Portfolio-to-Sell entry remains pending #81. Amounts are acceptance fixtures; the screen shows the user's own numbers.
 
 | API error code | Business rule | API message (contract) | UI hint (proposal) |
 | -------------- | ------------- | ---------------------- | ------------------ |

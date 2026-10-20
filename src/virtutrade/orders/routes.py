@@ -8,7 +8,7 @@ from flask import Blueprint, current_app, g, jsonify, render_template, request
 from virtutrade.accounts.errors import AuthError
 from virtutrade.orders.errors import OrderError
 from virtutrade.orders.repository import order_unit_of_work
-from virtutrade.orders.service import execute_buy, preview_order
+from virtutrade.orders.service import execute_buy, execute_sell, preview_order
 
 blueprint = Blueprint(
     "orders",
@@ -25,6 +25,7 @@ STATUS = {
     "QUOTE_STALE": 409,
     "QUOTE_CHANGED": 409,
     "INSUFFICIENT_CASH": 409,
+    "INSUFFICIENT_SHARES": 409,
     "INVALID_QUANTITY": 422,
     "VALIDATION_ERROR": 422,
     "QUOTE_UNAVAILABLE": 503,
@@ -101,9 +102,13 @@ def trade_form():
     # Public shell does not expose balances; every read/write API checks identity.
     token_provider = current_app.extensions.get("orders_csrf_token")
     signed_in = g.get("current_session_id") is not None
+    side = request.args.get("side", "buy")
+    if side not in ("buy", "sell"):
+        side = "buy"
     return render_template(
         "orders/trade.html",
         symbol=request.args.get("symbol", ""),
+        side=side,
         csrf_token=token_provider() if token_provider and signed_in else "",
         simulation=current_app.config.get("QUOTE_MODE") == "simulation",
         auth_ready=signed_in and "orders_identity" in current_app.extensions,
@@ -127,6 +132,18 @@ def buy():
     session_id = identity()
     data = payload(["symbol", "quantity", "expected_quote_at"])
     result = execute_buy(
+        session_id,
+        **data,
+        unit_of_work=partial(order_unit_of_work, current_app.config["DATABASE"]),
+    )
+    return jsonify(result), 201
+
+
+@blueprint.post("/api/orders/sell")
+def sell():
+    session_id = identity()
+    data = payload(["symbol", "quantity", "expected_quote_at"])
+    result = execute_sell(
         session_id,
         **data,
         unit_of_work=partial(order_unit_of_work, current_app.config["DATABASE"]),
