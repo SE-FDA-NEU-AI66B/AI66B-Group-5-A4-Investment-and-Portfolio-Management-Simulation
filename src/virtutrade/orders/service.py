@@ -1,4 +1,4 @@
-"""Exact-money preview and buy rules, independent of Flask and SQLite."""
+"""Exact-money preview and buy/sell rules, independent of Flask and SQLite."""
 
 import re
 from datetime import datetime, timezone
@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 from virtutrade.accounts.service import IDLE_SECONDS
 from virtutrade.market.service import parse_timestamp
 from virtutrade.orders.errors import OrderError
+from virtutrade.orders.sell import calculate_sell
 
 MAX_INTEGER = 9_007_199_254_740_991
 
@@ -159,4 +160,48 @@ def execute_buy(
                 "quantity": new_quantity,
                 "cost_basis_vnd": new_cost,
             },
+        }
+
+
+def execute_sell(
+    session_id, symbol, quantity, expected_quote_at, unit_of_work, *, now=None
+):
+    """Sell held shares at the previewed quote inside one write transaction.
+
+    Revalidates the session, holding and quote snapshot, computes the exact
+    allocation with calculate_sell, then updates cash, the holding and the trade
+    together; any failure rolls the whole transaction back.
+    """
+    now = now or datetime.now(timezone.utc)
+    symbol = validate_order("sell", symbol, quantity)
+    if not isinstance(expected_quote_at, str) or not expected_quote_at:
+        raise OrderError("VALIDATION_ERROR", "Preview the order before confirming it.")
+    with unit_of_work(write=True) as repo:
+        account, quote, holding = load_inputs(repo, session_id, symbol, now)
+        if quote.quoted_at != expected_quote_at:
+            raise OrderError(
+                "QUOTE_CHANGED", "Price changed; refresh the preview before confirming."
+            )
+        result = calculate_sell(holding, quantity, quote.price_vnd, symbol=symbol)
+        stamp = now.isoformat().replace("+00:00", "Z")
+        trade_id = repo.save_sell(account, quote, quantity, result, stamp)
+        holding = None
+        if result.remaining_quantity:
+            holding = {
+                "symbol": symbol,
+                "quantity": result.remaining_quantity,
+                "cost_basis_vnd": result.remaining_cost_vnd,
+            }
+        return {
+            "trade": {
+                "id": trade_id,
+                "symbol": symbol,
+                "side": "sell",
+                "quantity": quantity,
+                "fill_price_vnd": quote.price_vnd,
+                "executed_at": stamp,
+                "realised_pnl_vnd": result.realised_pnl_vnd,
+            },
+            "cash_vnd": account.cash_vnd + result.proceeds_vnd,
+            "holding": holding,
         }
