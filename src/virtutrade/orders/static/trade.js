@@ -11,6 +11,30 @@
   const input = () => ({symbol: byId("symbol").value.trim().toUpperCase(), quantity: Number(byId("quantity").value)});
   const valid = x => x.symbol && Number.isSafeInteger(x.quantity) && x.quantity > 0;
   const invalidate = () => { preview = null; confirm.disabled = true; generation++; };
+  function showEstimate(data) {
+    const estimate = byId("estimate");
+    const lines = document.createElement("dl");
+    lines.className = "preview-lines";
+    const values = [
+      ["Stock", data.symbol], ["Quantity", `${data.quantity.toLocaleString("en-US")} shares`],
+      ["Price per share", cash(data.quote.price_vnd)], ["Available cash", cash(data.cash_vnd)],
+      [selling ? "Estimated proceeds" : "Estimated cost", cash(data.estimate_vnd)],
+      [selling ? "Shares held" : data.shortfall_vnd ? "Shortfall" : "Cash after purchase", selling ? data.available_quantity.toLocaleString("en-US") : cash(data.shortfall_vnd || data.cash_vnd - data.estimate_vnd)]
+    ];
+    for (const [label, value] of values) {
+      const row = document.createElement("div");
+      row.className = "preview-line" + ((label === "Estimated cost" || label === "Estimated proceeds") ? " total" : "");
+      const term = document.createElement("dt"), description = document.createElement("dd");
+      term.textContent = label; description.textContent = value;
+      row.append(term, description); lines.append(row);
+    }
+    const note = document.createElement("p");
+    note.className = "quote-note";
+    note.textContent = `Quote: ${data.quote.quoted_at} (${data.quote.source}). The server checks this quote again when you confirm.`;
+    estimate.replaceChildren(lines, note);
+    byId("preview-placeholder").hidden = true;
+    estimate.hidden = false;
+  }
   async function request(url, body) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 10000);
@@ -27,12 +51,6 @@
       }
       return data;
     } finally { clearTimeout(timeout); }
-  }
-  function estimateCopy(data) {
-    if (selling) {
-      return `Estimated proceeds: ${cash(data.estimate_vnd)}. Shares held: ${data.available_quantity}. Quote: ${data.quote.quoted_at} (${data.quote.source}).`;
-    }
-    return `Estimated cost: ${cash(data.estimate_vnd)}. Available cash: ${cash(data.cash_vnd)}. Quote: ${data.quote.quoted_at} (${data.quote.source}).`;
   }
   function orderCopy(data) {
     if (selling) {
@@ -52,8 +70,7 @@
       const data = await request("/api/orders/preview", {side, ...x});
       if (sequence !== generation) return;
       preview = {input:x, data};
-      byId("estimate").textContent = estimateCopy(data);
-      byId("estimate").hidden = false;
+      showEstimate(data);
       byId("order-error").textContent = data.warning || "";
       byId("order-status").textContent = data.can_submit ? "Check the quote, then confirm." : "Adjust the quantity to continue.";
       confirm.disabled = !data.can_submit;
@@ -96,4 +113,6 @@
     } catch (e) { byId("order-error").textContent = e.rejected ? e.message : "Could not confirm quote refresh. Return to Market and check its timestamp."; }
     finally { button.disabled = false; }
   });
+  // Restore a preview if fields were filled before deferred scripts attached.
+  if (valid(input())) refreshPreview();
 })();

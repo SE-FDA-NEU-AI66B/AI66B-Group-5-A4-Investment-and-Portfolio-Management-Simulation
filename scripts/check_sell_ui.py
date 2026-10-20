@@ -56,7 +56,9 @@ def main():
                 page.goto(f"{base}/trade?side=sell&symbol=HPG")
                 expect(page.get_by_role("heading", name="Sell shares")).to_be_visible()
                 page.get_by_label("Number of shares").fill("400")
-                expect(page.locator("#estimate")).to_contain_text("Shares held: 1000")
+                expect(page.locator(".preview-line").filter(
+                    has=page.locator("dt", has_text="Shares held")
+                ).locator("dd")).to_have_text("1,000")
                 expect(page.get_by_role("button", name="Confirm sell")).to_be_enabled()
                 page.get_by_role("button", name="Confirm sell").click()
                 expect(page.locator("#result")).to_contain_text("Sold 400 HPG")

@@ -1,26 +1,31 @@
 <!doctype html>
+{% set selling = side|default("buy") == "sell" %}
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="csrf-token" content="{{ csrf_token }}"><meta name="order-side" content="{{ side }}">
-<title>{{ 'Sell' if side == 'sell' else 'Buy' }} shares · VirtuTrade</title>
+<meta name="csrf-token" content="{{ csrf_token }}"><meta name="order-side" content="{{ side|default('buy') }}"><title>{{ 'Sell' if selling else 'Buy' }} shares &middot; VirtuTrade</title>
 <link rel="stylesheet" href="{{ url_for('market.static', filename='market.css') }}"></head>
-<body><header><a class="brand" href="/market">VirtuTrade</a><span class="badge">PAPER TRADING</span></header>
-<main><nav aria-label="Main"><a href="/market">Market</a>
-{% if portfolio_url and auth_ready %}<a href="{{ portfolio_url }}">Portfolio</a>{% endif %}</nav>
-<h1>{{ 'Sell shares' if side == 'sell' else 'Buy shares' }}</h1>
-<p>{% if side == 'sell' %}Preview the proceeds before confirming. You can only sell shares you hold.{% else %}Preview the price and cost before confirming.{% endif %} All balances and orders are virtual.</p>
-{% if not auth_ready %}<aside>Sign in before trading. <a href="/login">Log in</a> or
-<a href="/register">Register</a>, then select {{ 'Sell' if side == 'sell' else 'Buy' }} shares from Market.</aside>{% endif %}
-<form id="buy-form"><p><label for="symbol">Stock symbol</label><br>
-<input id="symbol" name="symbol" value="{{ symbol }}" required maxlength="10" autocomplete="off"></p>
-<p><label for="quantity">Number of shares</label><br><input id="quantity" name="quantity" type="number" min="1" step="1" required></p>
-<button id="preview-button" type="submit" {% if not auth_ready %}disabled{% endif %}>Preview order</button>
-<button id="confirm-button" type="button" disabled>Confirm {{ side }}</button></form>
+<body>{% set current_page = 'trade' %}{% include 'market/_header.html' %}
+<main class="trade-main"><a class="back-link" href="/market">&larr; Back to market</a>
+<div class="page-heading"><div><div class="eyebrow">BUILD YOUR PRACTICE PORTFOLIO</div><h1>Make your next move.</h1><p class="intro">Choose a stock. Check the numbers. {{ 'Sell only shares you hold.' if selling else 'Buy with virtual capital.' }}</p></div></div>
+{% if not auth_ready %}<aside>Sign in before trading. Use Log in or Register in the navigation, then return to Buy shares.</aside>{% endif %}
+<div class="trade-grid">
+<section class="card order-card" aria-labelledby="buy-title"><div class="card-heading"><span class="step">01</span><div><h2 id="buy-title">{{ 'Sell' if selling else 'Buy' }} shares</h2><p>Set up your virtual order</p></div></div>
+<form id="buy-form">
+<div class="field stock-picker"><label for="symbol">Stock symbol</label><span class="field-hint" id="stock-help">Search by symbol or company name.</span>
+<div class="input-with-icon"><input id="symbol" name="symbol" value="{{ symbol }}" required maxlength="100" autocomplete="off" spellcheck="false" placeholder="Search stocks, e.g. HPG" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="stock-options" aria-describedby="stock-help stock-picker-status"><span aria-hidden="true">&#8964;</span></div>
+<div id="stock-options" class="stock-options" role="listbox" aria-label="Stocks" hidden></div>
+<p id="stock-picker-status" class="field-hint" role="status">Loading available stocks&hellip;</p><button id="retry-stocks" class="text-button" type="button" hidden>Retry stock list</button></div>
+<div id="selected-stock" class="selected-stock" hidden><span id="selected-name"></span><strong id="selected-price"></strong><small id="selected-source"></small></div>
+<div class="field"><label for="quantity">Number of shares</label><input id="quantity" name="quantity" type="number" min="1" step="1" required placeholder="e.g. 100" aria-describedby="quantity-help"><span id="quantity-help" class="field-hint">Whole shares only. Minimum 1 share.</span></div>
+<button id="preview-button" class="button secondary full-width" type="submit" {% if not auth_ready %}disabled{% endif %}>Preview order</button>
+<div class="order-footer"><span class="step">02</span><p>Review the summary before confirming. A preview does not place an order.</p></div>
+<button id="confirm-button" class="button primary full-width" type="button" disabled>Confirm {{ side|default('buy') }}</button>
+</form></section>
+<div class="summary-column"><section class="card summary-card" aria-labelledby="preview-title"><div class="card-heading"><span class="step">&#8599;</span><div><h2 id="preview-title">Order summary</h2><p>All amounts in VND</p></div></div>
 <p id="order-status" role="status" aria-live="polite">Enter a stock and quantity to preview.</p>
-<section id="estimate" aria-label="Order preview" hidden></section>
-<p id="order-error" role="alert"></p>
-<p id="result"></p>
-{% if portfolio_url and auth_ready %}<p><a href="{{ portfolio_url }}">View portfolio</a></p>{% endif %}
-<section id="demo-actions" {% if not simulation %}hidden{% endif %}>
-<p>Simulation mode: generate a new demo observation when prices are stale. This is not live DNSE data.</p>
-<button id="generate-quotes" type="button" {% if not auth_ready %}disabled{% endif %}>Generate demo quotes</button></section>
-</main><script src="{{ url_for('orders.static', filename='trade.js') }}" defer></script></body></html>
+<div id="preview-placeholder" class="preview-placeholder"><span aria-hidden="true">&#8599;</span><h3>Your numbers, before you {{ 'sell' if selling else 'buy' }}.</h3><p>Select a stock and enter a quantity to see the price, {{ 'estimated proceeds and shares held' if selling else 'total cost and available cash' }}.</p></div>
+<section id="estimate" aria-label="Order preview" hidden></section><p id="order-error" role="alert"></p><p id="result" role="status"></p>
+{% if portfolio_url and auth_ready %}<a class="row-action" href="{{ portfolio_url }}">View portfolio &rarr;</a>{% endif %}</section>
+<section id="demo-actions" class="demo-card" {% if not simulation %}hidden{% endif %}><span class="eyebrow">SIMULATION DATA</span><h3>Practice at your own pace.</h3><p>These are generated prices, not live DNSE quotes. If a price expires, generate fresh demo quotes and preview again.</p><button id="generate-quotes" class="button secondary" type="button" {% if not auth_ready %}disabled{% endif %}>Generate demo quotes</button></section>
+<p class="quiet-note">No real money moves. Orders are recorded only in your simulation account.</p></div></div>
+<footer><strong>VirtuTrade &middot; Team 05</strong><span>Paper trading, with the details in view.</span></footer></main>
+<script src="{{ url_for('orders.static', filename='stock-picker.js') }}" defer></script><script src="{{ url_for('orders.static', filename='trade.js') }}" defer></script></body></html>

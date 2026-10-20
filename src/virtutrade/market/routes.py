@@ -24,8 +24,9 @@ def index():
         quotes = market_snapshot(reader)
     except MarketDataUnavailable:
         current_app.logger.exception('Could not load market snapshot')
-        return render_template('market/index.html', quotes=[], error=True), 503
-    return render_template('market/index.html', quotes=quotes, error=False)
+        return render_template('market/index.html', quotes=[], quote_payload=[], error=True), 503
+    return render_template('market/index.html', quotes=quotes,
+                           quote_payload=[asdict(quote) for quote in quotes], error=False)
 
 
 @api_blueprint.get('/quotes')
