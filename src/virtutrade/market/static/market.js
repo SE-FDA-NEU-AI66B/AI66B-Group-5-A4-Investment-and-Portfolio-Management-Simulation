@@ -36,6 +36,17 @@
     rows.replaceChildren(fragment);
     document.getElementById("instrument-total").textContent = `${quotes.length} symbols`;
     document.getElementById("symbol-count").textContent = query ? `${quotes.length} matching symbols · VND` : `${quotes.length} symbols · VND`;
+    updateBoards(quotes);
+  }
+  function updateBoards(quotes) {
+    const strip = document.getElementById("ticker-strip");
+    strip.replaceChildren(...quotes.slice(0, 6).map(quote => { const tile = element("a", "", "ticker-tile"); tile.href = `/market/${encodeURIComponent(quote.symbol)}`; tile.setAttribute("aria-label", `View ${quote.symbol} quote`); const title = element("span", quote.symbol); title.append(element("small", sourceName(quote))); tile.append(title, element("strong", money.format(quote.price_vnd), direction(quote)), element("small", quote.change === null ? "Reference unavailable" : `${Number(quote.change) > 0 ? "+" : ""}${quote.change}%`, direction(quote))); return tile; }));
+    const counts = {positive: 0, negative: 0, neutral: 0, unclassified: 0}; for (const quote of quotes) counts[direction(quote)]++;
+    document.getElementById("breadth-board").replaceChildren(...[["positive", "Advancing"], ["negative", "Declining"], ["neutral", "Unchanged"], ["unclassified", "No reference"]].map(([key, label]) => { const cell = element("div", "", `breadth-cell ${key}`); cell.append(element("strong", String(counts[key])), element("span", label)); return cell; }));
+    const monitored = quotes.filter(quote => quote.change !== null).sort((a, b) => Math.abs(Number(b.change)) - Math.abs(Number(a.change))).slice(0, 5);
+    const monitorRows = monitored.map(quote => { const row = document.createElement("tr"); row.append(element("td", quote.symbol), element("td", money.format(quote.price_vnd), "number"), element("td", `${Number(quote.change) > 0 ? "+" : ""}${quote.change}%`, `number ${direction(quote)}`), element("td", sourceName(quote))); return row; });
+    if (!monitorRows.length) { const row = document.createElement("tr"); const cell = element("td", "No comparable quotes. Waiting for reference prices."); cell.colSpan = 4; row.append(cell); monitorRows.push(row); }
+    document.getElementById("movement-rows").replaceChildren(...monitorRows);
   }
   function schedule() { clearTimeout(timer); timer = setTimeout(refresh, 3000); }
   async function refresh() {
