@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{% if quote %}{{ quote.symbol }}{% else %}Ticker not found{% endif %} · VirtuTrade</title>
+  <link rel="stylesheet" href="{{ url_for('market.static', filename='market.css') }}">
+</head>
+<body>
+  {% include 'market/_header.html' %}
+  <main class="detail">
+    <nav aria-label="Breadcrumb"><a href="/market">&larr; Back to market</a></nav>
+    {% if error %}
+      <section id="market-error" class="empty" role="alert">
+        <h1>Market data is unavailable</h1>
+        <p>The quote could not be loaded. Try again, or go back to the market list.</p>
+        <p><a class="button" href="/market/{{ symbol|urlencode }}">Try again</a> <a href="/market">Back to market</a></p>
+      </section>
+    {% elif quote is none %}
+      <section class="empty" role="alert">
+        <h1>Ticker not found</h1>
+        <p>No stock with the symbol "{{ symbol }}" exists. Search the market list for a valid symbol.</p>
+        <p><a class="button" href="/market">Back to market</a></p>
+      </section>
+    {% else %}
+      <div class="eyebrow">STOCK DETAIL</div>
+      <h1>{{ quote.symbol }} · {{ quote.name }}</h1>
+      <p class="big price">{{ quote.price_vnd|vnd }} VND</p>
+      <dl>
+        <dt>Change vs previous close</dt>
+        <dd class="{{ 'positive' if quote.change is not none and quote.change|float > 0 else 'negative' if quote.change is not none and quote.change|float < 0 else 'neutral' }}">{% if quote.change is none %}—<small>Reference unavailable</small>{% else %}{{ '+' if quote.change|float > 0 else '' }}{{ quote.change }}% (previous close {{ quote.previous_close_vnd|vnd }} VND){% endif %}</dd>
+        <dt>Last quote</dt>
+        <dd><time datetime="{{ quote.quoted_at }}">{{ quote.quoted_at|local_time }}</time><small>{{ quote.quoted_at }} UTC</small></dd>
+        <dt>Source</dt>
+        <dd><span class="source">{{ quote.source|source_label }}</span></dd>
+        <dt>Status</dt>
+        <dd>{% if quote.stale %}<span class="delayed">Price may be delayed</span>{% else %}Up to date{% endif %}</dd>
+      </dl>
+      <p>
+        <a class="button" href="/trade?symbol={{ quote.symbol|urlencode }}">Buy {{ quote.symbol }}</a>
+        {% if not g.current_account %}<small>Signing in is required before trading.</small>{% endif %}
+      </p>
+      <aside>All prices are virtual reference data. No real money or market orders.</aside>
+    {% endif %}
+  </main>
+</body>
+</html>
