@@ -76,6 +76,12 @@ promote a story to **works**. On this branch, each Market row has a Buy link to
 or company and shows a structured preview. The solid arrows above continue to
 mean merged `main`; these enhancements are pending review/merge.
 
+The #101 follow-up also applies the red/charcoal presentation to Login and
+Register using a shared account template. On mobile the form comes first.
+Existing routes, CSRF, server messages and login/register behavior remain
+unchanged; this presentation update does not complete the remaining US01 flow.
+See [account screenshots and checks](market-buy-ui-evidence.md#account-presentation-follow-up).
+
 | Story | Concrete behavior in this follow-up | Remaining acceptance |
 |-------|----------------------------------------|----------------------|
 | US03 | Read stored quotes with source/time; choose Buy on the matching row | #85 market search and stock-detail screen remain with Vu |

@@ -94,3 +94,19 @@ syntax and whitespace checks. Browser QA passes Market/picker/mobile states,
 both real-auth buy scenarios, partial/full sale with oversell rejection, and
 registration/login with exactly one grant. New sell/grant captures are stored
 in the author's local QA folder to preserve the original teammate evidence.
+
+## Account presentation follow-up
+
+Login and Register now share an account layout and the terminal stylesheet,
+including a compact form-first mobile layout. The form routes, CSRF handling,
+email retention, password limits, server error messages and authentication
+service remain unchanged. Package data explicitly includes the account templates.
+Browser checks cover invalid login with email retained and password cleared,
+successful registration, and both pages at desktop/mobile sizes.
+
+- [Login](images/ui/market-buy-2026-10-20/login-desktop.png)
+- [Register](images/ui/market-buy-2026-10-20/register-desktop.png)
+- [Mobile login error](images/ui/market-buy-2026-10-20/login-error-mobile.png)
+
+This is presentation work under #101, not additional credit for #77 or proof of
+the remaining independent M3 acceptance.

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{% block title %}{% endblock %} &middot; VirtuTrade</title>
+  <link rel="stylesheet" href="{{ url_for('market.static', filename='market.css') }}">
+</head>
+<body class="auth-page">
+  <header class="app-header">
+    <a class="brand" href="/market"><span class="brand-mark" aria-hidden="true">V</span>VirtuTrade<span class="brand-dot">.</span></a>
+    <nav class="account-nav" aria-label="Main"><span class="badge">PAPER TRADING</span><a href="/market">Market</a></nav>
+  </header>
+  <main class="auth-layout">
+    <section class="auth-intro" aria-labelledby="welcome-title">
+      <div class="eyebrow">YOUR PRACTICE TRADING DESK</div>
+      <h1 id="welcome-title">Build confidence.<br><span>Trade virtually.</span></h1>
+      <p>Explore stocks, preview an order and learn how each decision changes your virtual balance.</p>
+      <div class="auth-capital"><span>Starting virtual capital</span><strong>100,000,000 <small>VND</small></strong><span>Granted once when you register.</span></div>
+      <p class="auth-disclaimer">A simulation account. No deposits, no real-money orders.</p>
+    </section>
+    <section class="card auth-card" aria-labelledby="auth-title">
+      {% block form %}{% endblock %}
+    </section>
+  </main>
+  <footer class="auth-footer"><strong>VirtuTrade &middot; Team 05</strong><span>Learn with virtual capital.</span></footer>
+</body>
+</html>
