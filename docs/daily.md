@@ -68,3 +68,12 @@ Updated `docs/ui.md` and traceability for US05; a Sell link from a holding still
 - @nguyentue110 — Brought the #78 grant display onto `main` after the earlier slice landed only on the old auth branch, keeping the one-time grant unchanged.
 Expanded the grant tests for client-supplied balance fields and captured a real-browser screenshot of the Market-header balance after registration and login.
 The Portfolio balance and independent verification remain pending #81/#83.
+
+## 2026-10-20
+
+- @bianh13 — Verified the reviewed and merged #75 contract against its remaining checklist and reconciled my outstanding acceptance work.
+Extended the real-auth buy browser checks with saved evidence and stale-quote recovery, then fixed the stuck loading status and obsolete cash estimate discovered during those checks.
+Synchronized the buy error documentation and added the PO-authorized #101 stock picker, responsive Market-to-Buy presentation and browser checks, while retaining the Portfolio handoff, independent review and DNSE board-comparison requirements.
+
+- @nguyentue110: Fixed the #105 US01 defect by sending form login to the Portfolio whenever the real GET route is registered, keeping `/market` as the fallback until #81 merges, and added a regression test in `tests/test_auth.py`.
+Updated the design, UI and traceability notes; Portfolio screenshots and independent acceptance remain with #81/#82.

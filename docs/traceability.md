@@ -7,11 +7,11 @@ implemented run; designed endpoints remain future work.
 
 | Story | Scenario steps | Acceptance checks | Screen / entry | Endpoint (proposed unless stated) | Tables | Work / history | Implementation / verification |
 |-------|----------------|-------------------|----------------|----------------------------------|--------|----------------|-------------------------------|
-| US01 P0 | S1.1 | Register, login, duplicate email, lockout | `/` | POST `/api/accounts`, POST `/api/sessions` | account | #46; history #13 | Auth implemented on main via #93; final independent UI evidence remains #82/#83 |
-| US02 P0 | S1.1 | 100,000,000 VND once | `/` registration | POST `/api/accounts` | account | #46; history #14 | One-time grant on main via #93; Market-header balance and additional grant tests are in open PR #99 for #78; Portfolio display pending #81 |
+| US01 P0 | S1.1 | Register, login, duplicate email, lockout | `/` | POST `/api/accounts`, POST `/api/sessions` | account | #46; history #13 | Auth implemented on main via #93; #105 fixed form login to reach `/portfolio` once #81 registers it (otherwise `/market`); final independent UI evidence remains #82/#83 |
+| US02 P0 | S1.1 | 100,000,000 VND once | `/` registration | POST `/api/accounts` | account | #46; history #14 | One-time grant on main via #93; Market-header balance and additional grant tests are on main via merged PR #99 for #78; Portfolio display pending #81 |
 | US03 P0 | S1.2, S2.1, S6.3 | Price, daily change, timestamp, delayed/unknown ticker | `/market` | GET `/market` **implemented**; GET `/api/market/quotes/{symbol}` designed; list JSON on main via merged #92; optional worker in #60 | instrument, price_quote | #50; history #15 | Snapshot subset implemented and locally tested; search/detail and live feed pending |
 | US04 P0 | S1.3–S1.4 | Preview, valid fill, insufficient cash, invalid quantity | `/trade` | POST `/api/orders/preview`, POST `/api/orders/buy` | account, holding, trade, price_quote | #46/#49; history #16 | Real auth/buy integration merged via #92 on 19 October; portfolio transition and final independent journey evidence pending |
-| US05 P0 | S2.2–S2.3 | Fill, realised result, oversell, quote time | `/trade` | POST `/api/orders/preview`, POST `/api/orders/sell` | account, holding, trade, price_quote | #46/#49; history #17 | Open PR #98: sell preview/confirm, exact allocation, oversell tests and author browser evidence (19 October); not on main at 97973d2; Portfolio entry pending #81 |
+| US05 P0 | S2.2–S2.3 | Fill, realised result, oversell, quote time | `/trade` | POST `/api/orders/preview`, POST `/api/orders/sell` | account, holding, trade, price_quote | #46/#49; history #17 | Merged PR #98: sell preview/confirm, exact allocation, oversell tests and author browser evidence (19 October); on main at 50ff313; Portfolio entry pending #81 |
 | US06 P0 | S1.5, S2.1, S2.3 | Quantity, cost, P&L, NAV, empty portfolio | `/portfolio` | GET `/api/portfolio` | account, holding, instrument, price_quote | #46/#49; history #18 | Specified; not implemented |
 | US10 P0 | S1.3 | Inline warning, disable/re-enable confirmation | `/trade` | POST `/api/orders/preview`, GET `/api/portfolio`; POST `/api/orders/buy` independently enforces BR1 | account, price_quote | #46/#49; history #22 | Real auth/buy integration merged via #92 on 19 October; portfolio transition and final independent journey evidence pending |
 | US07 P1 | S3.1–S3.2 | Threshold trigger, no holding, single auto-close | `/trade` | Deferred | Future conditional-order storage; holding, trade | history #19 | Backlog; schema extension needed |
@@ -30,11 +30,11 @@ administration A, quote ingestion M. Implemented authentication gates are server
 | Rule | Enforcement design | Evidence today |
 |------|--------------------|----------------|
 | BR1 | Atomic buy transaction rechecks cash; nonnegative cash CHECK is a second guard | Atomic buy revalidation, rollback and concurrency tests in #92 |
-| BR2 | Atomic sell transaction rechecks held quantity | Atomic sell revalidation, rollback, oversell and concurrency tests in open PR #98 |
-| BR3 | Capture accepted quote inside the order transaction | Buy quote revalidation on main via #92; sell transaction equivalent in open PR #98 |
+| BR2 | Atomic sell transaction rechecks held quantity | Atomic sell revalidation, rollback, oversell and concurrency tests in merged PR #98 |
+| BR3 | Capture accepted quote inside the order transaction | Buy quote revalidation on main via #92; sell transaction equivalent in merged PR #98 |
 | BR4 | Conditional-order monitor with idempotent execution | Deferred |
-| BR5 | Account creation grants 100,000,000 VND once; login/enable never grants again | Real account service and grant-once tests in #93; client-balance/no-regrant tests extended in open PR #99 for #78 |
-| BR6 | Exact total cost / quantity; partial-sale whole-VND allocation and final residual per money-rules.md | Integer cost storage; partial-sale allocation implemented/tested in open PR #98 |
+| BR5 | Account creation grants 100,000,000 VND once; login/enable never grants again | Real account service and grant-once tests in #93; client-balance/no-regrant tests extended in merged PR #99 for #78 |
+| BR6 | Exact total cost / quantity; partial-sale whole-VND allocation and final residual per money-rules.md | Integer cost storage; partial-sale allocation implemented/tested in merged PR #98 |
 | BR7 | Benchmark/performance service compares matching dates | Deferred |
 | BR8 | Ranking uses achievement timestamps to break ties | Deferred |
 | BR9 | Role check and atomic status-change/audit write | CHECKs/FKs only; service pending |

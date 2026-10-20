@@ -27,6 +27,8 @@
   }
 
   function update(quotes) {
+    const focusedAction = rows.contains(document.activeElement) ?
+      document.activeElement.getAttribute("aria-label") : null;
     const initialError = document.getElementById("market-error");
     if (initialError) initialError.hidden = true;
     const shown = quotes.filter(matches);
@@ -46,6 +48,7 @@
       const timestamp = cell("Last quote (UTC)");
       const time = element("time", quote.quoted_at);
       time.dateTime = quote.quoted_at;
+      time.title = quote.quoted_at;
       timestamp.append(time);
       const source = cell("Source / Status");
       source.append(element("span", quote.source === "simulation" ? "Simulation / generated" : quote.source === "dnse" ? "DNSE" : "Demo / seed", "source"));
@@ -82,6 +85,50 @@
       : quotes.some(q => q.source === "dnse")
       ? "DNSE market data · Last received prices. Check timestamps and sources; some rows may still contain demo data. No real money or market orders."
       : "Demo data · Seeded example prices, not live DNSE quotes. No real money or market orders.";
+    updateBoards(quotes);
+    previousPrices = new Map(quotes.map(quote => [quote.symbol, quote.price_vnd]));
+  }
+
+  function updateBoards(quotes) {
+    const strip = document.getElementById("ticker-strip");
+    const focusedTile = strip.contains(document.activeElement) ? document.activeElement.getAttribute("aria-label") : null;
+    const tiles = quotes.slice(0, 6).map(quote => {
+      const tile = element("a", "", "ticker-tile");
+      tile.href = `/trade?symbol=${encodeURIComponent(quote.symbol)}`;
+      tile.setAttribute("aria-label", `Preview ${quote.symbol}`);
+      const title = element("span", quote.symbol);
+      title.append(element("small", sourceName(quote)));
+      tile.append(title, element("strong", money.format(quote.price_vnd), direction(quote)),
+        element("small", quote.change === null ? "Reference unavailable" :
+          `${Number(quote.change) > 0 ? "+" : ""}${quote.change}%`, direction(quote)));
+      return tile;
+    });
+    strip.replaceChildren(...tiles);
+    if (focusedTile) tiles.find(tile => tile.getAttribute("aria-label") === focusedTile)?.focus({preventScroll: true});
+
+    const counts = {positive: 0, negative: 0, neutral: 0, unclassified: 0};
+    for (const quote of quotes) counts[direction(quote)]++;
+    document.getElementById("breadth-board").replaceChildren(...[
+      ["positive", "Advancing"], ["negative", "Declining"], ["neutral", "Unchanged"], ["unclassified", "No reference"]
+    ].map(([key, label]) => {
+      const cell = element("div", "", `breadth-cell ${key}`);
+      cell.append(element("strong", String(counts[key])), element("span", label));
+      return cell;
+    }));
+    const monitored = quotes.filter(q => q.change !== null).sort((a, b) =>
+      Math.abs(Number(b.change)) - Math.abs(Number(a.change))).slice(0, 5);
+    const monitorRows = monitored.map(quote => {
+      const row = document.createElement("tr");
+      row.append(element("td", quote.symbol), element("td", money.format(quote.price_vnd), "number"),
+        element("td", `${Number(quote.change) > 0 ? "+" : ""}${quote.change}%`, `number ${direction(quote)}`),
+        element("td", sourceName(quote)));
+      return row;
+    });
+    if (!monitorRows.length) {
+      const row = document.createElement("tr"), cell = element("td", "No comparable quotes. Waiting for reference prices.");
+      cell.colSpan = 4; row.append(cell); monitorRows.push(row);
+    }
+    document.getElementById("movement-rows").replaceChildren(...monitorRows);
   }
 
   const searchForm = document.getElementById("search-form");
@@ -114,6 +161,12 @@
       setTimeout(refresh, 3000);
     }
     status.classList.remove("delayed");
+  }
+  const initial = document.getElementById("initial-quotes");
+  if (initial) {
+    const quotes = JSON.parse(initial.textContent);
+    updateBoards(quotes);
+    previousPrices = new Map(quotes.map(quote => [quote.symbol, quote.price_vnd]));
   }
   setTimeout(refresh, 3000);
 })();

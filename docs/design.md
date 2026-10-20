@@ -222,7 +222,7 @@ contract above; each uses the same service as its API counterpart.
 |--------|------|--------|-------|---------|--------|--------|
 | GET | `/market` | G/U | optional `q` | 200 HTML list; "No stocks match" when a search finds nothing | 503 HTML unavailable page | List implemented; `q` proposed (#85) |
 | GET | `/market/<symbol>` | G/U | path symbol | 200 HTML detail | 404 "Ticker not found"; 503 HTML unavailable page | Designed (#85) |
-| GET, POST | `/register`, `/login` | G | form fields, `csrf_token`, optional `next` | 302 to `/market` with session cookie today; to `next` or `/portfolio` once designed | Page re-rendered with the API message and status (409, 401, 429, 403, 422) | Pages and sessions implemented (#77); `next` and `/portfolio` redirect designed; browser verification pending |
+| GET, POST | `/register`, `/login` | G | form fields, `csrf_token`, optional `next` | 302 with session cookie: form login to `/portfolio` when the real GET route is registered (#81), otherwise `/market`; registration still `/market`; `next` remains designed | Page re-rendered with the API message and status (409, 401, 429, 403, 422) | Pages and sessions implemented (#77); form-login destination fixed in #105; `next` designed; browser verification pending |
 | POST | `/logout` | U | `csrf_token` | 302 to `/market`, cookie expired | Redirect to `/login` | Implemented (#77); browser verification pending |
 | GET | `/trade` | U | `side`, `symbol` | 200 HTML preview and confirm form | 302 to `/login?next=...` for a guest | Designed (#76/#79) |
 | GET | `/portfolio` | U | none | 200 HTML cash, holdings, total | 302 to `/login?next=...` for a guest | Designed (#81) |
@@ -441,3 +441,28 @@ buy branch and remain in #60, so provider verification cannot block the P0 demo.
 Auth and quote migrations have distinct ledgers/version ownership; seed reruns
 preserve grants, quotes and holdings. Portfolio links are exposed only after the
 real /portfolio GET route is registered by #81; no placeholder UI is presented.
+
+
+### Market-to-Buy UI refinement - #101, 20 October 2026
+
+The trade screen's raw symbol entry is supplemented by a keyboard-accessible
+picker calling the existing GET /api/market/quotes. Each market row links to the
+existing GET /trade?symbol=... route. The server still validates symbols, exact
+integer money, freshness, funds and session/CSRF; the browser cannot approve an
+order from its cached list. No new API or ERD entity is introduced.
+
+Presentation code stays in market/static and orders/static. Market/Trade share
+market/_header.html; stock-picker.js owns discovery and its read failure states,
+while trade.js owns preview/confirmation feedback. The structured preview uses
+server-supplied values, retains uncertain-POST locking and makes no automatic
+trade retries. Existing #98 sell metadata/receipt behavior is retained for
+integration, without implementing or taking ownership of the sell service.
+Portfolio, market search/detail and DNSE acceptance remain with #81/#85/#59.
+
+
+The #101 dark-board follow-up serializes the same public quote snapshot into
+HTML for initial watchboard/breadth rendering; polling still uses the existing
+GET /api/market/quotes. No additional database query or provider endpoint is
+introduced. All derived counts and movers are scoped to displayed rows and
+exclude missing reference changes. Price-cell flashes occur only when the stored
+price changes and respect prefers-reduced-motion.

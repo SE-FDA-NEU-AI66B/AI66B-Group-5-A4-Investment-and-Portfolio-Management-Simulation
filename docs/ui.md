@@ -6,6 +6,8 @@ wireframes, implemented journeys and browser evidence are still required.
 
 ## 1. P0 stories and status
 
+Merged-state refresh: 20 October 2026, `main` at `50ff313` (#98/#99/#100 merged).
+
 Statuses describe the implementation observed on `main`, not the ambition of an
 issue or the existence of a schema. Old M1/M2 issue closure does not prove a
 working M3 journey. Screen names are used consistently below: **Register,
@@ -15,17 +17,17 @@ behavior not on `main`) and **open PR work**.
 
 | Story | Screen(s) | Route | Status | Issue | Notes |
 | ----- | --------- | ----- | ------ | ----- | ----- |
-| US01 - Register / sign in | Register, Login | `/register`, `/login` | partly works | [#77](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/77) | Implemented: both pages, session cookie, CSRF, lockout; both redirect to Market list today. Planned: return to the page the guest came from via a local `next` (proposed), otherwise Portfolio once #81 lands. Open PR: <add number or "none">. |
-| US02 - Initial virtual capital | Register, Trade | `/register`, `/trade` | partly works | [#78](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/78) | On main: 100,000,000 VND granted once at registration; Trade shows cash. Open PR #99: Market-header balance, additional tests and [author screenshot](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/blob/7dcd74f/docs/images/ui/grant-balance.png). Planned: Portfolio balance (#81). |
-| US03 - Find a stock and inspect its quote | Market list, Stock detail | `/market`, `/market/<symbol>` | partly works | [#85](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/85) | Implemented: Market list only. Planned (#85): search (`?q=`, proposed) and Stock detail. Open PR: <add number or "none">. |
+| US01 - Register / sign in | Register, Login | `/register`, `/login` | partly works | [#77](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/77) | Implemented: both pages, session cookie, CSRF, lockout; #105 sends form login to the Portfolio once its real GET route exists (#81), otherwise to the Market list; registration still lands on the Market list. Planned: return to the page the guest came from via a local `next` (proposed). |
+| US02 - Initial virtual capital | Register, Market list, Trade | `/register`, `/market`, `/trade` | partly works | [#78](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/78) | On main: 100,000,000 VND granted once at registration; Trade shows cash. Merged PR #99: Market-header balance, additional tests and [author screenshot](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/blob/7dcd74f/docs/images/ui/grant-balance.png). Planned: Portfolio balance (#81). |
+| US03 - Find a stock and inspect its quote | Market list, Stock detail | `/market`, `/market/<symbol>` | partly works | [#85](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/85) | Implemented: Market list only. Planned (#85): search (`?q=`, proposed) and Stock detail. No additional implementation PR is listed in this snapshot. |
 | US04 - Buy shares | Market list, Trade | `/market`, `/trade` | partly works | [#76](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/76) | Implemented on main via #92: Market Buy shares link, guest guard, authenticated preview and purchase receipt. Planned: Stock detail entry and Portfolio transition (#81). |
-| US05 - Sell shares | Portfolio, Trade | `/portfolio`, `/trade?side=sell&symbol=HPG` | not started | [#79](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/79) | Open PR #98 (partly works on its branch): sell preview/confirm, partial/full sale and oversell warning; [author browser evidence](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/tree/28fe0ee/docs/images/ui) from 19 October. Planned: Sell entry from a Portfolio holding (#81). |
+| US05 - Sell shares | Portfolio, Trade | `/portfolio`, `/trade?side=sell&symbol=HPG` | partly works | [#79](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/79) | Merged PR #98: sell preview/confirm, partial/full sale and oversell warning; [author browser evidence](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/tree/28fe0ee/docs/images/ui) from 19 October. Planned: Sell entry from a Portfolio holding (#81). |
 | US06 - View portfolio | Portfolio | `/portfolio` | not started | [#81](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/81) | Planned: a "Portfolio" header link for signed-in users. |
 | US10 - Insufficient-balance warning | Trade | `/trade` | partly works | [#76](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/76) | Implemented on main via #92: inline shortfall, disabled confirmation and correction. Final independent P0 journey evidence remains pending. |
 
 On `main` today: `/` redirects to Market list; Register, Login and Log out are
 reachable from the Market list header, which also links to the Trade screen for
-buying shares. There is no Portfolio link until #81 lands. Wireframes below show
+buying shares. The sell form is available directly at `/trade?side=sell&symbol=HPG`; its Portfolio entry remains pending #81. There is no Portfolio link until #81 lands. Wireframes below show
 the target design; the table and flow distinguish implemented and planned paths.
 
 ### Screen flow (solid = on `main`, dashed = planned)
@@ -42,7 +44,7 @@ flowchart TD
     Trade -->|guest: Log in| Login
     Trade -->|guest: Register| Register
     Trade -->|Market link| Market
-    Trade -->|saved buy: receipt on Trade| Trade
+    Trade -->|saved buy or sell: receipt on Trade| Trade
     Trade -->|rejected or invalid: stay, fix input| Trade
 
     Market -. "header Portfolio, signed in" .-> Portfolio[Portfolio /portfolio]
@@ -65,6 +67,26 @@ The planned Trade → Portfolio path means an order that was **saved**, not a cl
 on Confirm; the current buy implementation displays its receipt on Trade.
 A rejected order keeps the user on Trade with the error beside the input.
 The `next` value must be a local path (`/trade?...`), never an external URL.
+
+### Branch verification - 20 October, #101
+
+The UI follow-up supports existing stories; it does not add a new P0 story or
+promote a story to **works**. On this branch, each Market row has a Buy link to
+`/trade?symbol=...`; the Trade screen searches the existing quote list by symbol
+or company and shows a structured preview. The solid arrows above continue to
+mean merged `main`; these enhancements are pending review/merge.
+
+The #101 follow-up also applies the red/charcoal presentation to Login and
+Register using a shared account template. On mobile the form comes first.
+Existing routes, CSRF, server messages and login/register behavior remain
+unchanged; this presentation update does not complete the remaining US01 flow.
+See [account screenshots and checks](market-buy-ui-evidence.md#account-presentation-follow-up).
+
+| Story | Concrete behavior in this follow-up | Remaining acceptance |
+|-------|----------------------------------------|----------------------|
+| US03 | Read stored quotes with source/time; choose Buy on the matching row | #85 market search and stock-detail screen remain with Vu |
+| US04 | Select a stock using the picker, preview and confirm with real auth/SQLite | #76 Portfolio handoff (#81), review and merge |
+| US10 | Show exact shortfall, disable Confirm, recover after correcting quantity | Independent final journey review; no premature works status |
 
 ## 2. Wireframes
 
@@ -275,6 +297,25 @@ Result unknown:  "Result unknown. Check your portfolio." (link; no retry)
 +---------------------------------------------------------------+
 ```
 
+### 2.7 Market-to-Buy presentation follow-up - #101
+
+The user comes here to choose a known stock without memorizing its symbol and
+understand the cost before buying. The buy form has a searchable stock picker,
+quantity field, Preview and Confirm controls, and a separate order summary.
+The summary shows symbol, quantity, unit price, available cash, estimated cost,
+remaining cash (or shortfall), quote source and timestamp. A row-level Buy link
+preselects the stock. Existing server rules and receipt behavior are unchanged.
+
+Calls: existing `GET /api/market/quotes`, `POST /api/orders/preview`,
+`POST /api/orders/buy` and, only in simulation, `POST /api/simulation/quotes/refresh`.
+No market search/detail endpoint is introduced by this follow-up.
+
+Picker states: loading text; an empty-list message with Retry; an unavailable
+message with Retry/known-symbol fallback; and symbol/company results. No-match
+search preserves the entered text. Arrow keys, Enter, Escape and Tab work.
+See [observed screens and reproducible checks](market-buy-ui-evidence.md).
+These author page captures are not the PDF address-bar screenshots.
+
 ## 3. Error messages
 
 Every row separates two things: the **API message**, which is the exact string
@@ -306,6 +347,13 @@ code of `ACCOUNT_DISABLED`, and the `VALIDATION_ERROR` messages have no test.
 | 409 `EMAIL_IN_USE` | US01 - an email can register only once | Email already in use | Sign in with this email, or register with another one. |
 | 401 `INVALID_CREDENTIALS` | US01 - wrong password and unknown email give the same answer | Invalid email or password | Check both fields and try again. |
 | 429 `LOGIN_LOCKED` | US01 - five wrong passwords lock the account for 15 minutes | Account locked. Try again in N seconds. (N is the remaining time from the server) | You can sign in again when the countdown ends. |
+| 409 `QUOTE_STALE` | BR3 / US04 - stale quotes cannot authorize a buy | Price may be delayed. Generate demo quotes, then preview again. | Recovery is included in this exact simulation-mode message; verified through the real preview endpoint on 20 October, see [buy evidence](buy-acceptance.md). |
+
+Buy/US10 also shows `Exceeds available balance by 12,000,000 VND. Reduce the quantity.`
+for the 4,000 HPG fixture, with confirmation disabled. This is a warning returned
+by a successful preview (HTTP 200), not an API error code. A real server-rejected
+stale preview is the fourth reachable error above; its fixture ages only the
+throwaway test database. DNSE/seed mode uses `Price may be delayed. Wait for a fresh market quote, then preview again.`
 
 ### 3.2 Implemented, not reachable as visible text today
 
@@ -316,17 +364,16 @@ code of `ACCOUNT_DISABLED`, and the `VALIDATION_ERROR` messages have no test.
 | 403 `CSRF_FAILED` | Every state-changing request needs a valid CSRF token | Invalid or missing CSRF token | Reload the page and try again. | Appears only when a form stays open past its token lifetime (pre-auth tokens last about one to two hours). |
 | 401 `AUTH_REQUIRED` | Private routes need a valid session | Authentication required | Sign in again to continue. | Browser pages redirect a guest to Login instead of showing text; the message reaches JSON clients, and the Trade and Portfolio pages once built if a session expires mid-use. |
 
-### 3.3 Proposed - not implemented until #76 and #79 merge
+### 3.3 Other order errors - buy and sell implemented
 
-Amounts below are the acceptance fixtures; the screen shows the user's own numbers.
+Buy handling below is implemented via #92, with service/route coverage; this table alone does not prove each browser trigger. Sell handling is on main via #98; the Portfolio-to-Sell entry remains pending #81. Amounts are acceptance fixtures; the screen shows the user's own numbers.
 
 | API error code | Business rule | API message (contract) | UI hint (proposal) |
 | -------------- | ------------- | ---------------------- | ------------------ |
-| 409 `INSUFFICIENT_CASH` | BR1 - an order may not cost more than the available cash | Insufficient cash: this order needs 360,000,000 VND but only 72,000,000 VND is available | Reduce the quantity and preview again. |
+| 409 `INSUFFICIENT_CASH` | BR1 - an order may not cost more than the available cash | Insufficient cash: this order needs 360,000,000 VND but only 72,000,000 VND is available. Reduce the quantity and preview again. | Included in the message. |
 | 409 `INSUFFICIENT_SHARES` | BR2 - a sale may not exceed the shares held | You hold 500 HPG; the maximum you can sell is 500 | Reduce the quantity and preview again. |
-| 422 `INVALID_QUANTITY` | US04/US05 - quantity is a whole number of at least 1 | Quantity must be a whole number of at least 1 share | Enter a whole number of 1 or more and preview again. |
-| 409 `QUOTE_CHANGED` | BR3 - the fill uses the quote accepted at submission | Price changed; refresh the preview | Check the new price before confirming your order. |
-| 409 `QUOTE_STALE` | US03/US14 - a quote older than 15 minutes cannot authorize a trade | Price may be delayed; refresh before trading | Simulation mode: generate demo quotes, then preview again. DNSE mode: wait for a fresh quote, then preview again. |
+| 422 `INVALID_QUANTITY` | US04/US05 - quantity is a whole number of at least 1 | Quantity must be a whole number of at least 1 share. | Enter a whole number of 1 or more and preview again. |
+| 409 `QUOTE_CHANGED` | BR3 - the fill uses the quote accepted at submission | Price changed; refresh the preview before confirming. | Recovery is included in the message. |
 
 Rows in 3.3 move to 3.1 only after someone has reproduced them in a browser.
 Place errors next to the relevant input or in an accessible alert, and never
@@ -376,3 +423,29 @@ transition. `/portfolio` links appear only when that real GET route is registere
 there is no placeholder portfolio. Vu's #96 wireframes merged on 19 October;
 this integration note does not replace final browser evidence. Auth error messages stay unchanged;
 the buy UI adds separate recovery guidance for login, CSRF and disabled accounts.
+
+
+### Market-to-Buy presentation - #101, 20 October
+
+The UI showed that a raw ticker text field forced beginners to remember stock
+codes. The buy screen now reads the existing quote API to offer symbol/company
+selection. Market links pass the selected symbol through the existing query
+parameter, and the summary separates money values instead of presenting one
+long sentence. A shared Market/Trade header keeps navigation consistent; CSS
+and the picker remain within their feature modules. No business rule, schema,
+new API or investment recommendation is added. Section 2 records the observed
+branch behavior; P0 statuses remain conservative until integration and review.
+The corresponding architecture note is updated in design.md in this same PR.
+
+
+### Price-board presentation follow-up - 20 October, #101
+
+At the PO's request, Market/Trade use a charcoal/red theme and a denser quote
+board inspired by the public DNSE board layout. The existing quote snapshot
+also supplies a six-symbol watchboard, counts of advancing/declining/unchanged
+and unclassified rows, and a table of the five largest absolute percentage moves
+among displayed rows. These are not exchange indices or investment advice.
+Missing reference/change stays unavailable and is excluded from the movement
+table; source labels distinguish DNSE, seed and simulation. No order-book depth,
+volume, ceiling/floor or historical chart is fabricated. US03 remains partly
+works pending #85 search/detail; this presentation stays under #101's 2 points.

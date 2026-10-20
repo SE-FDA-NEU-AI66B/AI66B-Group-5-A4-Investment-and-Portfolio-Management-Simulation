@@ -1,0 +1,47 @@
+{
+  "scenario": "disconnect",
+  "passed": true,
+  "observations": [
+    {
+      "state": "guest-guard",
+      "screenshot": "buy-disconnect-guest-guard.png",
+      "observed_at_utc": "2026-10-20T03:55:53.279189+00:00",
+      "route": "/trade"
+    },
+    {
+      "state": "shortfall",
+      "screenshot": "buy-disconnect-shortfall.png",
+      "observed_at_utc": "2026-10-20T03:55:54.651023+00:00",
+      "route": "/trade"
+    },
+    {
+      "state": "receipt",
+      "screenshot": "buy-disconnect-receipt.png",
+      "observed_at_utc": "2026-10-20T03:55:55.604339+00:00",
+      "route": "/trade"
+    },
+    {
+      "state": "stale-quote",
+      "screenshot": "buy-disconnect-stale-quote.png",
+      "observed_at_utc": "2026-10-20T03:55:55.722429+00:00",
+      "route": "/trade"
+    },
+    {
+      "state": "unknown-result",
+      "screenshot": "buy-disconnect-unknown-result.png",
+      "observed_at_utc": "2026-10-20T03:55:57.618623+00:00",
+      "route": "/trade"
+    }
+  ],
+  "database_assertions": {
+    "trades": 2,
+    "cash_vnd": 71972000,
+    "shares": 1001
+  },
+  "limitations": [
+    "Author QA, not independent-machine acceptance.",
+    "Page captures exclude browser chrome/address bar; not M3 submission screenshots.",
+    "Stale quote is a controlled temporary-database fixture.",
+    "Portfolio transition remains pending #81."
+  ]
+}

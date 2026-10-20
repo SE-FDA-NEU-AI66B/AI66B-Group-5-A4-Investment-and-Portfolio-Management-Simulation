@@ -415,6 +415,20 @@ def test_html_form_register_redirects_to_market(client):
     assert b'w@example.com' in market.data
 
 
+def test_html_form_login_lands_on_portfolio_once_route_exists(client):
+    agent, app, _db = client
+    if not any(rule.rule == '/portfolio' and 'GET' in rule.methods
+               for rule in app.url_map.iter_rules()):
+        app.add_url_rule('/portfolio', 'portfolio_fixture.index',
+                         lambda: 'portfolio')
+    register(agent)
+    response = agent.post('/login', data={
+        'email': 'a@example.com', 'password': PASSWORD,
+        'csrf_token': mint_preauth_csrf(SECRET)})
+    assert response.status_code == 302
+    assert response.headers['Location'] == '/portfolio'
+
+
 def test_html_guest_nav_shows_login_register(client):
     agent, _app, _db = client
     market = agent.get('/market')

@@ -164,6 +164,14 @@ def _do_register():
     return _set_session_cookie(redirect('/market'), token)
 
 
+def _post_login_destination():
+    """US01-AC2: reach the portfolio once #81 registers it; market until then."""
+    if any(rule.rule == '/portfolio' and 'GET' in rule.methods
+           for rule in current_app.url_map.iter_rules()):
+        return '/portfolio'
+    return '/market'
+
+
 def _do_login():
     try:
         _check_origin()
@@ -177,7 +185,7 @@ def _do_login():
         response = jsonify({'account': {'id': account.id, 'role': account.role},
                             'redirect_to': '/portfolio'})
         return _set_session_cookie(response, token)
-    return _set_session_cookie(redirect('/market'), token)
+    return _set_session_cookie(redirect(_post_login_destination()), token)
 
 
 def _do_logout():

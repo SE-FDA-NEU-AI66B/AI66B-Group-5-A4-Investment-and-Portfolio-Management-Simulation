@@ -533,3 +533,28 @@ stored quotes across a controlled restart, but provider-board comparison and
 independent review remain pending. #60 and documentation PR #97 are refreshed
 against current main; neither is merged by this reconciliation. Main's reviewed
 wireframes, real auth and buy/simulation behavior must be retained during review.
+
+### Acceptance follow-up — 20 October 2026
+
+#75's final documentation checkbox is supported by the reviewed #91 diff, which
+updated design.md, api-contract.md and ui.md together; its closed state stands.
+#76's code was merged, but its recorded Portfolio/full-journey handoff remains
+unfinished. It is reopened for that acceptance work and the new buy UI fixes;
+the earlier closed-state notes describe GitHub's state on 19 October only.
+See [buy acceptance evidence](buy-acceptance.md). No additional points are added
+and no final velocity is inferred from this update. #59 still needs provider-board
+comparison and independent acceptance; #74's confirmed planning remains complete.
+
+
+### Added UI scope - 20 October 2026, PO-authorized
+
+Issue #101 adds 2 points for the Market-to-Buy presentation and stock picker.
+Historical commitment remains **52 points**, 13/member. Added scope is **2**;
+current total scope is **54**: @bianh13 15/54 (27.8%), and each other member
+13/54 (24.1%). The PO explicitly authorized the departure from equal allocation;
+no new unanimous team agreement is claimed. #101 has zero completed points
+until accepted, independently reviewed and merged. Existing estimates and
+owners are unchanged; neither a new issue nor screenshots establish velocity.
+
+#101 supports US03/US04/US10 and does not replace #85 stock search/detail,
+#81 Portfolio, #79 sell, #83 independent SETUP or #88 submission work.
