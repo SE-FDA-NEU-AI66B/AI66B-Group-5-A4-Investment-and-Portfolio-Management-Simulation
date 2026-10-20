@@ -53,8 +53,14 @@ def main():
                 page.get_by_role("button", name="Confirm buy").click()
                 expect(page.locator("#result")).to_contain_text("Holding: 1000 shares")
 
-                page.goto(f"{base}/trade?side=sell&symbol=HPG")
+                page.get_by_role("link", name="Market", exact=True).click()
+                page.get_by_role("link", name="Sell shares", exact=True).click()
+                expect(page.get_by_role("link", name="Sell shares", exact=True)).to_have_attribute(
+                    "aria-current", "page")
+                expect(page.get_by_role("link", name="Buy shares", exact=True)).not_to_have_attribute(
+                    "aria-current", "page")
                 expect(page.get_by_role("heading", name="Sell shares")).to_be_visible()
+                page.get_by_label("Stock symbol").fill("HPG")
                 page.get_by_label("Number of shares").fill("400")
                 expect(page.locator(".preview-line").filter(
                     has=page.locator("dt", has_text="Shares held")
