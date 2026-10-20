@@ -1,5 +1,6 @@
-> Provider-specific instructions: run these only on feature/dnse-market-data (PR #60).
-> The buy/simulation branch deliberately has no worker or stream command.
+> PR #60 is merged into `main` at `17c7214` (20 October 2026).
+> Run the worker from that revision or later; use a provider database separate
+> from simulation quotes.
 
 # DNSE market-data worker — #59
 
@@ -167,3 +168,20 @@ is covered by tests and displays unavailable; same-day live reference/change
 comparison remains unverified. Neither the ready flag nor passing CI closes
 these external verification items. No board comparison was completed during
 this review follow-up because no connected browser was available.
+
+## Main integration - 20 October 2026
+
+PR #60 was independently approved for worker integration and merged at
+`17c7214`, after the UI PR #102. The exact combined tree was tested locally:
+193 passed, 2 existing skips; Ruff and whitespace checks passed.
+
+An isolated copy runs the new UI and worker against the same provider database.
+At 16:44 UTC+7 the worker authenticated and DNSE acknowledged tick/reference
+subscriptions for all 12 seeded symbols. No new tick was observed during this
+check. Browser verification confirmed that the API's stored FPT/HPG values,
+original timestamps, source and stale labels match the table; this is not a
+new live-price or provider-board comparison. Seed rows remain explicitly seed.
+
+Keep #59 open at zero completed points until the outstanding provider-board
+unit/value/timestamp comparison and independent live acceptance are complete.
+The code approval and merge do not waive those criteria.

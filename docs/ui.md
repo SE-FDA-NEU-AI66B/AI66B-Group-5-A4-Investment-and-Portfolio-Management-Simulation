@@ -32,6 +32,12 @@ the target design; the table and flow distinguish implemented and planned paths.
 
 ### Screen flow (solid = on `main`, dashed = planned)
 
+Navigation follow-up after #102/#60: this branch adds a visible **Sell shares**
+header link to the existing `/trade?side=sell` form and marks the correct Buy/Sell
+tab active. Users select a symbol there; holding-specific entry from Portfolio
+still belongs to #81. The header enhancement is pending review/merge and does
+not establish the complete Portfolio-to-Sell journey.
+
 ```mermaid
 flowchart TD
     Home[Home /] -->|redirect| Market[Market list /market]
