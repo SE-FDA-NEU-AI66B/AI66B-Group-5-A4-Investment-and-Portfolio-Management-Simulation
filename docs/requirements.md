@@ -109,7 +109,7 @@ before integration. The app sends no real orders to DNSE.
 ### S2 — Khánh reviews and rebalances a holding (core product scenario)
 
 1. Inspect a held ticker's reference price and the portfolio's quantity, average cost and P&L (US03, US06).
-2. Enter a sell quantity; reject quantities above the holding, otherwise fill at the quote accepted on submission (US05).
+2. Enter a sell quantity; reject quantities above the holding, preview the quote, and confirm only if its timestamp still matches the latest stored quote. If it changed, preview again before confirming (US05).
 3. Review remaining quantity, cash, realised result and unrealised P&L (US05, US06).
 4. Open transaction history to inspect the completed sale (US08, P1 follow-up).
 
@@ -218,7 +218,7 @@ that I can open a position using virtual money instead of my own.
   120,000 VND, then the order is rejected with the message "Insufficient cash:
   this order needs 360,000,000 VND but only 72,000,000 VND is available" (BR1).
 - Given the order form, when I submit a buy for 0 shares, then it is rejected
-  with "Quantity must be a whole number of at least 1 share".
+  with the exact message `Quantity must be a whole number of at least 1 share.`
 
 ### US05 - Place a market sell order · P0 · 5 points · Screen: `/trade`
 
@@ -235,9 +235,15 @@ that I can realise a profit or cut a loss.
   grows by 30,000,000 VND (BR2, BR3).
 - Given I hold 500 HPG, when I try to sell 800 HPG, then the order is rejected
   with "You hold 500 HPG; the maximum you can sell is 500" (BR2).
-- Given HPG is quoted at 28,000 VND at 09:15:00 and I submit a sell at
-  09:15:03, when the quote changes to 27,500 VND at 09:15:10, then my order is
-  filled at 28,000 VND (BR3).
+- Given I preview HPG at 28,000 VND with quote time 09:15:00 and confirm at
+  09:15:03 while that quote is still current and valid, then the order fills at
+  28,000 VND. A later quote of 27,500 VND at 09:15:10 does not change that
+  already-committed fill (BR3).
+- Given I preview HPG at 28,000 VND at 09:15:00, when the stored quote changes
+  to 27,500 VND at 09:15:10 before I confirm using the old preview, then the
+  server returns 409 `QUOTE_CHANGED` with "Price changed; refresh the preview
+  before confirming."; cash, holdings and trades remain unchanged. After
+  previewing the new quote, I can explicitly confirm at 27,500 VND (BR3).
 
 ### US06 - View portfolio holdings with average cost and unrealised P&L · P0 · 3 points · Screen: `/portfolio`
 
@@ -425,7 +431,7 @@ and rounding for BR6. These documents do not mark trading/auth services implemen
 |----|------|----------------|
 | BR1 | An order may not cost more than the available cash balance. | Cash 100,000,000 VND. Buy 1,000 HPG at 28,000 VND = 28,000,000 VND → accepted, cash falls to 72,000,000 VND. Then buy 3,000 FPT at 120,000 VND = 360,000,000 VND → rejected: the order needs 360,000,000 VND but only 72,000,000 VND is available. |
 | BR2 | An account may sell at most the quantity it currently holds. Short selling is not allowed. | Hold 500 HPG. Sell 500 → accepted, holding becomes 0. Sell 800 → rejected: "You hold 500 HPG; the maximum you can sell is 500." |
-| BR3 | A market order is filled at the latest quoted price at the moment the order is submitted. | FPT is quoted at 120,000 VND at 09:15:00; the order is submitted at 09:15:03; the quote moves to 121,500 VND at 09:15:10. Buying 100 FPT costs 12,000,000 VND (filled at 120,000), not 12,150,000 VND. |
+| BR3 | Confirmation revalidates the preview's exact quote timestamp against the latest valid stored quote inside the order transaction. A changed quote rejects the order without writes and requires a new preview; a later tick never changes a committed fill. | Preview FPT at 120,000 VND at 09:15:00 and confirm at 09:15:03 while unchanged: 100 shares cost 12,000,000 VND. If the quote changes before confirmation, return 409 QUOTE_CHANGED; preview again and explicitly confirm the new quote. |
 | BR4 | A stop-loss order triggers automatically and closes the entire position as soon as the market price reaches or falls below the threshold. A take-profit order triggers the same way once the price reaches or rises above its threshold. Default thresholds are 5% below and 10% above the average cost basis. | Holding 100 shares of X at a cost basis of 25,000 VND. Stop-loss set at 23,750 VND (−5%). Price reaches 23,750 VND → the system sells all 100 shares for 2,375,000 VND, realizing a loss of 125,000 VND. |
 | BR5 | The initial virtual capital is fixed for every new account | Every new account receives exactly 100,000,000 VND. |
 | BR6 | Buying more of a symbol already held recalculates the average cost as a weighted average of every purchase. Selling does not change the average cost. | Buy 100 HPG at 28,000 VND (2,800,000 VND), then 100 HPG at 32,000 VND (3,200,000 VND). Total 200 shares for 6,000,000 VND, so the average cost is 30,000 VND - not 32,000 VND. Selling 100 HPG at 35,000 VND still leaves the average cost of the remaining 100 shares at 30,000 VND. |

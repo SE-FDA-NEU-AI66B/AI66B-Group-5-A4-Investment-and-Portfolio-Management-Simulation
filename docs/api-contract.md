@@ -168,7 +168,7 @@ For US04's 3,000 FPT at 120,000 VND and cash 72,000,000, return 409:
 For quantity 0, fractional/string/bool quantities, return 422:
 
 ```json
-{"error":{"code":"INVALID_QUANTITY","message":"Quantity must be a whole number of at least 1 share","details":{"field":"quantity"}}}
+{"error":{"code":"INVALID_QUANTITY","message":"Quantity must be a whole number of at least 1 share.","details":{"field":"quantity"}}}
 ```
 
 POST `/api/orders/sell` uses the same request shape. Selling all 1,000 HPG bought
@@ -195,6 +195,11 @@ Do not silently fill from a different timestamp or from an invalid future time.
 Re-check affordability/availability using the accepted snapshot, then update
 cash, the unique holding pair and trade together; roll back on any error.
 A tick arriving after this transaction does not change the recorded fill.
+
+Acceptance clarification (#106): clicking Preview is not submitting a fill.
+A changed `expected_quote_at` before Confirm is rejected without writes, even
+when the numeric price happens to be unchanged. The investor must preview again
+and explicitly confirm; a price movement after commit cannot revise that trade.
 
 Cost allocation follows [the exact rounding decision](money-rules.md). Delete
 the holding on a full sale. Seed quotes can support a deliberately refreshed
