@@ -58,6 +58,26 @@ Provider error text is not logged because it may echo credentials; authenticatio
 or subscription rejection stops safely. Network closures reconnect with fresh
 authentication/subscription and a 1–60 second bounded backoff.
 
+### Explicit retry policy
+
+| Condition | Worker behavior | Recovery |
+|-----------|-----------------|----------|
+| Network/timeout/WebSocket exception, or normal socket closure | Reconnect with 1–60 second backoff; authenticate and subscribe again | Automatic; last stored quotes remain available |
+| `auth_error` | Stop with a fixed authentication error | Check credentials/access, then restart |
+| Provider `error`, before or after subscription | Stop with a fixed provider-error message | Check subscription/access and provider status, then restart |
+| Invalid welcome/protocol, or SQLite failure | Stop rather than discard accepted data | Correct the protocol/storage problem before restart |
+| Malformed/unsupported market event | Reject that event and continue | No price overwrite |
+
+Stopping on provider `error` is intentional and is **not limited to auth failures**.
+The reviewed [official client](https://github.com/dnse-tech/openapi-sdk/blob/main/python/dnse/websocket/client.py)
+does not establish a retryable-code contract used by this adapter. We do not
+infer recoverability from free-form provider messages. Consequently, an explicit
+error caused by a temporary provider problem also needs an operator restart;
+automatic recovery currently covers transport/session closure only. A later
+retryable-error allowlist needs documented provider semantics and tests first.
+Tests exercise fatal errors before/after subscription through `run_feed`, assert
+no retry and unchanged quotes, and verify provider payloads are not echoed.
+
 No historical REST bootstrap is included. Reference streams may not emit on
 every connection; missing reference stays explicit rather than invented.
 
@@ -100,3 +120,50 @@ reference events, zero persisted DNSE quotes. No secret or raw payload was logge
 This verifies access only. Quote value/unit/provider-time comparison and live
 disconnect/restart acceptance still need an observation with actual events;
 #59 and #60 remain incomplete and must not be marked accepted from these results.
+
+## Live ticks and controlled restart — 19 October 2026
+
+Tested application commit: `31d4f0a2db81e33567bddfbd412d0419ab94799d`.
+The [sanitized observation report](evidence/dnse-live-2026-10-19.json) records
+only public quote fields, counters and verification outcomes; it contains no
+credentials, account data or raw authentication payloads.
+
+At 10:43:31 UTC+7, a 25-second read-only session authenticated, subscribed and
+received five tick events. SQLite stored FPT at 57,800 VND and HPG at 20,900 VND
+with original provider timestamps and `source=dnse`. These are observations at
+those timestamps, not current-price promises or independently verified values.
+
+A separate temporary database was then used for two 25-second sessions starting
+at 10:44:51 and 10:45:16 UTC+7. The first received seven ticks. After stopping
+that connection, recreating Flask over the same database preserved the exact
+stored rows and `/api/market/quotes` still returned HTTP 200. A newly authenticated
+and subscribed connection received nine more ticks; the API then exposed FPT at
+57,700 VND and HPG at 20,950 VND with fresh provider timestamps and `stale=false`.
+The market HTML route returned HTTP 200 after each session. This verifies a
+controlled stop/reconnect and application recreation, not a real network-outage
+backoff test or a browser rendering test. Automated local-server tests cover
+the reconnect/backoff behavior separately.
+
+Neither probe received reference events, so live `previous_close_vnd` and
+`change` correctly remained null. Comparison against the public DNSE board
+has not been completed: no browser connection was available in this session.
+The final price/unit comparison acceptance criterion and independent review
+remain unchecked; #59 stays open with zero completed points.
+
+### Outstanding board comparison and reference verification
+
+The `x1000` conversion is the adapter's G1 equity unit assumption. The observed
+57,800/20,900 VND values and the [DNSE equity example](https://developers.dnse.com.vn/docs/guide/market-data/connect/)
+are consistent with it, but do not independently verify it against the board.
+Before acceptance, record a matching ticker and observation time, the raw
+provider price/timestamp, the stored/API VND price, and the board price with
+its displayed unit; include the board URL/screenshot and exact tested commit.
+A current board quote cannot prove the value of an earlier intraday tick.
+
+The [provider guide](https://developers.dnse.com.vn/docs/guide/market-data/connect/)
+describes security definitions as scheduled batch data rather than per-tick
+updates. Our midday probes received no such event. Missing-reference behavior
+is covered by tests and displays unavailable; same-day live reference/change
+comparison remains unverified. Neither the ready flag nor passing CI closes
+these external verification items. No board comparison was completed during
+this review follow-up because no connected browser was available.
