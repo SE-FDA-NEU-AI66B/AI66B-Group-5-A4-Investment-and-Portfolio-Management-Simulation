@@ -1,0 +1,7 @@
+/* Portfolio-only additions; layout, colours and tables come from market.css. */
+.metric .warn,.warn{color:#e5b55a}
+.unpriced{color:#6f7787}
+.portfolio-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:18px 0 0}
+.portfolio-row-actions{white-space:nowrap}
+.portfolio-row-actions .row-action{gap:0;margin-right:6px}
+.market-panel+footer,.market-summary+footer{margin-top:24px}
