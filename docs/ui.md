@@ -19,7 +19,7 @@ behavior not on `main`) and **open PR work**.
 | ----- | --------- | ----- | ------ | ----- | ----- |
 | US01 - Register / sign in | Register, Login | `/register`, `/login` | partly works | [#77](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/77) | Implemented: both pages, session cookie, CSRF, lockout; #105 sends form login to the Portfolio once its real GET route exists (#81), otherwise to the Market list; registration still lands on the Market list. Planned: return to the page the guest came from via a local `next` (proposed). |
 | US02 - Initial virtual capital | Register, Market list, Trade | `/register`, `/market`, `/trade` | partly works | [#78](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/78) | On main: 100,000,000 VND granted once at registration; Trade shows cash. Merged PR #99: Market-header balance, additional tests and [author screenshot](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/blob/7dcd74f/docs/images/ui/grant-balance.png). Planned: Portfolio balance (#81). |
-| US03 - Find a stock and inspect its quote | Market list, Stock detail | `/market`, `/market/<symbol>` | partly works | [#85](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/85) | Implemented: Market list only. Planned (#85): search (`?q=`, proposed) and Stock detail. No additional implementation PR is listed in this snapshot. |
+| US03 - Find a stock and inspect its quote | Market list, Stock detail | `/market`, `/market/<symbol>` | partly works | [#85](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/85) | Implemented: stored-quote list, case-insensitive symbol/company search (`?q=`), stock detail, quote-detail JSON, unknown-ticker state and Market-to-detail-to-Buy navigation. Browser evidence/review remain before changing the status to works. |
 | US04 - Buy shares | Market list, Trade | `/market`, `/trade` | partly works | [#76](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/76) | Implemented on main via #92: Market Buy shares link, guest guard, authenticated preview and purchase receipt. Planned: Stock detail entry and Portfolio transition (#81). |
 | US05 - Sell shares | Portfolio, Trade | `/portfolio`, `/trade?side=sell&symbol=HPG` | partly works | [#79](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/79) | Merged PR #98: sell preview/confirm, partial/full sale and oversell warning; [author browser evidence](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/tree/28fe0ee/docs/images/ui) from 19 October. Planned: Sell entry from a Portfolio holding (#81). |
 | US06 - View portfolio | Portfolio | `/portfolio` | not started | [#81](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/81) | Planned: a "Portfolio" header link for signed-in users. |
@@ -158,9 +158,9 @@ Confirm Password and its error are proposed; the current form has Email and Pass
 *The user comes here to find a stock by ticker or company name and see whether
 its price is fresh.*
 
-**Calls:** `GET /api/market/quotes` (list; designed, JSON owner agreed with #59/#75).
-Until the JSON endpoint lands the page renders the same data
-server-side from `market_snapshot`. Search uses `GET /market?q=<text>`.
+**Calls:** `GET /api/market/quotes?q=<text>` (list) and
+`GET /api/market/quotes/<symbol>` (detail). Both project the same stored quote
+data as the server-rendered page. Search uses `GET /market?q=<text>`.
 
 ```text
 +- Data -----------------------------------------+  +- Empty (no match) ---------------------+
@@ -187,10 +187,10 @@ mode, calls `POST /api/simulation/quotes/refresh` (#75), and the Source column
 then reads **Simulation / generated** with the generation time. Seed rows keep
 the **Demo / seed** label. Simulated data is never called live DNSE data.
 
-Time zone (**proposal, not yet agreed**): the template shows UTC today. Showing
-local time with an explicit zone label, e.g. `09:15 30/09/2026 (UTC+7)`, is the
-fix #87 will validate against the running screen. Likewise `?q=` is a proposed
-query name until #85 and the API owner confirm it.
+Time zone: browser rendering uses Vietnam time with an explicit `UTC+7` label;
+the original ISO timestamp remains in the `time` element for traceability. `q`
+is the implemented optional symbol/company search parameter on the HTML list
+and quote-list API.
 
 Rules: search text is preserved on retry and after a failed load; the retry
 button appears for transient read failures only; narrow screens stack each row
@@ -201,7 +201,7 @@ as a card so price, time and status stay visible without horizontal scrolling.
 *The user comes here to understand one stock's price, daily movement and
 freshness before deciding to buy.*
 
-**Calls:** `GET /api/market/quotes/{symbol}` (designed).
+**Calls:** `GET /api/market/quotes/{symbol}` (implemented against stored quotes).
 
 ```text
 +--------------------------------------------------+
