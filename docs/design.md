@@ -458,3 +458,11 @@ server-supplied values, retains uncertain-POST locking and makes no automatic
 trade retries. Existing #98 sell metadata/receipt behavior is retained for
 integration, without implementing or taking ownership of the sell service.
 Portfolio, market search/detail and DNSE acceptance remain with #81/#85/#59.
+
+
+The #101 dark-board follow-up serializes the same public quote snapshot into
+HTML for initial watchboard/breadth rendering; polling still uses the existing
+GET /api/market/quotes. No additional database query or provider endpoint is
+introduced. All derived counts and movers are scoped to displayed rows and
+exclude missing reference changes. Price-cell flashes occur only when the stored
+price changes and respect prefers-reduced-motion.

@@ -38,11 +38,27 @@ def main(evidence_dir):
                 page.on("pageerror", lambda error: errors.append(str(error)))
                 page.goto(f"http://127.0.0.1:{server.server_port}/")
                 expect(page.get_by_role("link", name="Buy HPG", exact=True)).to_be_visible()
+                expect(page.locator("#breadth-board .breadth-cell")).to_have_count(4)
+                expect(page.locator("#ticker-strip .ticker-tile")).to_have_count(6)
+                expect(page.locator("#movement-rows tr")).to_have_count(5)
                 capture(page, "market-desktop")
                 page.get_by_role("link", name="Buy HPG", exact=True).focus()
                 # Verify the per-row action and keyboard focus survive polling.
                 expect(page.locator("#refresh-status")).to_contain_text("Snapshot refreshed", timeout=10000)
                 expect(page.get_by_role("link", name="Buy HPG", exact=True)).to_be_focused()
+                # Missing DNSE references must not become flat/zero-change movers.
+                snapshot = page.request.get(f"http://127.0.0.1:{server.server_port}/api/market/quotes").json()
+                for quote in snapshot["quotes"][:2]:
+                    quote.update(source="dnse", change=None, previous_close_vnd=None)
+
+                def missing_reference(route):
+                    route.fulfill(json=snapshot)
+
+                page.route("**/api/market/quotes", missing_reference)
+                expect(page.locator(".breadth-cell.unclassified strong")).to_have_text("2", timeout=10000)
+                expect(page.locator("#movement-rows")).not_to_contain_text("ACB")
+                expect(page.locator("#movement-rows")).not_to_contain_text("BID")
+                page.unroute("**/api/market/quotes", missing_reference)
                 page.get_by_role("link", name="Buy HPG", exact=True).click()
                 expect(page.get_by_label("Stock symbol")).to_have_value("HPG")
                 expect(page.locator("#selected-name")).to_contain_text("Hoa Phat")

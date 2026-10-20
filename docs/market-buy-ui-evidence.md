@@ -67,3 +67,15 @@ combined: retain the side-aware new trade template/handler, and carry #99's
 Market balance into the shared header only on Market (not a stale balance on
 Trade). These checks do not approve or merge the teammates' PRs, or establish a
 visible Portfolio-to-Sell entry; the sell scenario explicitly visits its route.
+
+
+## Requested dark price-board revision
+
+The current captures use the PO-requested red/charcoal theme. The layout was
+informed by the public [DNSE board](https://banggia.dnse.com.vn/): compact quote
+columns and clear reference/movement information. VirtuTrade keeps its own
+branding and only renders available fields. The watchboard and movement/count
+panels use the same stored snapshot; they are not VNINDEX/VN30 data. Browser QA
+also verifies that two quotes with missing references count as unclassified and
+are excluded from movers. This explicit read-response fixture is not provider
+verification. The two buy scenarios remain covered under the revised theme.
