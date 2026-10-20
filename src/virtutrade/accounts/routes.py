@@ -13,6 +13,13 @@ blueprint = Blueprint('accounts', __name__, template_folder='templates')
 
 SESSION_COOKIE = 'vt_session'
 SESSION_MAX_AGE = 12 * 3600
+UI_ERROR_HINTS = {
+    'EMAIL_IN_USE': 'Sign in with this email, or register with another one.',
+    'INVALID_CREDENTIALS': 'Check both fields and try again.',
+    'LOGIN_LOCKED': 'You can sign in again when the countdown ends.',
+    'CSRF_FAILED': 'Reload the page and try again.',
+    'ACCOUNT_DISABLED': 'This account is disabled and cannot be used to sign in or trade.',
+}
 
 
 def init_auth(app):
@@ -89,7 +96,8 @@ def _fail(exc):
     token = service.mint_preauth_csrf(current_app.config['SECRET_KEY'])
     page = ('accounts/login.html' if 'login' in request.path
             else 'accounts/register.html')
-    return render_template(page, error=exc.message, csrf_token=token,
+    return render_template(page, error=exc.message, error_code=exc.code,
+                           error_hint=UI_ERROR_HINTS.get(exc.code), csrf_token=token,
                            email=request.form.get('email', '')), exc.status
 
 
@@ -219,7 +227,8 @@ def _do_logout():
 @blueprint.get('/register')
 def register_page():
     token = service.mint_preauth_csrf(current_app.config['SECRET_KEY'])
-    return render_template('accounts/register.html', error=None,
+    return render_template('accounts/register.html', error=None, error_code=None,
+                           error_hint=None,
                            csrf_token=token, email='')
 
 
@@ -232,7 +241,8 @@ def register():
 @blueprint.get('/login')
 def login_page():
     token = service.mint_preauth_csrf(current_app.config['SECRET_KEY'])
-    return render_template('accounts/login.html', error=None,
+    return render_template('accounts/login.html', error=None, error_code=None,
+                           error_hint=None,
                            csrf_token=token, email='')
 
 

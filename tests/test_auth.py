@@ -444,6 +444,26 @@ def test_html_form_error_status(client):
         'email': 'a@example.com', 'password': PASSWORD, 'csrf_token': token})
     assert response.status_code == 409
     assert b'Email already in use' in response.data
+    assert b'Sign in with this email, or register with another one.' in response.data
+    assert b'id="auth-error"' in response.data
+    assert b'aria-describedby="auth-error"' in response.data
+
+
+def test_html_error_hint_does_not_change_the_json_error_contract(client):
+    agent, _app, _db = client
+    register(agent)
+    html = agent.post('/login', data={
+        'email': 'a@example.com', 'password': WRONG_PASSWORD,
+        'csrf_token': mint_preauth_csrf(SECRET)})
+    assert html.status_code == 401
+    assert b'Invalid email or password' in html.data
+    assert b'Check both fields and try again.' in html.data
+    assert b'aria-invalid="true"' in html.data
+
+    api = login(agent, password=WRONG_PASSWORD)
+    assert api.status_code == 401
+    assert api.get_json()['error'] == {
+        'code': 'INVALID_CREDENTIALS', 'message': 'Invalid email or password', 'details': {}}
 
 
 def test_same_origin_mismatch_rejected(client):
