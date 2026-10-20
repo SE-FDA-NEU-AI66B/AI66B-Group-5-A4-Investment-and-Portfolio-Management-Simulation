@@ -126,6 +126,7 @@ ever retried automatically and nothing is sent to a broker.
 | Preview fails with *"Price may be delayed. Wait for a fresh market quote…"* (HTTP 409) and there is no Generate button | You are in seed mode (rows say *Demo / seed*). Switch `.env` to simulation (step 2), run `init-demo`, and restart. |
 | Logged out after restarting the server | `SECRET_KEY` is empty, so a new key was generated. Log in again, or set a private `SECRET_KEY` in `.env`. |
 | `Account locked. Try again in 900 seconds.` | Five wrong passwords in a row lock the account for 15 minutes. Wait, or register another disposable `@example.test` account. |
+| `bash: [200~…: command not found` in Git Bash | The terminal added bracketed-paste characters. Retype the command, or paste with a right-click instead of Ctrl+V. |
 | Address/port already in use | Set `PORT=5001` in `.env`, restart and open http://127.0.0.1:5001/. |
 | Market data is unavailable (503) | Check `DATABASE_PATH` and permissions, run `init-demo` (or `init-db`) with the same `.env`, and read the server log. |
 | Linux cannot create venv | Install the OS's venv package (Debian/Ubuntu: `python3-venv`), then repeat. |
@@ -163,18 +164,18 @@ To fill the environment rows accurately, run this in the clone after step 1:
 
 | Field | Value |
 |-------|-------|
-| Tested by | pending |
-| Date | pending |
-| Start → end (clone → story done) | pending |
-| OS | pending |
-| Python | pending |
-| Git | pending |
-| Tested commit | pending |
-| P0 story completed via UI | pending |
-| Rejection observed via UI | pending |
-| Tests | pending |
-| Evidence | pending |
-| Notes / problems met | pending |
+| Tested by | Bùi Khang Long (@longbk761-bot) |
+| Date | 2026-10-20, UTC+7 |
+| Start → end (clone → story done) | 23:32:39 → 23:39:05 (about 6.5 min); tests finished 23:43:52 |
+| OS | Windows-10-10.0.26200-SP0 (Windows 11, `DESKTOP-B5K0QRN`) |
+| Python | 3.11.9 |
+| Git | 2.53.0.windows.2 |
+| Tested commit | `e59e59d` (`feature/83-setup-verification`, main `3cb08ce` + this SETUP), fresh clone in `D:\code\verify83` (ASCII path) |
+| P0 story completed via UI | US01/US02: registered a new disposable account and saw 100,000,000 VND. US04: Generate demo quotes, then bought 1,000 HPG (`POST /api/orders/buy` 201 at 23:37:50). US05: sold 400 HPG (`POST /api/orders/sell` 201 at 23:39:05). |
+| Rejection observed via UI | US10/BR1: 5,000 HPG showed "Exceeds available balance by … VND. Reduce the quantity." with Confirm buy disabled. BR2: selling more than held showed "You hold 1,000 HPG; the maximum you can sell is 1,000." |
+| Tests | `pytest -q`: 196 passed, 2 skipped in 27.37 s |
+| Evidence | Captured during the timed run: [buy receipt, order #1](images/setup-m3/buy-receipt.png), [US10 rejection](images/setup-m3/us10-rejection.png), [BR2 oversell](images/setup-m3/sell-oversell.png), [sell receipt, order #2](images/setup-m3/sell-receipt.png) |
+| Notes / problems met | (1) Git Bash pasted `[200~` before a command, so it was retyped (added to Troubleshooting). (2) A second VS Code terminal opened in an older checkout, so the tester ran `cd` into the clone first. The tester wrote this SETUP update but did not write US04/US10/US05 (#76/#79), so this is a non-author check of those stories. A run by a teammate who did not edit SETUP is still welcome, and so is a re-run after #81 (#103) merges to cover Portfolio. |
 
 M2 record, kept for history only: on 3 October the PO did a local clean-clone check on
 Windows/Python 3.10.11 at commit `b5fdb0f` ([handoff](m2-po-handoff.md)). It was
