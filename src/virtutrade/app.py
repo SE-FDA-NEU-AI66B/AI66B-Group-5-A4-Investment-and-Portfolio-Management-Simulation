@@ -17,7 +17,8 @@ def create_app(config=None):
     if config:
         app.config.update(config)
     # Compose infrastructure here; controllers/services do not select a database.
-    app.extensions['market_reader_factory'] = lambda: SQLiteQuoteRepository(app.config['DATABASE'])
+    app.extensions['market_reader_factory'] = lambda: SQLiteQuoteRepository(
+        app.config['DATABASE'], provider_only=app.config.get('QUOTE_MODE') == 'dnse')
     app.register_blueprint(accounts_blueprint)
     app.register_blueprint(market_blueprint, url_prefix='/market')
     app.register_blueprint(api_blueprint, url_prefix='/api/market')

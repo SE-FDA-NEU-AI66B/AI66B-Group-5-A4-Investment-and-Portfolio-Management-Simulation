@@ -81,7 +81,9 @@
     }
     document.getElementById("instrument-total").textContent = `${quotes.length} symbols`;
     document.getElementById("symbol-count").textContent = `${quotes.length} symbols · VND`;
-    document.getElementById("data-notice").textContent = quotes.some(q => q.source === "simulation")
+    document.getElementById("data-notice").textContent = document.body.dataset.quoteMode === "dnse"
+      ? "DNSE market data · Latest available trades, including outside trading hours. Check quote times; delayed prices cannot be used for orders. Symbols awaiting DNSE data are hidden; demo prices are excluded."
+      : quotes.some(q => q.source === "simulation")
       ? "Simulation / generated · Scenario reference prices, not live DNSE data."
       : quotes.some(q => q.source === "dnse")
       ? "DNSE market data · Last received prices. Check timestamps and sources; some rows may still contain demo data. No real money or market orders."
