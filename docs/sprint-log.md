@@ -558,3 +558,42 @@ owners are unchanged; neither a new issue nor screenshots establish velocity.
 
 #101 supports US03/US04/US10 and does not replace #85 stock search/detail,
 #81 Portfolio, #79 sell, #83 independent SETUP or #88 submission work.
+
+## Sprint 4 - Milestone 4
+
+**Window:** opened 23 October 2026, 00:00; LMS due 3 November 2026,
+00:00 (UTC+7). Submit during 2 November. **PO and Scrum Master:** @bianh13
+(Thanh). Long was the Sprint 3 Scrum Master. [Milestone board](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/milestone/3).
+
+**Initial commitment: 40 points, exactly 10 per person.** This is the planning
+allocation, not a claim of acceptance or completed velocity. Portfolio #81 is
+the 5-point carry-over from Sprint 3 and remains open; PR #103 currently
+conflicts with main. Its old Sprint 3 work earns no Sprint 4 completed points
+until the feature and evidence are accepted in this sprint. Do not double-count
+its estimate across sprint velocities.
+
+| Owner | Issues (points) | Total |
+|---|---|---:|
+| Thanh @bianh13 | #114 PO backlog (1), #115 SM closeout (1), #116 Buy error states (3), #117 US04/US10 tests (3), #118 testing dossier (2) | **10** |
+| Tue @nguyentue110 | #119 US01/US02 tests (4), #120 US05 tests (4), #121 boundary/mutation audit (2) | **10** |
+| Long @longbk761-bot | #81 Portfolio carry-over (5), #122 US06 tests (3), #123 independent SETUP/pytest (2) | **10** |
+| Vu @VuSiSi | #124 US03 tests (4), #125 Market four-state UI (4), #126 final PDF (2) | **10** |
+
+P0 story coverage: US01/US02 → #119; US03 → #124/#125; US04/US10 →
+#116/#117; US05 → #120; US06 → #81/#122. #118 integrates the required
+four-section `docs/testing.md` from actual case IDs and tests. #123 verifies
+SETUP/pytest independently. #126 prepares the PDF only from merged evidence.
+
+**Review rotation:** Thanh reviews Tue, Tue reviews Long, Long reviews Vu,
+and Vu reviews Thanh. Every member must author at least one test, contribute
+one independently reviewed merged PR, give a substantive review, and close an
+accepted issue. No author self-review counts. Target first reviewable PRs by
+29 October; prioritize Long's #103 conflict before new Portfolio tests.
+The final three days, 31 October–2 November, are for integration, evidence
+and submission rather than a burst of first-time merges.
+
+**Progress as of 27 October:** issues assigned; accepted/completed points and
+velocity **pending review and merge**. The team has not yet recorded each
+member's acceptance of this new allocation. #114 remains open until that
+confirmation and its planning PR are complete. #115 remains open until actual
+final evidence, merge counts and submission are reconciled.

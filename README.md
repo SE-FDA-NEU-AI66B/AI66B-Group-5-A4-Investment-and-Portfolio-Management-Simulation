@@ -1,7 +1,25 @@
 # AI66B - Group 5 - Topic A4: Investment & Portfolio Management Simulation (Paper Trading)
 
+## Sprint 4 / Milestone 4: current work
 
-## Sprint 3 / Milestone 3: start here
+**Product Owner and Scrum Master:** @bianh13 (Thanh). Sprint 4 opened
+**23 October 2026, 00:00** and the LMS submission is due **3 November 2026,
+00:00 (UTC+7)**; submit during 2 November. [Assigned issues](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/milestone/3)
+· [Sprint plan](docs/sprint-log.md#sprint-4---milestone-4)
+· [SETUP](docs/SETUP.md).
+
+The team is building executable tests and four-state UI evidence for P0 stories
+US01–US06 and US10. Portfolio issue #81 and PR #103 are carried into this sprint;
+the PR currently conflicts with `main` and requires Long's repair and peer review.
+The merged app already supports account access, stored Market data, and virtual
+Buy/Sell; Portfolio must not be presented as complete until its PR merges.
+
+Sprint 4 commitment is **40 points, 10 per member**. The team targets the first
+reviewable PR from every member by 29 October, leaving 31 October–2 November
+for integration checks and submission evidence.
+
+
+## Sprint 3 / Milestone 3: historical plan
 
 **Product Owner:** @bianh13 · **Scrum Master:** @longbk761-bot (Long).
 M3 opens **9 October 2026, 00:00** and is due **21 October 2026, 00:00 (UTC+7)**;
@@ -120,7 +138,7 @@ http://127.0.0.1:5000/market; expect 12 symbols with a **Demo / seed** label.
 
 * **Product Owner:** [bianh13](https://github.com/bianh13)
 
-* **Scrum Master for Sprint 3 (current):** [longbk761-bot](https://github.com/longbk761-bot). Previous: Sprint 1 [VuSiSi](https://github.com/VuSiSi); Sprint 2 [nguyentue110](https://github.com/nguyentue110).
+* **Scrum Master for Sprint 4 (current):** [bianh13](https://github.com/bianh13). Previous: Sprint 1 [VuSiSi](https://github.com/VuSiSi); Sprint 2 [nguyentue110](https://github.com/nguyentue110); Sprint 3 [longbk761-bot](https://github.com/longbk761-bot).
 
 * **Definition of Done:** [docs/definition-of-done.md](docs/definition-of-done.md)
 
