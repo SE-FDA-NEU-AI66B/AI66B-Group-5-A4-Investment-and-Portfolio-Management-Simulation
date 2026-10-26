@@ -55,8 +55,8 @@
       const controller = new AbortController(); const timeout = setTimeout(() => controller.abort(), 5000); let response; let data;
       try { const suffix = query ? `?q=${encodeURIComponent(query)}` : ""; response = await fetch(`/api/market/quotes${suffix}`, {cache: "no-store", signal: controller.signal}); data = await response.json(); } finally { clearTimeout(timeout); }
       if (!response.ok || !Array.isArray(data.quotes)) throw new Error("Unavailable");
-      update(data.quotes); document.getElementById("market-error")?.setAttribute("hidden", ""); retry.hidden = true; status.classList.remove("delayed"); status.textContent = "Snapshot refreshed. Check each quote’s timestamp; prices may be delayed.";
-    } catch { retry.hidden = false; status.classList.add("delayed"); status.textContent = "Could not refresh. Displaying the last snapshot; prices may be delayed."; } finally { schedule(); }
+      update(data.quotes); document.dispatchEvent(new CustomEvent("virtutrade:quotes", {detail:data.quotes})); document.getElementById("market-error")?.setAttribute("hidden", ""); retry.hidden = true; status.classList.remove("delayed"); status.textContent = "Snapshot refreshed. Check each quote’s timestamp; prices may be delayed.";
+    } catch { document.dispatchEvent(new Event("virtutrade:quotes-error")); retry.hidden = false; status.classList.add("delayed"); status.textContent = "Could not refresh. Displaying the last snapshot; prices may be delayed."; } finally { schedule(); }
   }
   retry.addEventListener("click", refresh);
   for (const time of rows.querySelectorAll("time")) { time.title = time.dateTime; time.textContent = quoteTime(time.dateTime); }
