@@ -9,6 +9,9 @@ from virtutrade.market import blueprint as market_blueprint
 from virtutrade.market.repository import SQLiteQuoteRepository
 from virtutrade.market.routes import api_blueprint
 from virtutrade.orders.routes import blueprint as orders_blueprint
+from virtutrade.portfolio import api_blueprint as portfolio_api_blueprint
+from virtutrade.portfolio import blueprint as portfolio_blueprint
+from virtutrade.portfolio.repository import SQLitePortfolioRepository
 
 
 def create_app(config=None):
@@ -19,10 +22,15 @@ def create_app(config=None):
     # Compose infrastructure here; controllers/services do not select a database.
     app.extensions['market_reader_factory'] = lambda: SQLiteQuoteRepository(
         app.config['DATABASE'], provider_only=app.config.get('QUOTE_MODE') == 'dnse')
+    app.extensions['portfolio_reader_factory'] = (
+        lambda: SQLitePortfolioRepository(app.config['DATABASE'])
+    )
     app.register_blueprint(accounts_blueprint)
     app.register_blueprint(market_blueprint, url_prefix='/market')
     app.register_blueprint(api_blueprint, url_prefix='/api/market')
     app.register_blueprint(orders_blueprint)
+    app.register_blueprint(portfolio_blueprint, url_prefix='/portfolio')
+    app.register_blueprint(portfolio_api_blueprint, url_prefix='/api')
     init_auth(app)
 
     @app.context_processor

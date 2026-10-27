@@ -4,7 +4,7 @@
     <a href="/market" {% if current_page == 'market' %}aria-current="page"{% endif %}>Market</a>
     <a href="/trade" {% if current_page == 'trade' and side|default('buy') != 'sell' %}aria-current="page"{% endif %}>Buy shares</a>
     <a href="/trade?side=sell" {% if current_page == 'trade' and side|default('buy') == 'sell' %}aria-current="page"{% endif %}>Sell shares</a>
-    {% if portfolio_url and g.current_account %}<a href="{{ portfolio_url }}">Portfolio</a>{% endif %}
+    {% if portfolio_url and g.current_account %}<a href="{{ portfolio_url }}" {% if current_page == 'portfolio' %}aria-current="page"{% endif %}>Portfolio</a>{% endif %}
   </nav>
   <div class="account-nav"><span class="badge">PAPER TRADING</span>
     {% if g.current_account %}<span class="account-email">{{ g.current_account.email }}</span>{% if current_page == 'market' %}<span class="account-balance">{{ g.current_account.cash_vnd|vnd }} VND</span>{% endif %}
