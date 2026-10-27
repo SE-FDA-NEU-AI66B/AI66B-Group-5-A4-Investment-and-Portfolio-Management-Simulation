@@ -98,15 +98,25 @@ PowerShell:
 
 ```powershell
 .\.venv\Scripts\python.exe -m pip install pytest
-.\.venv\Scripts\python.exe -m pytest -q
+.\.venv\Scripts\pytest.exe -v
 ```
+
+To use the instructor's literal `pytest` command in PowerShell, activate the
+environment first with `.\.venv\Scripts\Activate.ps1`, then type `pytest`.
+If PowerShell blocks activation, the `pytest.exe -v` command above runs the
+same suite without changing the machine's execution policy.
 
 macOS / Linux:
 
 ```bash
 .venv/bin/python -m pip install pytest
-.venv/bin/python -m pytest -q
+.venv/bin/pytest -v
 ```
+
+Alternatively, run `source .venv/bin/activate` and then `pytest`. Tests use
+temporary SQLite files and do not require a running server, real credentials,
+or the app's persistent database. Capture the full `python -m pytest -v`
+output for the Milestone 4 submission after all reviewed tests have merged.
 
 Run the full suite; auth and buy tests use real temporary SQLite databases and do not change the
 running demo's data. CI installs `pytest`, `pytest-cov` and `ruff` separately
