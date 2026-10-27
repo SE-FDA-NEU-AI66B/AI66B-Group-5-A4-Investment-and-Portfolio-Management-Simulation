@@ -29,6 +29,11 @@
     <section class="market-panel"><div class="section-heading"><div><h2>Price monitor</h2><p>Largest absolute percentage moves in this snapshot.</p></div></div>
       <div class="table-wrap"><table class="movement-table"><thead><tr><th>Symbol</th><th>Price (VND)</th><th>Change</th><th>Source</th></tr></thead><tbody id="movement-rows"><tr><td colspan="4">Loading snapshot&hellip;</td></tr></tbody></table></div>
     </section>
+    <section class="market-panel movement-chart-panel" aria-labelledby="change-chart-heading">
+      <div class="section-heading"><div><h2 id="change-chart-heading">Snapshot change map</h2><p>Largest percentage moves versus a valid previous close among displayed stocks.</p></div><span id="change-chart-summary">Preparing comparison</span></div>
+      <ol id="change-chart" class="change-chart"><li class="chart-empty">Preparing snapshot chart&hellip;</li></ol>
+      <p class="board-caption">Bar lengths are relative within this list. This compares stored quotes with their references; it is not a price-history chart.</p>
+    </section>
   </div>
   <footer><strong>VirtuTrade &middot; Team 05</strong><span>Learn with virtual capital. Every trade here is simulated.</span></footer>
-</main><script id="initial-quotes" type="application/json">{{ quote_payload|tojson }}</script><script src="{{ url_for('market.static', filename='market.js') }}" defer></script></body></html>
+</main><script id="initial-quotes" type="application/json">{{ quote_payload|tojson }}</script><script src="{{ url_for('market.static', filename='market.js') }}" defer></script><script src="{{ url_for('market.static', filename='charts.js') }}" defer></script></body></html>

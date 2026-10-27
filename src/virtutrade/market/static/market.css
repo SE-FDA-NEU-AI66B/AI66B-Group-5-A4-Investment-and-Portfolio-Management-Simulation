@@ -893,3 +893,39 @@ main{max-width:1600px;margin-top:25px;padding:0 28px}
 .tick-up .price{animation:quote-up 1s ease-out}.tick-down .price{animation:quote-down 1s ease-out}@keyframes quote-up{from{background:#174736}to{background:transparent}}@keyframes quote-down{from{background:#5a2432}to{background:transparent}}@media(prefers-reduced-motion:reduce){.tick-up .price,.tick-down .price{animation:none}}
 @media(max-width:1000px){.ticker-strip{grid-template-columns:repeat(3,minmax(0,1fr))}.board-grid{grid-template-columns:1fr}}
 @media(max-width:700px){main{padding:0 12px;margin-top:22px}.ticker-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.ticker-tile{padding:13px}.ticker-tile>strong{font-size:21px}.breadth-board{gap:5px;padding:10px 12px 18px}.breadth-cell{padding:16px 3px}.breadth-cell strong{font-size:26px}.breadth-cell span{font-size:9px}.terminal-heading h1{font-size:28px}.price-board th:first-child,.price-board td:first-child{min-width:100px;max-width:115px}.price-board th:last-child,.price-board td:last-child{padding:7px}.price-board .row-action{padding:7px 9px}.movement-table td,.movement-table th{padding:10px 11px}.trade-main{padding:0 16px}}
+
+/* Snapshot charts compare stored values only; no history is implied. */
+.movement-chart-panel{grid-column:1/-1}
+.change-chart{list-style:none;margin:0;padding:8px 18px 16px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:34px}
+.change-chart-row{display:grid;grid-template-columns:92px minmax(0,1fr) 70px;align-items:center;gap:12px;min-height:47px;border-bottom:1px solid #292d37}
+.change-chart-symbol{display:flex;align-items:baseline;gap:7px;min-width:0}
+.change-chart-symbol strong{font-size:12px;letter-spacing:.02em}
+.change-chart-symbol small{font-size:9px;color:var(--muted);white-space:nowrap}
+.change-chart-axis{display:grid;grid-template-columns:1fr 1fr;min-width:0;height:22px}
+.change-chart-half{display:flex;align-items:center;background:#171a21;min-width:0}
+.change-chart-half.negative{justify-content:flex-end;border-right:1px solid #77808f}
+.change-chart-bar{display:block;height:12px;min-width:3px;border-radius:3px}
+.change-chart-bar.positive{background:linear-gradient(90deg,#196c50,#39d69c)}
+.change-chart-bar.negative{background:linear-gradient(90deg,#ff667b,#9b293e)}
+.change-chart-bar.neutral{background:#f1c65d}
+.change-chart-value{text-align:right;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.chart-empty{grid-column:1/-1;padding:20px 0;color:var(--muted);font-size:12px;line-height:1.6}
+.movement-chart-panel .board-caption{padding-top:3px;padding-bottom:17px}
+
+.snapshot-comparison{margin-top:24px;border:1px solid #303541;border-radius:9px;background:#15181f}
+.snapshot-comparison .section-heading{padding:18px 20px 8px}
+.price-comparison{margin:0;padding:4px 20px 12px}
+.price-comparison-row{padding:12px 0;border-bottom:1px solid #292d37}
+.price-comparison-row:last-child{border-bottom:0}
+.price-comparison-row dt{font-size:11px;color:var(--muted);margin-bottom:8px}
+.price-comparison-row dd{margin:0;display:grid;grid-template-columns:minmax(0,1fr) 145px;align-items:center;gap:14px}
+.price-comparison-row strong{text-align:right;font-size:12px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.comparison-track{display:block;height:14px;border-radius:3px;background:#252a35;overflow:hidden}
+.comparison-fill{display:block;height:100%;border-radius:3px}
+.comparison-fill.reference{background:#77808f}
+.comparison-fill.current{background:linear-gradient(90deg,#a72943,#ff667b)}
+.snapshot-comparison .board-caption{padding:5px 20px 18px}
+.comparison-unavailable{padding:4px 20px 18px;font-size:12px;color:var(--muted);line-height:1.7}
+
+@media(max-width:1000px){.change-chart{grid-template-columns:1fr}}
+@media(max-width:700px){.change-chart{padding:4px 12px 12px}.change-chart-row{grid-template-columns:68px minmax(0,1fr) 62px;gap:7px}.change-chart-symbol{display:block}.change-chart-symbol small{display:block}.price-comparison-row dd{grid-template-columns:minmax(0,1fr) 110px;gap:8px}.price-comparison-row strong{font-size:10px}}

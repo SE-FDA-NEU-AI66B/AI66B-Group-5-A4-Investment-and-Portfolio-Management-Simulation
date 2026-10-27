@@ -50,3 +50,44 @@ def test_detail_html_unknown_and_stale_states(tmp_path):
     with sqlite3.connect(database) as connection:
         connection.execute("UPDATE price_quote SET quoted_at = '2020-01-01T00:00:00Z' WHERE id = 1")
     assert b'Price may be delayed' in client.get('/market/HPG').data
+
+
+def test_snapshot_charts_show_real_reference_and_explain_missing_one(tmp_path):
+    client, database = client_with_quotes(tmp_path)
+    market = client.get('/market')
+    assert market.status_code == 200
+    assert b'Snapshot change map' in market.data
+    assert b'not a price-history chart' in market.data
+    assert b'charts.js' in market.data
+
+    detail = client.get('/market/HPG')
+    assert detail.status_code == 200
+    assert b'Price vs previous close' in detail.data
+    assert b'27,500 VND' in detail.data and b'28,000 VND' in detail.data
+    assert b'comparison-track' in detail.data
+
+    with sqlite3.connect(database) as connection:
+        connection.execute(
+            "UPDATE price_quote SET previous_close_vnd=NULL WHERE instrument_id="
+            "(SELECT id FROM instrument WHERE symbol='HPG')"
+        )
+    missing = client.get('/market/HPG')
+    assert missing.status_code == 200
+    assert b'Reference unavailable for this snapshot' in missing.data
+    assert b'comparison-track' not in missing.data
+
+
+def test_chart_quote_source_tracks_search_and_latest_stored_price(tmp_path):
+    client, database = client_with_quotes(tmp_path)
+    before = client.get('/api/market/quotes?q=HPG').get_json()['quotes']
+    assert [row['symbol'] for row in before] == ['HPG']
+    assert before[0]['change'] == '1.82'
+
+    with sqlite3.connect(database) as connection:
+        connection.execute(
+            "UPDATE price_quote SET price_vnd=30000 WHERE instrument_id="
+            "(SELECT id FROM instrument WHERE symbol='HPG')"
+        )
+    after = client.get('/api/market/quotes?q=HPG').get_json()['quotes']
+    assert [row['symbol'] for row in after] == ['HPG']
+    assert after[0]['change'] == '9.09'
