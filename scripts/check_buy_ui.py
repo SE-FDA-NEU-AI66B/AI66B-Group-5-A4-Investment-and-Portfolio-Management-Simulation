@@ -56,7 +56,19 @@ def main(loss_mode="disconnect", evidence_dir=None):
                 expect(page.get_by_role("button", name="Log out")).to_be_visible()
                 page.get_by_role("link", name="Buy shares", exact=True).click()
                 page.get_by_label("Stock symbol").fill("HPG")
+                quantity = page.get_by_label("Number of shares")
+                for invalid_quantity in ("0", "-1", "1.5"):
+                    quantity.fill(invalid_quantity)
+                    page.get_by_role("button", name="Preview order").click()
+                    message = "Quantity must be a whole number of at least 1 share."
+                    expect(page.locator("#order-error")).to_have_text(message)
+                    assert quantity.evaluate("(input) => input.validationMessage") == message
+                    expect(page.get_by_role("button", name="Confirm buy")).to_be_disabled()
+                    expect(page.locator("#estimate")).to_be_hidden()
+                    if invalid_quantity == "0":
+                        capture(page, "zero-quantity")
                 page.get_by_label("Number of shares").fill("4000")
+                assert quantity.evaluate("(input) => input.validationMessage") == ""
                 expect(page.locator("#order-error")).to_contain_text(
                     "Exceeds available balance by 12,000,000 VND")
                 expect(page.get_by_role("button", name="Confirm buy")).to_be_disabled()

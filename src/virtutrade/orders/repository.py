@@ -9,8 +9,9 @@ from virtutrade.orders.models import Account, Holding, OrderQuote
 
 
 class OrderRepository:
-    def __init__(self, connection):
+    def __init__(self, connection, *, provider_only=False):
         self.connection = connection
+        self.provider_only = provider_only
 
     def account_for_session(self, session_id):
         row = self.connection.execute(
@@ -26,6 +27,9 @@ class OrderRepository:
             "LEFT JOIN price_quote q ON q.instrument_id=i.id WHERE i.symbol=?",
             (symbol,),
         ).fetchone()
+        if row and self.provider_only and row[4] != "dnse":
+            # Preserve the instrument identity but expose no demo price to orders.
+            row = (row[0], row[1], None, None, None)
         return OrderQuote(*row) if row else None
 
     def holding(self, account_id, instrument_id):
@@ -98,7 +102,7 @@ class OrderRepository:
 
 
 @contextmanager
-def order_unit_of_work(path, *, write=False):
+def order_unit_of_work(path, *, write=False, provider_only=False):
     connection = None
     try:
         connection = sqlite3.connect(
@@ -107,7 +111,7 @@ def order_unit_of_work(path, *, write=False):
         connection.execute("PRAGMA foreign_keys = ON")
         connection.execute("BEGIN IMMEDIATE" if write else "BEGIN")
         with connection:
-            yield OrderRepository(connection)
+            yield OrderRepository(connection, provider_only=provider_only)
     except sqlite3.Error as exc:
         raise OrderError(
             "SERVICE_UNAVAILABLE",

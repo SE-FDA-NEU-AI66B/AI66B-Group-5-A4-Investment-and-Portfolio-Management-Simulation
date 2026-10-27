@@ -2,7 +2,8 @@
   <a class="brand" href="/market"><span class="brand-mark" aria-hidden="true">V</span>VirtuTrade<span class="brand-dot">.</span></a>
   <nav class="main-nav" aria-label="Main">
     <a href="/market" {% if current_page == 'market' %}aria-current="page"{% endif %}>Market</a>
-    <a href="/trade" {% if current_page == 'trade' %}aria-current="page"{% endif %}>Buy shares</a>
+    <a href="/trade" {% if current_page == 'trade' and side|default('buy') != 'sell' %}aria-current="page"{% endif %}>Buy shares</a>
+    <a href="/trade?side=sell" {% if current_page == 'trade' and side|default('buy') == 'sell' %}aria-current="page"{% endif %}>Sell shares</a>
     {% if portfolio_url and g.current_account %}<a href="{{ portfolio_url }}" {% if current_page == 'portfolio' %}aria-current="page"{% endif %}>Portfolio</a>{% endif %}
   </nav>
   <div class="account-nav"><span class="badge">PAPER TRADING</span>

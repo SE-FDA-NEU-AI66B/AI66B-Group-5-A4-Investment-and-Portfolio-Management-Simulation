@@ -73,4 +73,7 @@ The Portfolio balance and independent verification remain pending #81/#83.
 
 - @bianh13 — Verified the reviewed and merged #75 contract against its remaining checklist and reconciled my outstanding acceptance work.
 Extended the real-auth buy browser checks with saved evidence and stale-quote recovery, then fixed the stuck loading status and obsolete cash estimate discovered during those checks.
-Synchronized the buy error documentation and added the PO-authorized #101 stock picker, responsive Market-to-Buy presentation and browser checks, while retaining the Portfolio handoff, independent review and DNSE board-comparison requirements.
+Synchronized the buy error documentation, added the PO-authorized #101 presentation and browser checks, reviewed #104's integration conflicts, addressed #106/#107, and implemented #59 latest-trade catch-up for all 12 symbols with my three-symbol provider-board confirmation, while retaining the Portfolio handoff and independent follow-up review requirement.
+
+- @nguyentue110: Fixed the #105 US01 defect by sending form login to the Portfolio whenever the real GET route is registered, keeping `/market` as the fallback until #81 merges, and added a regression test in `tests/test_auth.py`.
+Updated the design, UI and traceability notes; Portfolio screenshots and independent acceptance remain with #81/#82.

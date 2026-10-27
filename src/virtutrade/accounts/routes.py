@@ -4,6 +4,8 @@ API paths (/api/*) speak strict JSON; page paths speak HTML forms. Both share
 the service layer. Every state-changing request needs CSRF: pre-auth tokens
 for login/register, session-bound tokens afterwards.
 """
+import sqlite3
+
 from flask import Blueprint, current_app, g, jsonify, redirect, render_template, request
 from werkzeug.exceptions import BadRequest
 
@@ -13,6 +15,13 @@ blueprint = Blueprint('accounts', __name__, template_folder='templates')
 
 SESSION_COOKIE = 'vt_session'
 SESSION_MAX_AGE = 12 * 3600
+UI_ERROR_HINTS = {
+    'EMAIL_IN_USE': 'Sign in with this email, or register with another one.',
+    'INVALID_CREDENTIALS': 'Check both fields and try again.',
+    'LOGIN_LOCKED': 'You can sign in again when the countdown ends.',
+    'CSRF_FAILED': 'Reload the page and try again.',
+    'ACCOUNT_DISABLED': 'This account is disabled and cannot be used to sign in or trade.',
+}
 
 
 def init_auth(app):
@@ -31,7 +40,9 @@ def init_auth(app):
         try:
             account, session_id = service.resolve_with_id(
                 current_app.config['DATABASE'], session_token=token)
-        except errors.AuthError:
+        except (errors.AuthError, sqlite3.Error):
+            # A stale session cookie must not turn a public page's own
+            # recoverable storage state into an HTTP 500.
             return
         g.current_account = account
         g.current_session_id = session_id
@@ -89,7 +100,8 @@ def _fail(exc):
     token = service.mint_preauth_csrf(current_app.config['SECRET_KEY'])
     page = ('accounts/login.html' if 'login' in request.path
             else 'accounts/register.html')
-    return render_template(page, error=exc.message, csrf_token=token,
+    return render_template(page, error=exc.message, error_code=exc.code,
+                           error_hint=UI_ERROR_HINTS.get(exc.code), csrf_token=token,
                            email=request.form.get('email', '')), exc.status
 
 
@@ -164,6 +176,14 @@ def _do_register():
     return _set_session_cookie(redirect('/market'), token)
 
 
+def _post_login_destination():
+    """US01-AC2: reach the portfolio once #81 registers it; market until then."""
+    if any(rule.rule == '/portfolio' and 'GET' in rule.methods
+           for rule in current_app.url_map.iter_rules()):
+        return '/portfolio'
+    return '/market'
+
+
 def _do_login():
     try:
         _check_origin()
@@ -177,7 +197,7 @@ def _do_login():
         response = jsonify({'account': {'id': account.id, 'role': account.role},
                             'redirect_to': '/portfolio'})
         return _set_session_cookie(response, token)
-    return _set_session_cookie(redirect('/market'), token)
+    return _set_session_cookie(redirect(_post_login_destination()), token)
 
 
 def _do_logout():
@@ -211,7 +231,8 @@ def _do_logout():
 @blueprint.get('/register')
 def register_page():
     token = service.mint_preauth_csrf(current_app.config['SECRET_KEY'])
-    return render_template('accounts/register.html', error=None,
+    return render_template('accounts/register.html', error=None, error_code=None,
+                           error_hint=None,
                            csrf_token=token, email='')
 
 
@@ -224,7 +245,8 @@ def register():
 @blueprint.get('/login')
 def login_page():
     token = service.mint_preauth_csrf(current_app.config['SECRET_KEY'])
-    return render_template('accounts/login.html', error=None,
+    return render_template('accounts/login.html', error=None, error_code=None,
+                           error_hint=None,
                            csrf_token=token, email='')
 
 

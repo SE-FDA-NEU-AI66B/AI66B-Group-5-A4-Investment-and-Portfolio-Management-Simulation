@@ -1,10 +1,12 @@
-> Provider-specific instructions: run these only on feature/dnse-market-data (PR #60).
-> The buy/simulation branch deliberately has no worker or stream command.
+> PR #60 is merged into `main` at `17c7214` (20 October 2026).
+> Run the worker from that revision or later; use a provider database separate
+> from simulation quotes.
 
 # DNSE market-data worker — #59
 
-This optional worker authenticates only to DNSE's market-data WebSocket and
-subscribes to G1 equity tick/reference streams. It sends no broker orders, OTPs,
+This optional worker authenticates to DNSE's market-data WebSocket and signed
+latest-trade REST endpoint, subscribing to G1 equity tick/reference streams.
+It sends no broker orders, OTPs,
 trading tokens or account instructions. The browser calls our read-only quote
 API; credentials stay in the worker's environment and never enter JSON/HTML.
 
@@ -22,8 +24,13 @@ instrument reference fields and `feature_migration` ledger entry
 untouched. Failed migration rolls back DDL; a repeated successful run is harmless.
 
 Put DNSE_API_KEY and DNSE_API_SECRET in the local ignored `.env` at the checkout
-root. DNSE_SYMBOLS is a comma-separated selection of seeded equity symbols,
-for example HPG,FPT; at most 100 symbols (two streams each). Never share the file.
+root. Set `QUOTE_MODE=dnse` in **both terminals** to exclude demo prices from
+Market, the stock picker and virtual order requests. Use
+`DATABASE_PATH=instance/dnse.db`, separate from simulation.
+DNSE_SYMBOLS is a comma-separated selection of known equity symbols;
+leave it empty to receive all instruments in the database (12 initially),
+or set e.g. `HPG,FPT,MWG`; at most 100 symbols (two streams each).
+Never share the file.
 
 ```text
 python -m virtutrade init-db
@@ -43,7 +50,8 @@ Polling the stored snapshot is not proof that the provider stream is connected.
 
 ## Boundaries and handoff
 
-`dnse/worker.py` owns validation/authentication/reconnect; `dnse/repository.py`
+`dnse/snapshot.py` owns signed read-only REST requests and periodic catch-up;
+`dnse/worker.py` owns WebSocket validation/authentication/reconnect; `dnse/repository.py`
 owns newer-only writes. `market/service.py` derives percentage/freshness and
 `market/routes.py` maps HTML/JSON responses. Vu's #85 extends these same endpoints
 for search/detail; do not register a second list handler. The worker is a separate
@@ -78,8 +86,54 @@ retryable-error allowlist needs documented provider semantics and tests first.
 Tests exercise fatal errors before/after subscription through `run_feed`, assert
 no retry and unchanged quotes, and verify provider payloads are not echoed.
 
-No historical REST bootstrap is included. Reference streams may not emit on
-every connection; missing reference stays explicit rather than invented.
+### Latest prices outside trading hours
+
+`stream` starts both WebSocket ingestion and a latest-trade refresh immediately.
+It calls only `GET https://openapi.dnse.com.vn/price/{symbol}/trades/latest?boardId=G1`,
+then repeats one pass 60 seconds after the previous pass finishes.
+Requests run outside the async event loop, with a 10-second timeout per symbol,
+verified TLS, redirects disabled and a 64 KiB response limit.
+The signing protocol and pinned `version: 2026-07-23` follow the
+[official SDK](https://github.com/dnse-tech/openapi-sdk/blob/main/python/dnse/api/common.py).
+The [latest-trade API](https://developers.dnse.com.vn/docs/dnse/get-latest-trades/)
+returns the last trade even when no new tick arrives after startup.
+
+REST `time` is `YYYY-MM-DD HH:mm:ss.SSS` in GMT+7 per the official schema;
+it is stored as UTC with nine fractional digits for comparison with WebSocket events.
+G1 `matchPrice` is converted from thousands of VND with Decimal, never floats.
+An older REST response cannot overwrite a newer WebSocket tick.
+Fetching tonight does **not** change an afternoon trade's timestamp or make it fresh:
+the latest available price remains visible, while the existing 15-minute order
+freshness rule continues to block stale-price purchases/sales.
+
+Empty, malformed and failed responses preserve the last stored quote.
+REST 401/403 stops the worker with a fixed message; timeouts, rate limiting and
+other HTTP failures retry on the next pass without echoing provider bodies.
+A missing symbol stays absent in DNSE mode until valid data arrives, never
+replaced with a seed price. Demo mode remains available separately.
+
+Reference streams may not emit on every connection; missing reference stays
+explicit rather than invented. REST security definitions are deliberately not
+used as an automatic daily-reference fallback: the 20 October evening probe
+returned reference updates after 20:00, without an explicit trading date,
+so assigning them to the afternoon trade could invent a daily change.
+
+### Latest-trade verification — 20 October 2026
+
+The authenticated REST catch-up refreshed all 12 instruments on the isolated
+provider preview; WebSocket authentication and both subscriptions succeeded.
+MWG returned `74.9` at `2026-10-20 14:45:03.431`, persisted/displayed as
+`74,900 VND` at `2026-10-20T07:45:03.431000000Z`; FPT was `57,400 VND` and
+HPG `21,100 VND`. The web/API comparison is recorded in
+[the sanitized report](evidence/dnse-latest-2026-10-20.json).
+These are the latest available afternoon trades, not new evening ticks.
+
+The report is author integration evidence. The PO (`bianh13`) also confirmed
+MWG/FPT/HPG against the official DNSE board in chat on 20 October; the exact
+board-observation time and a browser capture were not supplied.
+This comparison is explicitly recorded as PO-reported, not automated or an
+independent code review. Independent review and merge of this follow-up remain
+required before closing #59.
 
 ## Verification status — 10 October 2026
 
@@ -167,3 +221,20 @@ is covered by tests and displays unavailable; same-day live reference/change
 comparison remains unverified. Neither the ready flag nor passing CI closes
 these external verification items. No board comparison was completed during
 this review follow-up because no connected browser was available.
+
+## Main integration - 20 October 2026
+
+PR #60 was independently approved for worker integration and merged at
+`17c7214`, after the UI PR #102. The exact combined tree was tested locally:
+193 passed, 2 existing skips; Ruff and whitespace checks passed.
+
+An isolated copy runs the new UI and worker against the same provider database.
+At 16:44 UTC+7 the worker authenticated and DNSE acknowledged tick/reference
+subscriptions for all 12 seeded symbols. No new tick was observed during this
+check. Browser verification confirmed that the API's stored FPT/HPG values,
+original timestamps, source and stale labels match the table; this is not a
+new live-price or provider-board comparison. Seed rows remain explicitly seed.
+
+Keep #59 open at zero completed points until the outstanding provider-board
+unit/value/timestamp comparison and independent live acceptance are complete.
+The code approval and merge do not waive those criteria.

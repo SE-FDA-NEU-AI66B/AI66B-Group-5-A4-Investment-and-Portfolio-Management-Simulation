@@ -74,14 +74,14 @@ the P0 wireframes in [ui.md](ui.md) exposed gaps in the M2 design. `/register`,
 `/login` and `/logout` now exist in the accounts module (#77); the routes below
 remain **designed** unless section 3 marks them implemented.
 
-- **Search (proposed).** A beginner must be able to find a stock by ticker or
+- **Search.** A beginner can find a stock by ticker or
   company name. `GET /market?q=<text>` filters the existing snapshot,
   case-insensitively, by symbol or name. The filter lives in
   `market/service.py`; the route only passes `q` and the repository still
   returns every quote. The entered text is echoed back in the search box,
   including on the 503 error page, so a retry does not lose it. An empty or
-  absent `q` shows all quotes. The parameter name awaits confirmation by #85
-  and the quote-API owners (#59/#75).
+  absent `q` shows all quotes. #85 implements the same optional parameter on
+  the HTML page and quote-list JSON endpoint; #59 reuses that projection.
 - **Stock detail.** `GET /market/<symbol>` renders one quote: price, change
   versus previous close, quote time, source and the delayed or "Reference
   unavailable" state. The symbol is trimmed and uppercased as in the JSON API.
@@ -220,9 +220,9 @@ contract above; each uses the same service as its API counterpart.
 
 | Method | Path | Access | Input | Success | Errors | Status |
 |--------|------|--------|-------|---------|--------|--------|
-| GET | `/market` | G/U | optional `q` | 200 HTML list; "No stocks match" when a search finds nothing | 503 HTML unavailable page | List implemented; `q` proposed (#85) |
-| GET | `/market/<symbol>` | G/U | path symbol | 200 HTML detail | 404 "Ticker not found"; 503 HTML unavailable page | Designed (#85) |
-| GET, POST | `/register`, `/login` | G | form fields, `csrf_token`, optional `next` | 302 to `/market` with session cookie today; to `next` or `/portfolio` once designed | Page re-rendered with the API message and status (409, 401, 429, 403, 422) | Pages and sessions implemented (#77); `next` and `/portfolio` redirect designed; browser verification pending |
+| GET | `/market` | G/U | optional `q` | 200 HTML list; "No stocks match" when a search finds nothing | 503 HTML unavailable page | Implemented (#85) |
+| GET | `/market/<symbol>` | G/U | path symbol | 200 HTML detail | 404 "Ticker not found"; 503 HTML unavailable page | Implemented (#85) |
+| GET, POST | `/register`, `/login` | G | form fields, `csrf_token`, optional `next` | 302 with session cookie: form login to `/portfolio` when the real GET route is registered (#81), otherwise `/market`; registration still `/market`; `next` remains designed | Page re-rendered with the API message and status (409, 401, 429, 403, 422) | Pages and sessions implemented (#77); form-login destination fixed in #105; `next` designed; browser verification pending |
 | POST | `/logout` | U | `csrf_token` | 302 to `/market`, cookie expired | Redirect to `/login` | Implemented (#77); browser verification pending |
 | GET | `/trade` | U | `side`, `symbol` | 200 HTML preview and confirm form | 302 to `/login?next=...` for a guest | Designed (#76/#79) |
 | GET | `/portfolio` | U | none | 200 HTML cash, holdings, total | 302 to `/login?next=...` for a guest | Designed (#81) |

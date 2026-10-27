@@ -4,8 +4,8 @@ M2 baseline: #49, 3 October 2026. M3 shared contract: #75, 10 October 2026.
 Owner: @bianh13. M3 reviewer: @nguyentue110; agreement approved in PR #91 on 12 October 2026.
 
 This contract separates implemented routes from planned work. Auth HTML/API
-routes and the public seeded market are on main via #93. Portfolio, sell and
-stock detail are still planned. The buy/simulation integration is on main via merged PR #92;
+routes and the public stored-quote market are on main via #93/#85. Portfolio
+remains separate. The buy/simulation integration is on main via merged PR #92;
 the optional provider worker is PR #60, with live price acceptance pending.
 On this checkout, real auth, GET /trade, POST /api/orders/preview,
 POST /api/orders/buy, POST /api/simulation/quotes/refresh and the quote
@@ -51,9 +51,9 @@ All errors below also use the shared validation/authorization rules above.
 | POST | `/api/accounts` | G; US01/US02 | email, password | 201 account id/email, cash_vnd=100000000; session cookie; Location `/api/portfolio` | 409 EMAIL_IN_USE; 422 VALIDATION_ERROR | Designed |
 | POST | `/api/sessions` | G; US01 | email, password | 200 account id/role; session cookie | 401 INVALID_CREDENTIALS; 429 LOGIN_LOCKED; 403 ACCOUNT_DISABLED | Designed |
 | DELETE | `/api/sessions/current` | U/A; US01 support | CSRF header; no body | 204; cookie expired, server session revoked | 401 AUTH_REQUIRED; 403 CSRF_FAILED | Designed |
-| GET | `/market` | G/U; US03 | none | 200 HTML with quotes, including empty state | 503 HTML unavailable page | Implemented on main |
-| GET | `/api/market/quotes` | G/U; US03 | no parameters | 200 quotes array; price/reference/time/source/stale/change | 503 MARKET_UNAVAILABLE | Implemented in resumed #60; review pending |
-| GET | `/api/market/quotes/{symbol}` | G/U; US03 | ticker path parameter | 200 one quote object; stale prices remain viewable | 404 TICKER_NOT_FOUND; 503 QUOTE_UNAVAILABLE | Designed |
+| GET | `/market` | G/U; US03 | optional `q` symbol/company search | 200 HTML list, search/empty state and detail links | 503 HTML unavailable page | Implemented in #85 |
+| GET | `/api/market/quotes` | G/U; US03 | optional `q` symbol/company search | 200 matching quote array; price/reference/time/source/stale/change | 503 MARKET_UNAVAILABLE | Implemented in #85; shared projection with #59 |
+| GET | `/api/market/quotes/{symbol}` | G/U; US03 | ticker path parameter | 200 one stored quote object; stale prices remain viewable | 404 TICKER_NOT_FOUND; 503 QUOTE_UNAVAILABLE | Implemented in #85 |
 | POST | `/api/orders/preview` | U; US04/US05/US10 | side=buy/sell, symbol, quantity | 200 estimate_vnd, available quantity/cash, shortfall, can_submit, warning and quote time/source; no writes | 422 INVALID_QUANTITY/VALIDATION_ERROR; 404 TICKER_NOT_FOUND; 409 QUOTE_STALE; 503 QUOTE_UNAVAILABLE | Designed |
 | POST | `/api/orders/buy` | U; US04/US10 | symbol, quantity, expected_quote_at | 201 trade, cash and updated holding | 409 INSUFFICIENT_CASH/QUOTE_CHANGED/QUOTE_STALE; 422 INVALID_QUANTITY; 404 TICKER_NOT_FOUND; 503 QUOTE_UNAVAILABLE | Designed |
 | POST | `/api/orders/sell` | U; US05 | symbol, quantity, expected_quote_at | 201 trade with realised_pnl_vnd, cash and remaining holding or null | 409 INSUFFICIENT_SHARES/QUOTE_CHANGED/QUOTE_STALE; 422 INVALID_QUANTITY; 404 TICKER_NOT_FOUND; 503 QUOTE_UNAVAILABLE | Designed |
@@ -168,7 +168,7 @@ For US04's 3,000 FPT at 120,000 VND and cash 72,000,000, return 409:
 For quantity 0, fractional/string/bool quantities, return 422:
 
 ```json
-{"error":{"code":"INVALID_QUANTITY","message":"Quantity must be a whole number of at least 1 share","details":{"field":"quantity"}}}
+{"error":{"code":"INVALID_QUANTITY","message":"Quantity must be a whole number of at least 1 share.","details":{"field":"quantity"}}}
 ```
 
 POST `/api/orders/sell` uses the same request shape. Selling all 1,000 HPG bought
@@ -195,6 +195,11 @@ Do not silently fill from a different timestamp or from an invalid future time.
 Re-check affordability/availability using the accepted snapshot, then update
 cash, the unique holding pair and trade together; roll back on any error.
 A tick arriving after this transaction does not change the recorded fill.
+
+Acceptance clarification (#106): clicking Preview is not submitting a fill.
+A changed `expected_quote_at` before Confirm is rejected without writes, even
+when the numeric price happens to be unchanged. The investor must preview again
+and explicitly confirm; a price movement after commit cannot revise that trade.
 
 Cost allocation follows [the exact rounding decision](money-rules.md). Delete
 the holding on a full sale. Seed quotes can support a deliberately refreshed

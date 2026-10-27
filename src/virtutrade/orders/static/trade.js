@@ -8,8 +8,11 @@
   const selling = side === "sell";
   let preview = null, generation = 0, timer, submitting = false, uncertain = false;
   const cash = n => new Intl.NumberFormat("en-US").format(n) + " VND";
+  const quantityMessage = "Quantity must be a whole number of at least 1 share.";
+  const quantityField = byId("quantity");
   const input = () => ({symbol: byId("symbol").value.trim().toUpperCase(), quantity: Number(byId("quantity").value)});
-  const valid = x => x.symbol && Number.isSafeInteger(x.quantity) && x.quantity > 0;
+  const validQuantity = x => Number.isSafeInteger(x.quantity) && x.quantity > 0;
+  const valid = x => x.symbol && validQuantity(x);
   const invalidate = () => { preview = null; confirm.disabled = true; generation++; };
   function showEstimate(data) {
     const estimate = byId("estimate");
@@ -64,7 +67,11 @@
     if (submitting || uncertain || byId("preview-button").disabled) return;
     const x = input(), sequence = generation;
     byId("estimate").hidden = true; byId("order-error").textContent = "";
-    if (!valid(x)) { byId("order-status").textContent = "Enter a symbol and a whole number of at least 1 share."; return; }
+    if (!valid(x)) {
+      byId("order-error").textContent = !validQuantity(x) ? quantityMessage : "Choose a stock from Market.";
+      byId("order-status").textContent = "Correct the input, then preview again.";
+      return;
+    }
     byId("order-status").textContent = "Loading preview…";
     try {
       const data = await request("/api/orders/preview", {side, ...x});
@@ -81,7 +88,19 @@
       }
     }
   }
-  form.addEventListener("input", () => { invalidate(); clearTimeout(timer); timer = setTimeout(refreshPreview, 300); });
+  form.addEventListener("input", event => {
+    if (event.target === quantityField) {
+      quantityField.setCustomValidity(validQuantity(input()) ? "" : quantityMessage);
+    }
+    invalidate(); clearTimeout(timer); timer = setTimeout(refreshPreview, 300);
+  });
+  quantityField.addEventListener("invalid", () => {
+    quantityField.setCustomValidity(validQuantity(input()) ? "" : quantityMessage);
+    invalidate();
+    byId("estimate").hidden = true;
+    byId("order-error").textContent = quantityMessage;
+    byId("order-status").textContent = "Correct the input, then preview again.";
+  });
   form.addEventListener("submit", e => { e.preventDefault(); clearTimeout(timer); refreshPreview(); });
   confirm.addEventListener("click", async () => {
     if (!preview || submitting || uncertain || confirm.disabled) return;
@@ -96,6 +115,10 @@
     } catch (e) {
       uncertain = !e.rejected;
       byId("order-error").textContent = e.rejected ? e.message : "Order result is unknown. Do not submit again; check your portfolio or contact the operator before trading again.";
+      byId("order-status").textContent = e.rejected
+        ? "Order was not placed. Review the message, then preview again."
+        : "Order result unknown. Do not submit again.";
+      if (e.rejected) byId("estimate").hidden = true;
     } finally {
       submitting = false;
       for (const element of form.elements) element.disabled = uncertain;

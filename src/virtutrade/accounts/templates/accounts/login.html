@@ -4,11 +4,11 @@
 <div class="eyebrow">WELCOME BACK</div>
 <h2 id="auth-title">Log in to your simulation account</h2>
 <p class="auth-description">Continue with your VirtuTrade email and password.</p>
-{% if error %}<div class="auth-error" role="alert">{{ error }}</div>{% endif %}
+{% if error %}<div id="auth-error" class="auth-error" role="alert"><strong>{{ error }}</strong>{% if error_hint %}<span>{{ error_hint }}</span>{% endif %}</div>{% endif %}
 <form method="post" action="/login">
   <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-  <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" required value="{{ email }}" autocomplete="username" placeholder="you@example.com"></div>
-  <div class="field"><label for="password">Password</label><input id="password" name="password" type="password" required autocomplete="current-password" aria-describedby="login-help"></div>
+  <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" required value="{{ email }}" autocomplete="username" placeholder="you@example.com"{% if error %} aria-describedby="auth-error" aria-invalid="true"{% endif %}></div>
+  <div class="field"><label for="password">Password</label><input id="password" name="password" type="password" required autocomplete="current-password" aria-describedby="login-help{% if error %} auth-error{% endif %}"{% if error %} aria-invalid="true"{% endif %}></div>
   <p id="login-help" class="field-hint">Five wrong passwords in a row lock the account for 15 minutes.</p>
   <button class="button primary full-width" type="submit">Log in</button>
 </form>

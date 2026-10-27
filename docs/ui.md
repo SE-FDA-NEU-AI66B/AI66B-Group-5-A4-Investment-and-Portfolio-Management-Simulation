@@ -17,9 +17,9 @@ behavior not on `main`) and **open PR work**.
 
 | Story | Screen(s) | Route | Status | Issue | Notes |
 | ----- | --------- | ----- | ------ | ----- | ----- |
-| US01 - Register / sign in | Register, Login | `/register`, `/login` | partly works | [#77](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/77) | Implemented: both pages, session cookie, CSRF, lockout; both redirect to Market list today. Planned: return to the page the guest came from via a local `next` (proposed), otherwise Portfolio once #81 lands. No additional implementation PR is listed in this snapshot. |
+| US01 - Register / sign in | Register, Login | `/register`, `/login` | partly works | [#77](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/77) | Implemented: both pages, session cookie, CSRF, lockout; #105 sends form login to the Portfolio once its real GET route exists (#81), otherwise to the Market list; registration still lands on the Market list. Planned: return to the page the guest came from via a local `next` (proposed). |
 | US02 - Initial virtual capital | Register, Market list, Trade | `/register`, `/market`, `/trade` | partly works | [#78](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/78) | On main: 100,000,000 VND granted once at registration; Trade shows cash. Merged PR #99: Market-header balance, additional tests and [author screenshot](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/blob/7dcd74f/docs/images/ui/grant-balance.png). Planned: Portfolio balance (#81). |
-| US03 - Find a stock and inspect its quote | Market list, Stock detail | `/market`, `/market/<symbol>` | partly works | [#85](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/85) | Implemented: Market list only. Planned (#85): search (`?q=`, proposed) and Stock detail. No additional implementation PR is listed in this snapshot. |
+| US03 - Find a stock and inspect its quote | Market list, Stock detail | `/market`, `/market/<symbol>` | partly works | [#85](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/85) | Implemented: stored-quote list, case-insensitive symbol/company search (`?q=`), stock detail, quote-detail JSON, unknown-ticker state and Market-to-detail-to-Buy navigation. Browser evidence/review remain before changing the status to works. |
 | US04 - Buy shares | Market list, Trade | `/market`, `/trade` | partly works | [#76](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/76) | Implemented on main via #92: Market Buy shares link, guest guard, authenticated preview and purchase receipt. Planned: Stock detail entry and Portfolio transition (#81). |
 | US05 - Sell shares | Portfolio, Trade | `/portfolio`, `/trade?side=sell&symbol=HPG` | partly works | [#79](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/79) | Merged PR #98: sell preview/confirm, partial/full sale and oversell warning; [author browser evidence](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/tree/28fe0ee/docs/images/ui) from 19 October. Planned: Sell entry from a Portfolio holding (#81). |
 | US06 - View portfolio | Portfolio | `/portfolio` | not started | [#81](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/issues/81) | Planned: a "Portfolio" header link for signed-in users. |
@@ -31,6 +31,12 @@ buying shares. The sell form is available directly at `/trade?side=sell&symbol=H
 the target design; the table and flow distinguish implemented and planned paths.
 
 ### Screen flow (solid = on `main`, dashed = planned)
+
+Navigation follow-up after #102/#60: this branch adds a visible **Sell shares**
+header link to the existing `/trade?side=sell` form and marks the correct Buy/Sell
+tab active. Users select a symbol there; holding-specific entry from Portfolio
+still belongs to #81. The header enhancement is pending review/merge and does
+not establish the complete Portfolio-to-Sell journey.
 
 ```mermaid
 flowchart TD
@@ -152,9 +158,9 @@ Confirm Password and its error are proposed; the current form has Email and Pass
 *The user comes here to find a stock by ticker or company name and see whether
 its price is fresh.*
 
-**Calls:** `GET /api/market/quotes` (list; designed, JSON owner agreed with #59/#75).
-Until the JSON endpoint lands the page renders the same data
-server-side from `market_snapshot`. Search uses `GET /market?q=<text>`.
+**Calls:** `GET /api/market/quotes?q=<text>` (list) and
+`GET /api/market/quotes/<symbol>` (detail). Both project the same stored quote
+data as the server-rendered page. Search uses `GET /market?q=<text>`.
 
 ```text
 +- Data -----------------------------------------+  +- Empty (no match) ---------------------+
@@ -181,10 +187,10 @@ mode, calls `POST /api/simulation/quotes/refresh` (#75), and the Source column
 then reads **Simulation / generated** with the generation time. Seed rows keep
 the **Demo / seed** label. Simulated data is never called live DNSE data.
 
-Time zone (**proposal, not yet agreed**): the template shows UTC today. Showing
-local time with an explicit zone label, e.g. `09:15 30/09/2026 (UTC+7)`, is the
-fix #87 will validate against the running screen. Likewise `?q=` is a proposed
-query name until #85 and the API owner confirm it.
+Time zone: browser rendering uses Vietnam time with an explicit `UTC+7` label;
+the original ISO timestamp remains in the `time` element for traceability. `q`
+is the implemented optional symbol/company search parameter on the HTML list
+and quote-list API.
 
 Rules: search text is preserved on retry and after a failed load; the retry
 button appears for transient read failures only; narrow screens stack each row
@@ -195,7 +201,7 @@ as a card so price, time and status stay visible without horizontal scrolling.
 *The user comes here to understand one stock's price, daily movement and
 freshness before deciding to buy.*
 
-**Calls:** `GET /api/market/quotes/{symbol}` (designed).
+**Calls:** `GET /api/market/quotes/{symbol}` (implemented against stored quotes).
 
 ```text
 +--------------------------------------------------+
@@ -325,16 +331,11 @@ HTML pages and the JSON API share the same string (`accounts/routes.py`,
 `_fail`), and the contract and `tests/test_auth.py` depend on it. API error
 codes never change either.
 
-**How the hint is added (proposal, implemented under #87 with #77).**
-`_fail()` in `accounts/routes.py` currently passes only `exc.message` to the
-template. It also passes `exc.code`. The template shows `error` in the alert as
-today, and below it the hint looked up by code from one mapping kept in the
-module that owns the page (for example a dict in the accounts module). The JSON
-envelope built by `_envelope()` is untouched, so JSON clients never receive a
-hint. Required tests: the JSON `message` for each implemented code still equals
-the contract string and the body has no hint field; the HTML page contains both
-the message and its hint. This section documents the design; none of it is
-implemented yet.
+**Implemented by #87.** `_fail()` passes the unchanged API message, code and a
+code-specific HTML recovery hint to the template. The alert has a stable id and
+the relevant fields reference it with `aria-describedby`/`aria-invalid`. The
+JSON envelope built by `_envelope()` remains unchanged: JSON clients receive no
+hint field and retain the exact public `message` and `code`.
 
 Test coverage today: `tests/test_auth.py` asserts the message of
 `EMAIL_IN_USE`, `INVALID_CREDENTIALS` and `LOGIN_LOCKED`. It asserts only the
@@ -342,12 +343,14 @@ code of `ACCOUNT_DISABLED`, and the `VALIDATION_ERROR` messages have no test.
 
 ### 3.1 Implemented and reachable through the UI
 
-| API error code | Business rule | API message (unchanged) | UI hint (proposal, #87) |
+| API error code | Business rule | API message (unchanged) | UI hint |
 | -------------- | ------------- | ----------------------- | ----------------------- |
 | 409 `EMAIL_IN_USE` | US01 - an email can register only once | Email already in use | Sign in with this email, or register with another one. |
 | 401 `INVALID_CREDENTIALS` | US01 - wrong password and unknown email give the same answer | Invalid email or password | Check both fields and try again. |
 | 429 `LOGIN_LOCKED` | US01 - five wrong passwords lock the account for 15 minutes | Account locked. Try again in N seconds. (N is the remaining time from the server) | You can sign in again when the countdown ends. |
 | 409 `QUOTE_STALE` | BR3 / US04 - stale quotes cannot authorize a buy | Price may be delayed. Generate demo quotes, then preview again. | Recovery is included in this exact simulation-mode message; verified through the real preview endpoint on 20 October, see [buy evidence](buy-acceptance.md). |
+| Client validation / API 422 `INVALID_QUANTITY` | US04/US05 - whole number of at least one share | Quantity must be a whole number of at least 1 share. | Correct the input, then preview again. The inline error and browser validation use the same message; no order is sent for invalid input. |
+| 409 `QUOTE_CHANGED` | BR3 - confirmation revalidates the preview timestamp | Price changed; refresh the preview before confirming. | Recovery is included in the message. Preview again and explicitly confirm the new quote; rejection does not change cash, holdings or trades. |
 
 Buy/US10 also shows `Exceeds available balance by 12,000,000 VND. Reduce the quantity.`
 for the 4,000 HPG fixture, with confirmation disabled. This is a warning returned
@@ -355,9 +358,14 @@ by a successful preview (HTTP 200), not an API error code. A real server-rejecte
 stale preview is the fourth reachable error above; its fixture ages only the
 throwaway test database. DNSE/seed mode uses `Price may be delayed. Wait for a fresh market quote, then preview again.`
 
+The #106/#107 follow-up verifies zero/negative/fractional quantity errors and
+changed-quote rejection/recovery in the real-auth browser. It updates the
+quantity message in the client; server messages and fill behavior are unchanged.
+See [acceptance evidence](order-acceptance-followup.md).
+
 ### 3.2 Implemented, not reachable as visible text today
 
-| API error code | Business rule | API message (unchanged) | UI hint (proposal, #87) | Why it is not shown today |
+| API error code | Business rule | API message (unchanged) | UI hint | Why it is not shown today |
 | -------------- | ------------- | ----------------------- | ----------------------- | ------------------------- |
 | 403 `ACCOUNT_DISABLED` | BR9 - disabled accounts cannot sign in or trade | Account is disabled | This account is disabled and cannot be used to sign in or trade. | No Admin screen exists yet (US13, P1); only a database edit triggers it. The message itself has no test. |
 | 422 `VALIDATION_ERROR` | US01 - email format, password 8..128 characters | Enter a valid email address. / Password must be 8..128 characters. | None: the message already states the rule. | The browser's form validation blocks these first; the server message appears only for direct API calls. No test asserts these strings. |
@@ -372,8 +380,6 @@ Buy handling below is implemented via #92, with service/route coverage; this tab
 | -------------- | ------------- | ---------------------- | ------------------ |
 | 409 `INSUFFICIENT_CASH` | BR1 - an order may not cost more than the available cash | Insufficient cash: this order needs 360,000,000 VND but only 72,000,000 VND is available. Reduce the quantity and preview again. | Included in the message. |
 | 409 `INSUFFICIENT_SHARES` | BR2 - a sale may not exceed the shares held | You hold 500 HPG; the maximum you can sell is 500 | Reduce the quantity and preview again. |
-| 422 `INVALID_QUANTITY` | US04/US05 - quantity is a whole number of at least 1 | Quantity must be a whole number of at least 1 share. | Enter a whole number of 1 or more and preview again. |
-| 409 `QUOTE_CHANGED` | BR3 - the fill uses the quote accepted at submission | Price changed; refresh the preview before confirming. | Recovery is included in the message. |
 
 Rows in 3.3 move to 3.1 only after someone has reproduced them in a browser.
 Place errors next to the relevant input or in an accessible alert, and never
