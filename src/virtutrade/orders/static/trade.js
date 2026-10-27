@@ -66,7 +66,10 @@
     invalidate();
     if (submitting || uncertain || byId("preview-button").disabled) return;
     const x = input(), sequence = generation;
-    byId("estimate").hidden = true; byId("order-error").textContent = "";
+    byId("estimate").hidden = true;
+    byId("preview-placeholder").hidden = false;
+    byId("result").textContent = "";
+    byId("order-error").textContent = "";
     if (!valid(x)) {
       byId("order-error").textContent = !validQuantity(x) ? quantityMessage : "Choose a stock from Market.";
       byId("order-status").textContent = "Correct the input, then preview again.";
@@ -83,7 +86,7 @@
       confirm.disabled = !data.can_submit;
     } catch (e) {
       if (sequence === generation) {
-        byId("order-error").textContent = e.rejected ? e.message : "Could not load a preview. Try Preview order again.";
+        byId("order-error").textContent = e.rejected ? e.message : "Could not load a preview. Your stock and quantity are saved; select Preview order to retry.";
         byId("order-status").textContent = "Preview unavailable. Review the message below.";
       }
     }
@@ -92,7 +95,10 @@
     if (event.target === quantityField) {
       quantityField.setCustomValidity(validQuantity(input()) ? "" : quantityMessage);
     }
-    invalidate(); clearTimeout(timer); timer = setTimeout(refreshPreview, 300);
+    invalidate();
+    byId("order-error").textContent = "";
+    byId("result").textContent = "";
+    clearTimeout(timer); timer = setTimeout(refreshPreview, 300);
   });
   quantityField.addEventListener("invalid", () => {
     quantityField.setCustomValidity(validQuantity(input()) ? "" : quantityMessage);
@@ -106,6 +112,8 @@
     if (!preview || submitting || uncertain || confirm.disabled) return;
     const accepted = preview; invalidate(); submitting = true;
     for (const element of form.elements) element.disabled = true;
+    byId("order-error").textContent = "";
+    byId("result").textContent = "";
     byId("order-status").textContent = "Submitting virtual order…";
     try {
       const result = await request("/api/orders/" + side, {...accepted.input, expected_quote_at:accepted.data.quote.quoted_at});
