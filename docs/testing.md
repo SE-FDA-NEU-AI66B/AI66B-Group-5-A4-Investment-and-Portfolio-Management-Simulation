@@ -19,20 +19,20 @@ failure with no writes, and authentication before presentation-only details.
 
 ## 2. Test cases for every P0 story
 
-`Branch` means the test exists in Thanh's [draft PR #128](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/pull/128), not yet on `main`.
+`Branch` identifies the linked PR that currently carries the test; it is not by itself proof on `main` until that PR is merged.
 `Planned` means the case is assigned but is not counted as automated evidence.
 Every planned ID must be added to a test name or comment by its issue owner.
 
 | ID | Story | Input | Expected result | Kind | Status/owner |
 |---|---|---|---|---|---|
-| TC-US01-01 | US01 access | Valid new account, then correct sign-in | Account/session created; protected route opens | Normal | Planned #119 Tue |
-| TC-US01-02 | US01 access | Duplicate email or incorrect password | Request refused; no extra account/session | Error | Planned #119 Tue |
-| TC-US01-03 | US01 access | Password lengths 7 and 8 | 7 refused, 8 accepted | Boundary | Planned #119 Tue |
-| TC-US01-04 | US01 access | Password lengths 128 and 129 | 128 accepted, 129 refused | Boundary | Planned #119 Tue |
-| TC-US01-05 | US01 access | Four failed logins, then fifth | Fifth locks account with retry period | Boundary/error | Planned #119 Tue |
-| TC-US02-01 | US02 grant | Register one account | Exactly 100,000,000 VND once | Normal | Planned #119 Tue |
-| TC-US02-02 | US02 grant | Log out/in repeatedly | Balance never granted again | Error prevention | Planned #119 Tue |
-| TC-US02-03 | US02 grant | Client sends 99,999,999 then 100,000,001 VND initial cash | Both ignored; persisted grant remains 100,000,000 | Boundary/error | Planned #119 Tue |
+| TC-US01-01 | US01 access | Valid new account, then correct sign-in | Account/session created; protected route opens | Normal | Branch #119 Tue |
+| TC-US01-02 | US01 access | Duplicate email or incorrect password | Request refused; no extra account/session | Error | Branch #119 Tue |
+| TC-US01-03 | US01 access | Password lengths 7 and 8 | 7 refused, 8 accepted | Boundary | Branch #119 Tue |
+| TC-US01-04 | US01 access | Password lengths 128 and 129 | 128 accepted, 129 refused | Boundary | Branch #119 Tue |
+| TC-US01-05 | US01 access | Four failed logins, then fifth | Fifth locks account with retry period | Boundary/error | Branch #119 Tue |
+| TC-US02-01 | US02 grant | Register one account | Exactly 100,000,000 VND once | Normal | Branch #119 Tue |
+| TC-US02-02 | US02 grant | Log out/in repeatedly | Balance never granted again | Error prevention | Branch #119 Tue |
+| TC-US02-03 | US02 grant | Client sends 99,999,999 then 100,000,001 VND initial cash | Both ignored; persisted grant remains 100,000,000 | Boundary/error | Branch #119 Tue |
 | TC-US03-01 | US03 market | Search lowercase ticker and company text | Matching stored symbols and source/timestamp | Normal | Planned #124 Vu |
 | TC-US03-02 | US03 market | Unknown symbol or failed DB read | 404 detail / 503 read with recovery; entered query preserved | Error | Planned #124 Vu |
 | TC-US03-03 | US03 market | Query lengths 50 and 51 | 50 preserved; 51st character safely trimmed | Boundary | Planned #124 Vu |
@@ -65,7 +65,14 @@ substitute for the final `main` run.
 | TC-US10-01 | `tests/test_buy_m4.py::test_tc_us10_01_cash_at_exact_cost_and_one_vnd_short` (exact/short parameters) | Branch |
 | TC-US10-02 | `tests/test_buy_m4.py::test_tc_us10_02_reducing_quantity_clears_warning` | Branch |
 | TC-US10-03 | `tests/test_buy_m4.py::test_tc_us10_03_cash_shortfall_recheck_does_not_write` | Branch |
-| TC-US01-01–05, TC-US02-01–03 | #119 to add exact paths after reviewed merge | Planned |
+| TC-US01-01 | `tests/test_auth_m4.py::test_tc_us01_01_register_then_valid_session_opens_portfolio` | Branch #119 |
+| TC-US01-02 | `tests/test_auth_m4.py::test_tc_us01_02_duplicate_wrong_password_and_csrf_refused_without_new_records` | Branch #119 |
+| TC-US01-03 | `tests/test_auth_m4.py::test_tc_us01_03_password_minimum_boundary` (7/8 parameters) | Branch #119 |
+| TC-US01-04 | `tests/test_auth_m4.py::test_tc_us01_04_password_maximum_boundary` (128/129 parameters) | Branch #119 |
+| TC-US01-05 | `tests/test_auth_m4.py::test_tc_us01_05_fifth_failure_locks_and_correct_password_stays_locked` | Branch #119 |
+| TC-US02-01 | `tests/test_auth_m4.py::test_tc_us02_01_registration_grants_exactly_once` | Branch #119 |
+| TC-US02-02 | `tests/test_auth_m4.py::test_tc_us02_02_login_logout_cycles_never_regrant` | Branch #119 |
+| TC-US02-03 | `tests/test_auth_m4.py::test_tc_us02_03_client_supplied_balances_are_ignored` | Branch #119 |
 | TC-US03-01–03 | #124 to add exact paths after reviewed merge | Planned |
 | TC-US05-01–03 | #120 to add exact paths after reviewed merge | Planned |
 | TC-US06-01–03 | #122 to add exact paths after #81/#103 merge | Planned |
@@ -99,3 +106,26 @@ test_tc_us04_03_quote_age_boundary[901-False] PASSED
 This demonstrates that the boundary test fails when the inclusive time rule
 breaks. The final red/green evidence and full-suite screenshot will be added
 after independent review; the deliberate mutation is absent from this branch.
+
+### Deliberate mutation, 28 October - TC-US01-03
+
+Temporarily changed `PASSWORD_MIN_LENGTH` in
+`src/virtutrade/accounts/service.py` from `8` to `7`. The seven-character
+case then returned 201 instead of the required 422:
+
+```text
+$ python -m pytest "tests/test_auth_m4.py::test_tc_us01_03_password_minimum_boundary[7-False]" -q
+FAILED tests/test_auth_m4.py::test_tc_us01_03_password_minimum_boundary[7-False]
+E   assert 201 == 422
+1 failed in 0.45s
+```
+
+Restored the rule to `8` and reran the same case:
+
+```text
+$ python -m pytest "tests/test_auth_m4.py::test_tc_us01_03_password_minimum_boundary[7-False]" -q
+1 passed in 0.27s
+```
+
+The mutation is absent from the branch. The complete US01/US02 file passes as
+part of the full suite after restoration.
