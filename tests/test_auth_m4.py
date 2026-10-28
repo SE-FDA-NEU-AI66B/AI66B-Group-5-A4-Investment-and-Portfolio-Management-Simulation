@@ -70,14 +70,20 @@ def latest_session_id(db_path):
 
 
 def test_tc_us01_01_register_then_valid_session_opens_portfolio(client):
-    agent, _app, db_path = client
+    agent, app, db_path = client
     response = register(agent)
 
     assert response.status_code == 201
     assert response.get_json()['account']['cash_vnd'] == GRANT
     assert count(db_path, 'account') == 1
     assert count(db_path, 'auth_session') == 1
-    assert agent.get('/portfolio').status_code == 200
+
+    returning = app.test_client()
+    signed_in = login(returning)
+    assert signed_in.status_code == 200
+    assert signed_in.get_json()['redirect_to'] == '/portfolio'
+    assert count(db_path, 'auth_session') == 2
+    assert returning.get('/portfolio').status_code == 200
 
 
 def test_tc_us01_02_duplicate_wrong_password_and_csrf_refused_without_new_records(client):
@@ -101,6 +107,8 @@ def test_tc_us01_02_duplicate_wrong_password_and_csrf_refused_without_new_record
     assert missing_csrf.status_code == 403
     assert missing_csrf.get_json()['error']['code'] == 'CSRF_FAILED'
     assert (count(db_path, 'account'), count(db_path, 'auth_session')) == before
+    assert one(db_path, 'SELECT cash_vnd FROM account WHERE email = ?',
+               ('a@example.com',))[0] == GRANT
     assert app.test_client().get('/portfolio').status_code == 401
 
 

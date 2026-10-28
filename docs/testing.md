@@ -19,7 +19,7 @@ failure with no writes, and authentication before presentation-only details.
 
 ## 2. Test cases for every P0 story
 
-`Branch` means the test exists in Thanh's [draft PR #128](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/pull/128), not yet on `main`.
+`Branch` identifies the linked PR that currently carries the test; it is not by itself proof on `main` until that PR is merged.
 `Planned` means the case is assigned but is not counted as automated evidence.
 Every planned ID must be added to a test name or comment by its issue owner.
 
