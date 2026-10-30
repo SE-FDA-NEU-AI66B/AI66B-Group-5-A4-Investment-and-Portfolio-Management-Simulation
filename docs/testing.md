@@ -39,9 +39,11 @@ Every planned ID must be added to a test name or comment by its issue owner.
 | TC-US04-01 | US04 buy | Preview and buy one HPG share | Preview writes nothing; confirmed trade/cash/holding exact | Normal | Branch #117 Thanh |
 | TC-US04-02 | US04 buy | Quantity zero | `INVALID_QUANTITY`; no trade | Error/boundary | Branch #117 Thanh |
 | TC-US04-03 | US04 buy | Quote ages 900 and 901 seconds | 900 allowed; 901 `QUOTE_STALE`, no write | Boundary | Branch #117 Thanh |
-| TC-US05-01 | US05 sell | Sell part of held position | Proceeds, cash, remainder and cost basis exact | Normal | Planned #120 Tue |
-| TC-US05-02 | US05 sell | Request more than held | `INSUFFICIENT_SHARES`; no writes | Error | Planned #120 Tue |
-| TC-US05-03 | US05 sell | Quantity 0, 1, exactly held, held + 1 | 0 and overheld refused; 1/exact held accepted | Boundary | Planned #120 Tue |
+| TC-US05-01 | US05 sell | Sell part of held position | Proceeds, cash, remainder and cost basis exact | Normal | Branch #120 Tue |
+| TC-US05-02 | US05 sell | Request more than held | `INSUFFICIENT_SHARES`; no writes | Error | Branch #120 Tue |
+| TC-US05-03 | US05 sell | Quantity 0, 1, exactly held, held + 1 | 0 and overheld refused; 1/exact held accepted | Boundary | Branch #120 Tue |
+| TC-US05-04 | US05 sell | Quote timestamp changes, then quote is 901+ seconds old | `QUOTE_CHANGED` / `QUOTE_STALE`; no writes | Error/boundary | Branch #120 Tue |
+| TC-US05-05 | US05 sell | HTTP preview then oversell confirmation | Route returns 409 `INSUFFICIENT_SHARES`; no writes | Error/route | Branch #120 Tue |
 | TC-US06-01 | US06 portfolio | New signed-in account with zero holdings | Empty state and total = cash | Normal/boundary | Planned #81/#122 Long |
 | TC-US06-02 | US06 portfolio | One holding and a current quote | Only own holding, cash, valuation and P&L exact | Normal/boundary | Planned #81/#122 Long |
 | TC-US06-03 | US06 portfolio | Guest or second account requests first account's data | 401/private holdings never leak | Error | Planned #81/#122 Long |
@@ -74,7 +76,11 @@ substitute for the final `main` run.
 | TC-US02-02 | `tests/test_auth_m4.py::test_tc_us02_02_login_logout_cycles_never_regrant` | Branch #119 |
 | TC-US02-03 | `tests/test_auth_m4.py::test_tc_us02_03_client_supplied_balances_are_ignored` | Branch #119 |
 | TC-US03-01–03 | #124 to add exact paths after reviewed merge | Planned |
-| TC-US05-01–03 | #120 to add exact paths after reviewed merge | Planned |
+| TC-US05-01 | `tests/test_sell_m4.py::test_tc_us05_01_partial_then_full_sale_preserves_cash_and_cost_basis` | Branch #120 |
+| TC-US05-02 | `tests/test_sell_m4.py::test_tc_us05_02_oversell_is_refused_without_writes` | Branch #120 |
+| TC-US05-03 | `tests/test_sell_m4.py::test_tc_us05_03_quantity_boundaries` (0/1/1000/1001 parameters) | Branch #120 |
+| TC-US05-04 | `tests/test_sell_m4.py::test_tc_us05_04_changed_and_stale_quote_are_refused_before_commit` | Branch #120 |
+| TC-US05-05 | `tests/test_sell_m4.py::test_tc_us05_05_sell_route_rejects_oversell_before_write` | Branch #120 |
 | TC-US06-01–03 | #122 to add exact paths after #81/#103 merge | Planned |
 
 The 27 October PR #128 worktree check selected its `src` explicitly because a
@@ -129,3 +135,26 @@ $ python -m pytest "tests/test_auth_m4.py::test_tc_us01_03_password_minimum_boun
 
 The mutation is absent from the branch. The complete US01/US02 file passes as
 part of the full suite after restoration.
+
+### Deliberate mutation, 30 October - TC-US05-03
+
+Temporarily changed the oversell guard in `src/virtutrade/orders/sell.py` from
+`quantity > held` to `quantity >= held`. Selling exactly the held quantity then
+raised `INSUFFICIENT_SHARES` instead of removing the holding:
+
+```text
+$ python -m pytest "tests/test_sell_m4.py::test_tc_us05_03_quantity_boundaries[1000-True]" -q
+FAILED tests/test_sell_m4.py::test_tc_us05_03_quantity_boundaries[1000-True]
+E   virtutrade.orders.errors.OrderError: You hold 1,000 HPG; the maximum you can sell is 1,000.
+1 failed
+```
+
+Restored the guard and reran the same case:
+
+```text
+$ python -m pytest "tests/test_sell_m4.py::test_tc_us05_03_quantity_boundaries[1000-True]" -q
+1 passed
+```
+
+The mutation is absent from the branch. The complete US05 file passes as part
+of the full suite after restoration.
