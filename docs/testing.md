@@ -40,9 +40,11 @@ Every planned ID must be added to a test name or comment by its issue owner.
 | TC-US04-01 | US04 buy | Preview and buy one HPG share | Preview writes nothing; confirmed trade/cash/holding exact | Normal | Branch #117 Thanh |
 | TC-US04-02 | US04 buy | Quantity zero | `INVALID_QUANTITY`; no trade | Error/boundary | Branch #117 Thanh |
 | TC-US04-03 | US04 buy | Quote ages 900 and 901 seconds | 900 allowed; 901 `QUOTE_STALE`, no write | Boundary | Branch #117 Thanh |
-| TC-US05-01 | US05 sell | Sell part of held position | Proceeds, cash, remainder and cost basis exact | Normal | Planned #120 Tue |
-| TC-US05-02 | US05 sell | Request more than held | `INSUFFICIENT_SHARES`; no writes | Error | Planned #120 Tue |
-| TC-US05-03 | US05 sell | Quantity 0, 1, exactly held, held + 1 | 0 and overheld refused; 1/exact held accepted | Boundary | Planned #120 Tue |
+| TC-US05-01 | US05 sell | Sell part of held position | Proceeds, cash, remainder and cost basis exact | Normal | Branch #120 Tue |
+| TC-US05-02 | US05 sell | Request more than held | `INSUFFICIENT_SHARES`; no writes | Error | Branch #120 Tue |
+| TC-US05-03 | US05 sell | Quantity 0, 1, exactly held, held + 1 | 0 and overheld refused; 1/exact held accepted | Boundary | Branch #120 Tue |
+| TC-US05-04 | US05 sell | Quote timestamp changes, then quote is 901+ seconds old | `QUOTE_CHANGED` / `QUOTE_STALE`; no writes | Error/boundary | Branch #120 Tue |
+| TC-US05-05 | US05 sell | HTTP preview then oversell confirmation | Route returns 409 `INSUFFICIENT_SHARES`; no writes | Error/route | Branch #120 Tue |
 | TC-US06-01 | US06 portfolio | New signed-in account with zero holdings | Empty state, total = cash, visible Browse the market link | Normal/boundary | Branch #122 Long |
 | TC-US06-02 | US06 portfolio | One holding and a current quote | Only own holding, cash, valuation and P&L exact integers | Normal | Branch #122 Long |
 | TC-US06-03 | US06 portfolio | Guest, revoked session, disabled account or second account requests first account's data | 401 for guest/invalid session; second account sees only its own data; private holdings never leak | Error | Branch #122 Long |
@@ -103,7 +105,11 @@ substitute for the final `main` run.
 | TC-US03-02 | `tests/test_market_search.py::test_tc_us03_02_unknown_ticker_and_storage_failures_return_errors` (HTML and JSON 404; HTML/API 503) | Branch #124 |
 | TC-US03-03 | `tests/test_market_search.py::test_tc_us03_03_search_query_length_boundary` (49/50/51 parameters) | Branch #124 |
 | TC-US03-04 | `tests/test_market_search.py::test_tc_us03_04_search_with_no_matches_shows_empty_result` | Branch #124 |
-| TC-US05-01–03 | #120 to add exact paths after reviewed merge | Planned |
+| TC-US05-01 | `tests/test_sell_m4.py::test_tc_us05_01_partial_then_full_sale_preserves_cash_and_cost_basis` | Branch #120 |
+| TC-US05-02 | `tests/test_sell_m4.py::test_tc_us05_02_oversell_is_refused_without_writes` | Branch #120 |
+| TC-US05-03 | `tests/test_sell_m4.py::test_tc_us05_03_quantity_boundaries` (0/1/1000/1001 parameters) | Branch #120 |
+| TC-US05-04 | `tests/test_sell_m4.py::test_tc_us05_04_changed_and_stale_quote_are_refused_before_commit` | Branch #120 |
+| TC-US05-05 | `tests/test_sell_m4.py::test_tc_us05_05_sell_route_rejects_oversell_before_write` | Branch #120 |
 | TC-US06-01 | `tests/test_portfolio_m4.py::test_tc_us06_01_empty_holdings_total_equals_cash_with_browse_market` | Branch #122 |
 | TC-US06-02 | `tests/test_portfolio_m4.py::test_tc_us06_02_one_holding_current_quote_exact_integer_values` and `::test_tc_us06_02_only_the_signed_in_accounts_holding_is_counted` | Branch #122 |
 | TC-US06-03 | `tests/test_portfolio_m4.py::test_tc_us06_03_guest_gets_401_and_no_private_data`, `::test_tc_us06_03_second_account_never_receives_the_first_accounts_data`, `::test_tc_us06_03_revoked_session_or_disabled_account_gets_401` (2 parameters) | Branch #122 |
@@ -215,3 +221,26 @@ absent from the branch):
 After each restore the same selection passed (4 passed; 1 passed; 1 passed).
 Fixtures use invented symbols (`XQA`, `XQB`) and explicit integers, so the
 expected values are derived by hand and no server or real database is needed.
+
+### Deliberate mutation, 30 October - TC-US05-03
+
+Temporarily changed the oversell guard in `src/virtutrade/orders/sell.py` from
+`quantity > held` to `quantity >= held`. Selling exactly the held quantity then
+raised `INSUFFICIENT_SHARES` instead of removing the holding:
+
+```text
+$ python -m pytest "tests/test_sell_m4.py::test_tc_us05_03_quantity_boundaries[1000-True]" -q
+FAILED tests/test_sell_m4.py::test_tc_us05_03_quantity_boundaries[1000-True]
+E   virtutrade.orders.errors.OrderError: You hold 1,000 HPG; the maximum you can sell is 1,000.
+1 failed
+```
+
+Restored the guard and reran the same case:
+
+```text
+$ python -m pytest "tests/test_sell_m4.py::test_tc_us05_03_quantity_boundaries[1000-True]" -q
+1 passed
+```
+
+The mutation is absent from the branch. The complete US05 file passes as part
+of the full suite after restoration.
