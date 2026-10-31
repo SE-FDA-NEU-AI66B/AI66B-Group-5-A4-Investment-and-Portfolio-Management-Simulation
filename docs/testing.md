@@ -19,39 +19,43 @@ failure with no writes, and authentication before presentation-only details.
 
 ## 2. Test cases for every P0 story
 
-`Branch` identifies the feature branch or linked PR carrying the test; it is not by itself proof on `main` until that PR is merged.
+`On main` means the named test exists in a merged PR. `Branch` means the test
+exists only in a linked, unmerged PR and is not final automated evidence.
 `Planned` means the case is assigned but is not counted as automated evidence.
 Every planned ID must be added to a test name or comment by its issue owner.
 
 | ID | Story | Input | Expected result | Kind | Status/owner |
-| -- | ----- | ----- | --------------- | ---- | ------------ |
-| TC-US01-01 | US01 access | Valid new account, then correct sign-in | Account/session created; protected route opens | Normal | Branch #119 Tue |
-| TC-US01-02 | US01 access | Duplicate email or incorrect password | Request refused; no extra account/session | Error | Branch #119 Tue |
-| TC-US01-03 | US01 access | Password lengths 7 and 8 | 7 refused, 8 accepted | Boundary | Branch #119 Tue |
-| TC-US01-04 | US01 access | Password lengths 128 and 129 | 128 accepted, 129 refused | Boundary | Branch #119 Tue |
-| TC-US01-05 | US01 access | Four failed logins, then fifth | Fifth locks account with retry period | Boundary/error | Branch #119 Tue |
-| TC-US02-01 | US02 grant | Register one account | Exactly 100,000,000 VND once | Normal | Branch #119 Tue |
-| TC-US02-02 | US02 grant | Log out/in repeatedly | Balance never granted again | Error prevention | Branch #119 Tue |
-| TC-US02-03 | US02 grant | Client sends 99,999,999 then 100,000,001 VND initial cash | Both ignored; persisted grant remains 100,000,000 | Boundary/error | Branch #119 Tue |
-| TC-US03-01 | US03 market | Search mixed-case ticker and lowercase company text; view a stale stored quote | Matching stored symbol; source, quote time and stale state reflect the temporary DB; stale detail is marked delayed | Normal/integrity | Branch #124 Vu |
-| TC-US03-02 | US03 market | Unknown symbol or failed DB read | Unknown HTML/JSON detail returns 404; storage failures return 503; entered query preserved on HTML search failure | Error | Branch #124 Vu |
-| TC-US03-03 | US03 market | Query lengths 49, 50 and 51 | 49 and 50 preserved; 51st character safely trimmed | Boundary | Branch #124 Vu |
-| TC-US03-04 | US03 market | Search for a query with no stored matches | 200 page preserves query and shows "No stocks match" empty state | Empty result | Branch #124 Vu |
-| TC-US04-01 | US04 buy | Preview and buy one HPG share | Preview writes nothing; confirmed trade/cash/holding exact | Normal | Branch #117 Thanh |
-| TC-US04-02 | US04 buy | Quantity zero | `INVALID_QUANTITY`; no trade | Error/boundary | Branch #117 Thanh |
-| TC-US04-03 | US04 buy | Quote ages 900 and 901 seconds | 900 allowed; 901 `QUOTE_STALE`, no write | Boundary | Branch #117 Thanh |
+|---|---|---|---|---|---|
+| TC-US01-01 | US01 access | Valid new account, then correct sign-in | Account/session created; protected route opens | Normal | On main (#132) Tue |
+| TC-US01-02 | US01 access | Duplicate email or incorrect password | Request refused; no extra account/session | Error | On main (#132) Tue |
+| TC-US01-03 | US01 access | Password lengths 7 and 8 | 7 refused, 8 accepted | Boundary | On main (#132) Tue |
+| TC-US01-04 | US01 access | Password lengths 128 and 129 | 128 accepted, 129 refused | Boundary | On main (#132) Tue |
+| TC-US01-05 | US01 access | Four failed logins, then fifth | Fifth locks account with retry period | Boundary/error | On main (#132) Tue |
+| TC-US02-01 | US02 grant | Register one account | Exactly 100,000,000 VND once | Normal | On main (#132) Tue |
+| TC-US02-02 | US02 grant | Log out/in repeatedly | Balance never granted again | Error prevention | On main (#132) Tue |
+| TC-US02-03 | US02 grant | Client sends 99,999,999 then 100,000,001 VND initial cash | Both ignored; persisted grant remains 100,000,000 | Boundary/error | On main (#132) Tue |
+| TC-US03-01 | US03 market | Search mixed-case ticker and lowercase company text; view a stale stored quote | Matching stored symbol; source, quote time and stale state reflect the temporary DB; stale detail is marked delayed | Normal/integrity | On main (#135) Vu |
+| TC-US03-02 | US03 market | Unknown symbol or failed DB read | Unknown HTML/JSON detail returns 404; storage failures return 503; entered query preserved on HTML search failure | Error | On main (#135) Vu |
+| TC-US03-03 | US03 market | Query lengths 49, 50 and 51 | 49 and 50 preserved; 51st character safely trimmed | Boundary | On main (#135) Vu |
+| TC-US03-04 | US03 market | Search for a query with no stored matches | 200 page preserves query and shows "No stocks match" empty state | Empty result | On main (#135) Vu |
+| TC-US04-01 | US04 buy | Preview and buy one HPG share | Preview writes nothing; confirmed trade/cash/holding exact | Normal | On main (#128) Thanh |
+| TC-US04-02 | US04 buy | Quantity zero | `INVALID_QUANTITY`; no trade | Error/boundary | On main (#128) Thanh |
+| TC-US04-03 | US04 buy | Quote ages 900 and 901 seconds | 900 allowed; 901 `QUOTE_STALE`, no write | Boundary | On main (#128) Thanh |
 | TC-US05-01 | US05 sell | Sell part of held position | Proceeds, cash, remainder and cost basis exact | Normal | Planned #120 Tue |
 | TC-US05-02 | US05 sell | Request more than held | `INSUFFICIENT_SHARES`; no writes | Error | Planned #120 Tue |
 | TC-US05-03 | US05 sell | Quantity 0, 1, exactly held, held + 1 | 0 and overheld refused; 1/exact held accepted | Boundary | Planned #120 Tue |
-| TC-US06-01 | US06 portfolio | New signed-in account with zero holdings | Empty state, total = cash, visible Browse the market link | Normal/boundary | Branch #122 Long |
-| TC-US06-02 | US06 portfolio | One holding and a current quote | Only own holding, cash, valuation and P&L exact integers | Normal | Branch #122 Long |
-| TC-US06-03 | US06 portfolio | Guest, revoked session, disabled account or second account requests first account's data | 401 for guest/invalid session; second account sees only its own data; private holdings never leak | Error | Branch #122 Long |
-| TC-US06-04 | US06 portfolio | Holding with no quote row; holding with a two-hour-old quote | No-quote holding shown as incomplete (value/P&L null, not 0, total flagged); old quote flagged delayed but still valued | Error | Branch #122 Long |
-| TC-US06-05 | US06 portfolio | Quantity 1 and 1,000,000; cost 0; one-VND gain/loss on 20,000 cost | Exact integer value/P&L/total; percent half-up (+0.01 / -0.01), null when cost is 0 | Boundary | Branch #122 Long |
-| TC-US06-06 | US06 portfolio | Quote age 900 and 901 seconds; 300 and 301 seconds in the future | 900 and +300 current; 901 and +301 delayed | Boundary | Branch #122 Long |
+| TC-US06-01 | US06 portfolio | New signed-in account with zero holdings | Empty state, total = cash, visible Browse the market link | Normal/boundary | On main (#140) Long |
+| TC-US06-02 | US06 portfolio | One holding and a current quote | Only own holding, cash, valuation and P&L exact integers | Normal | On main (#140) Long |
+| TC-US06-03 | US06 portfolio | Guest, revoked session, disabled account or second account requests first account's data | 401 for guest/invalid session; second account sees only its own data; private holdings never leak | Error | On main (#140) Long |
+| TC-US06-04 | US06 portfolio | Holding with no quote row; holding with a two-hour-old quote | No-quote holding shown as incomplete (value/P&L null, not 0, total flagged); old quote flagged delayed but still valued | Error | On main (#140) Long |
+| TC-US06-05 | US06 portfolio | Quantity 1 and 1,000,000; cost 0; one-VND gain/loss on 20,000 cost | Exact integer value/P&L/total; percent half-up (+0.01 / -0.01), null when cost is 0 | Boundary | On main (#140) Long |
+| TC-US06-06 | US06 portfolio | Quote age 900 and 901 seconds; 300 and 301 seconds in the future | 900 and +300 current; 901 and +301 delayed | Boundary | On main (#140) Long |
 | TC-US10-01 | US10 cash warning | Cash equals one-share cost, then one VND below | Exact balance allows; shortfall blocks with warning | Boundary/error | Branch #117 Thanh |
 | TC-US10-02 | US10 cash warning | Preview 2 shares with cash for 1, then reduce to 1 | Warning clears and confirmation becomes available; no preview writes | Normal recovery | Branch #117 Thanh |
 | TC-US10-03 | US10 cash warning | Cash falls one VND below cost after preview | Confirmation refuses with no trade or balance change | Error/race | Branch #117 Thanh |
+| TC-US10-01 | US10 cash warning | Cash equals one-share cost, then one VND below | Exact balance allows; shortfall blocks with warning | Boundary/error | On main (#128) Thanh |
+| TC-US10-02 | US10 cash warning | Preview 2 shares with cash for 1, then reduce to 1 | Warning clears and confirmation becomes available; no preview writes | Normal recovery | On main (#128) Thanh |
+| TC-US10-03 | US10 cash warning | Cash falls one VND below cost after preview | Confirmation refuses with no trade or balance change | Error/race | On main (#128) Thanh |
 
 ## 3. Automated tests
 
@@ -83,41 +87,54 @@ virtual environment. For final evidence, run
 all team PRs have merged. A screenshot is pending; the current branch is not a
 substitute for the final `main` run.
 
+From a clean clone after following [SETUP](SETUP.md), put the new venv on PATH
+and run plain `pytest -v` from the repository root. Capture **all test names**
+and the summary in an unedited terminal screenshot after all P0 test PRs have
+merged. Record the exact main commit and independent tester (#123) alongside
+the screenshot. The final screenshot is pending; this branch is not a
+substitute for that run.
+
 | Case IDs | Test location and exact pytest function | State |
-| -------- | --------------------------------------- | ----- |
-| TC-US04-01 | `tests/test_buy_m4.py::test_tc_us04_01_preview_has_no_write_then_buy_records_exact_amount` | Branch |
-| TC-US04-02 | `tests/test_buy_m4.py::test_tc_us04_02_zero_quantity_is_rejected_without_trade` | Branch |
-| TC-US04-03 | `tests/test_buy_m4.py::test_tc_us04_03_quote_age_boundary` (900/901 parameters) | Branch |
-| TC-US10-01 | `tests/test_buy_m4.py::test_tc_us10_01_cash_at_exact_cost_and_one_vnd_short` (exact/short parameters) | Branch |
-| TC-US10-02 | `tests/test_buy_m4.py::test_tc_us10_02_reducing_quantity_clears_warning` | Branch |
-| TC-US10-03 | `tests/test_buy_m4.py::test_tc_us10_03_cash_shortfall_recheck_does_not_write` | Branch |
-| TC-US01-01 | `tests/test_auth_m4.py::test_tc_us01_01_register_then_valid_session_opens_portfolio` | Branch #119 |
-| TC-US01-02 | `tests/test_auth_m4.py::test_tc_us01_02_duplicate_wrong_password_and_csrf_refused_without_new_records` | Branch #119 |
-| TC-US01-03 | `tests/test_auth_m4.py::test_tc_us01_03_password_minimum_boundary` (7/8 parameters) | Branch #119 |
-| TC-US01-04 | `tests/test_auth_m4.py::test_tc_us01_04_password_maximum_boundary` (128/129 parameters) | Branch #119 |
-| TC-US01-05 | `tests/test_auth_m4.py::test_tc_us01_05_fifth_failure_locks_and_correct_password_stays_locked` | Branch #119 |
-| TC-US02-01 | `tests/test_auth_m4.py::test_tc_us02_01_registration_grants_exactly_once` | Branch #119 |
-| TC-US02-02 | `tests/test_auth_m4.py::test_tc_us02_02_login_logout_cycles_never_regrant` | Branch #119 |
-| TC-US02-03 | `tests/test_auth_m4.py::test_tc_us02_03_client_supplied_balances_are_ignored` | Branch #119 |
-| TC-US03-01 | `tests/test_market_search.py::test_tc_us03_01_search_is_case_insensitive_and_returns_stored_quote_metadata`; `tests/test_market_search.py::test_detail_html_and_stale_states` | Branch #124 |
-| TC-US03-02 | `tests/test_market_search.py::test_tc_us03_02_unknown_ticker_and_storage_failures_return_errors` (HTML and JSON 404; HTML/API 503) | Branch #124 |
-| TC-US03-03 | `tests/test_market_search.py::test_tc_us03_03_search_query_length_boundary` (49/50/51 parameters) | Branch #124 |
-| TC-US03-04 | `tests/test_market_search.py::test_tc_us03_04_search_with_no_matches_shows_empty_result` | Branch #124 |
+|---|---|---|
+| TC-US04-01 | `tests/test_buy_m4.py::test_tc_us04_01_preview_has_no_write_then_buy_records_exact_amount` | On main (#128) |
+| TC-US04-02 | `tests/test_buy_m4.py::test_tc_us04_02_zero_quantity_is_rejected_without_trade` | On main (#128) |
+| TC-US04-03 | `tests/test_buy_m4.py::test_tc_us04_03_quote_age_boundary` (900/901 parameters) | On main (#128) |
+| TC-US10-01 | `tests/test_buy_m4.py::test_tc_us10_01_cash_at_exact_cost_and_one_vnd_short` (exact/short parameters) | On main (#128) |
+| TC-US10-02 | `tests/test_buy_m4.py::test_tc_us10_02_reducing_quantity_clears_warning` | On main (#128) |
+| TC-US10-03 | `tests/test_buy_m4.py::test_tc_us10_03_cash_shortfall_recheck_does_not_write` | On main (#128) |
+| TC-US01-01 | `tests/test_auth_m4.py::test_tc_us01_01_register_then_valid_session_opens_portfolio` | On main (#132) |
+| TC-US01-02 | `tests/test_auth_m4.py::test_tc_us01_02_duplicate_wrong_password_and_csrf_refused_without_new_records` | On main (#132) |
+| TC-US01-03 | `tests/test_auth_m4.py::test_tc_us01_03_password_minimum_boundary` (7/8 parameters) | On main (#132) |
+| TC-US01-04 | `tests/test_auth_m4.py::test_tc_us01_04_password_maximum_boundary` (128/129 parameters) | On main (#132) |
+| TC-US01-05 | `tests/test_auth_m4.py::test_tc_us01_05_fifth_failure_locks_and_correct_password_stays_locked` | On main (#132) |
+| TC-US02-01 | `tests/test_auth_m4.py::test_tc_us02_01_registration_grants_exactly_once` | On main (#132) |
+| TC-US02-02 | `tests/test_auth_m4.py::test_tc_us02_02_login_logout_cycles_never_regrant` | On main (#132) |
+| TC-US02-03 | `tests/test_auth_m4.py::test_tc_us02_03_client_supplied_balances_are_ignored` | On main (#132) |
+| TC-US03-01 | `tests/test_market_search.py::test_tc_us03_01_search_is_case_insensitive_and_returns_stored_quote_metadata`; `tests/test_market_search.py::test_detail_html_and_stale_states` | On main (#135) |
+| TC-US03-02 | `tests/test_market_search.py::test_tc_us03_02_unknown_ticker_and_storage_failures_return_errors` | On main (#135) |
+| TC-US03-03 | `tests/test_market_search.py::test_tc_us03_03_search_query_length_boundary` (49/50/51 parameters) | On main (#135) |
+| TC-US03-04 | `tests/test_market_search.py::test_tc_us03_04_search_with_no_matches_shows_empty_result` | On main (#135) |
 | TC-US05-01–03 | #120 to add exact paths after reviewed merge | Planned |
-| TC-US06-01 | `tests/test_portfolio_m4.py::test_tc_us06_01_empty_holdings_total_equals_cash_with_browse_market` | Branch #122 |
-| TC-US06-02 | `tests/test_portfolio_m4.py::test_tc_us06_02_one_holding_current_quote_exact_integer_values` and `::test_tc_us06_02_only_the_signed_in_accounts_holding_is_counted` | Branch #122 |
-| TC-US06-03 | `tests/test_portfolio_m4.py::test_tc_us06_03_guest_gets_401_and_no_private_data`, `::test_tc_us06_03_second_account_never_receives_the_first_accounts_data`, `::test_tc_us06_03_revoked_session_or_disabled_account_gets_401` (2 parameters) | Branch #122 |
-| TC-US06-04 | `tests/test_portfolio_m4.py::test_tc_us06_04_missing_quote_is_incomplete_and_never_valued_as_zero` and `::test_tc_us06_04_delayed_quote_is_flagged_but_keeps_its_value` | Branch #122 |
-| TC-US06-05 | `tests/test_portfolio_m4.py::test_tc_us06_05_quantity_value_and_percent_boundaries` (6 parameters) | Branch #122 |
-| TC-US06-06 | `tests/test_portfolio_m4.py::test_tc_us06_06_quote_age_boundary` (900/901 and +300/+301 parameters) | Branch #122 |
-| #125 Market read states | `tests/test_market_states.py` | Branch #125 |
-| #125 Keyboard refresh focus | `scripts/check_market_keyboard_focus_ui.py` | Branch #125; requires Playwright and Edge |
+| TC-US06-01 | `tests/test_portfolio_m4.py::test_tc_us06_01_empty_holdings_total_equals_cash_with_browse_market` | On main (#140) |
+| TC-US06-02 | `tests/test_portfolio_m4.py::test_tc_us06_02_one_holding_current_quote_exact_integer_values` and `tests/test_portfolio_m4.py::test_tc_us06_02_only_the_signed_in_accounts_holding_is_counted` | On main (#140) |
+| TC-US06-03 | `tests/test_portfolio_m4.py::test_tc_us06_03_guest_gets_401_and_no_private_data`, `tests/test_portfolio_m4.py::test_tc_us06_03_second_account_never_receives_the_first_accounts_data`, `tests/test_portfolio_m4.py::test_tc_us06_03_revoked_session_or_disabled_account_gets_401` (2 parameters) | On main (#140) |
+| TC-US06-04 | `tests/test_portfolio_m4.py::test_tc_us06_04_missing_quote_is_incomplete_and_never_valued_as_zero` and `tests/test_portfolio_m4.py::test_tc_us06_04_delayed_quote_is_flagged_but_keeps_its_value` | On main (#140) |
+| TC-US06-05 | `tests/test_portfolio_m4.py::test_tc_us06_05_quantity_value_and_percent_boundaries` (6 parameters) | On main (#140) |
+| TC-US06-06 | `tests/test_portfolio_m4.py::test_tc_us06_06_quote_age_boundary` (900/901 and +300/+301 parameters) | On main (#140) |
+| #125 Market read states | `tests/test_market_states.py` | On main (#136) |
+| #125 Keyboard refresh focus | `scripts/check_market_keyboard_focus_ui.py` | On main (#136); requires Playwright and Edge |
+
+PR #133 carries the proposed US05 tests and is now wall-clock independent, but
+it must resolve its `docs/testing.md` conflict before it can be counted as
+on-main evidence. The final clean-clone screenshot remains pending under #123.
 
 The 27 October PR #128 worktree check selected its `src` explicitly because a
 reused virtual environment was editable-installed from an older worktree:
-**236 passed, 2 skipped**. This is not the independent clean-clone result.
-Long's #123 must repeat from an independent clean clone. The final document
-will record the plain `pytest` result from that clone.
+**236 passed, 2 skipped**. An author check on main `6eba4b0` ran plain
+`pytest -q` on 1 November: **293 passed, 2 skipped**. Neither is the
+independent clean-clone result. Long's #123 must repeat the setup on another
+machine after the remaining test PRs merge; the final document will record that
+exact main SHA, full `pytest -v` result and terminal screenshot.
 
 ## 4. What the tests found
 
