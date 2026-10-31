@@ -122,6 +122,20 @@ Run the full suite; auth and buy tests use real temporary SQLite databases and d
 running demo's data. CI installs `pytest`, `pytest-cov` and `ruff` separately
 and runs on Python 3.12.
 
+For the final Milestone 4 screenshot on a fresh clone, install this checkout in
+its new venv as above, then run the **unmodified** suite with the venv on PATH:
+
+```powershell
+$env:PATH = (Resolve-Path .\.venv\Scripts).Path + ';' + $env:PATH
+pytest -v
+```
+
+On macOS/Linux, use `.venv/bin/pytest -v`. Capture the complete test-name and
+summary output with the checked-out commit SHA after the P0 test PRs have
+merged. Do not set `PYTHONPATH` to another checkout or substitute selected
+tests for the full run. Long's independent-machine result is tracked by #123;
+an author run is not that evidence.
+
 ## Independent verification
 
 A non-author must follow these updated module-install/run commands on a
