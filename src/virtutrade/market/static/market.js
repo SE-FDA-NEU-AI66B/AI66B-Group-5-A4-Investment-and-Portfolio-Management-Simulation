@@ -16,6 +16,9 @@
 
   function element(tag, text, className) { const node = document.createElement(tag); node.textContent = text; if (className) node.className = className; return node; }
   function update(quotes) {
+    const activeLink = document.activeElement instanceof HTMLAnchorElement ? document.activeElement : null;
+    const focusRoot = activeLink?.closest("#quote-rows, #ticker-strip");
+    const focusHref = focusRoot ? activeLink.getAttribute("href") : null;
     const fragment = document.createDocumentFragment();
     for (const quote of quotes) {
       const row = document.createElement("tr");
@@ -37,6 +40,10 @@
     document.getElementById("instrument-total").textContent = `${quotes.length} symbols`;
     document.getElementById("symbol-count").textContent = query ? `${quotes.length} matching symbols · VND` : `${quotes.length} symbols · VND`;
     updateBoards(quotes);
+    if (focusRoot && focusHref) {
+      const replacement = Array.from(focusRoot.querySelectorAll("a[href]")).find(link => link.getAttribute("href") === focusHref);
+      replacement?.focus({preventScroll: true});
+    }
   }
   function updateBoards(quotes) {
     const strip = document.getElementById("ticker-strip");

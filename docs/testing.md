@@ -7,7 +7,7 @@ The status column distinguishes current branch evidence from planned work.
 ## 1. What we test, and why
 
 | Layer | Test | Why |
-|---|---|---|
+| ----- | ---- | --- |
 | Services (`accounts`, `market`, `orders`, `portfolio`) | Rule and boundary tests with fake repositories or temporary SQLite | Login lockout, quote freshness, available cash, shares and valuation decide whether a user can trade safely. |
 | Repositories and database | Temporary SQLite tests with actual schema/migrations | SQL updates must conserve virtual cash and holdings, roll back on failure, and isolate accounts. |
 | Routes/controllers | Flask test-client tests without starting a server | Check request validation, authentication/CSRF and public status/error contracts. |
@@ -24,7 +24,7 @@ failure with no writes, and authentication before presentation-only details.
 Every planned ID must be added to a test name or comment by its issue owner.
 
 | ID | Story | Input | Expected result | Kind | Status/owner |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | TC-US01-01 | US01 access | Valid new account, then correct sign-in | Account/session created; protected route opens | Normal | Branch #119 Tue |
 | TC-US01-02 | US01 access | Duplicate email or incorrect password | Request refused; no extra account/session | Error | Branch #119 Tue |
 | TC-US01-03 | US01 access | Password lengths 7 and 8 | 7 refused, 8 accepted | Boundary | Branch #119 Tue |
@@ -51,14 +51,36 @@ Every planned ID must be added to a test name or comment by its issue owner.
 
 ## 3. Automated tests
 
-From the repository root after following [SETUP](SETUP.md), run `pytest` in the
-activated virtual environment. For the final evidence, run
+`requirements.txt` contains application/runtime dependencies and is deliberately
+not the source for test tools. Install the test dependencies into the same
+virtual environment used for the app. The server-rendered tests need `pytest`:
+
+```text
+python -m pip install pytest
+python -m pytest -q tests/test_market_states.py
+```
+
+Browser regression scripts additionally need Playwright 1.63.0 and, for the
+Edge-specific checks on Windows, Microsoft Edge installed:
+
+```text
+python -m pip install playwright==1.63.0
+python scripts/check_market_keyboard_focus_ui.py --evidence-dir docs/images/ui/market-four-states
+```
+
+To install both test tools at once, use
+`python -m pip install pytest playwright==1.63.0`. These packages are
+development/QA-only and are intentionally not added to the runtime
+`requirements.txt`.
+
+For the full suite, run `pytest` from the repository root in the activated
+virtual environment. For final evidence, run
 `python -m pytest -v` and capture **all test names** in the screenshot after
 all team PRs have merged. A screenshot is pending; the current branch is not a
 substitute for the final `main` run.
 
 | Case IDs | Test location and exact pytest function | State |
-|---|---|---|
+| --- | --- | --- |
 | TC-US04-01 | `tests/test_buy_m4.py::test_tc_us04_01_preview_has_no_write_then_buy_records_exact_amount` | Branch |
 | TC-US04-02 | `tests/test_buy_m4.py::test_tc_us04_02_zero_quantity_is_rejected_without_trade` | Branch |
 | TC-US04-03 | `tests/test_buy_m4.py::test_tc_us04_03_quote_age_boundary` (900/901 parameters) | Branch |
@@ -76,6 +98,8 @@ substitute for the final `main` run.
 | TC-US03-01–03 | #124 to add exact paths after reviewed merge | Planned |
 | TC-US05-01–03 | #120 to add exact paths after reviewed merge | Planned |
 | TC-US06-01–03 | #122 to add exact paths after #81/#103 merge | Planned |
+| #125 Market read states | `tests/test_market_states.py` | Branch #125 |
+| #125 Keyboard refresh focus | `scripts/check_market_keyboard_focus_ui.py` | Branch #125; requires Playwright and Edge |
 
 The 27 October PR #128 worktree check selected its `src` explicitly because a
 reused virtual environment was editable-installed from an older worktree:
