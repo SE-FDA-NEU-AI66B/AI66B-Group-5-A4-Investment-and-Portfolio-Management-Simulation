@@ -7,7 +7,7 @@ The status column distinguishes current branch evidence from planned work.
 ## 1. What we test, and why
 
 | Layer | Test | Why |
-|---|---|---|
+| ----- | ---- | --- |
 | Services (`accounts`, `market`, `orders`, `portfolio`) | Rule and boundary tests with fake repositories or temporary SQLite | Login lockout, quote freshness, available cash, shares and valuation decide whether a user can trade safely. |
 | Repositories and database | Temporary SQLite tests with actual schema/migrations | SQL updates must conserve virtual cash and holdings, roll back on failure, and isolate accounts. |
 | Routes/controllers | Flask test-client tests without starting a server | Check request validation, authentication/CSRF and public status/error contracts. |
@@ -19,12 +19,12 @@ failure with no writes, and authentication before presentation-only details.
 
 ## 2. Test cases for every P0 story
 
-`Branch` identifies the linked PR that currently carries the test; it is not by itself proof on `main` until that PR is merged.
+`Branch` identifies the feature branch or linked PR carrying the test; it is not by itself proof on `main` until that PR is merged.
 `Planned` means the case is assigned but is not counted as automated evidence.
 Every planned ID must be added to a test name or comment by its issue owner.
 
 | ID | Story | Input | Expected result | Kind | Status/owner |
-|---|---|---|---|---|---|
+| -- | ----- | ----- | --------------- | ---- | ------------ |
 | TC-US01-01 | US01 access | Valid new account, then correct sign-in | Account/session created; protected route opens | Normal | Branch #119 Tue |
 | TC-US01-02 | US01 access | Duplicate email or incorrect password | Request refused; no extra account/session | Error | Branch #119 Tue |
 | TC-US01-03 | US01 access | Password lengths 7 and 8 | 7 refused, 8 accepted | Boundary | Branch #119 Tue |
@@ -33,9 +33,10 @@ Every planned ID must be added to a test name or comment by its issue owner.
 | TC-US02-01 | US02 grant | Register one account | Exactly 100,000,000 VND once | Normal | Branch #119 Tue |
 | TC-US02-02 | US02 grant | Log out/in repeatedly | Balance never granted again | Error prevention | Branch #119 Tue |
 | TC-US02-03 | US02 grant | Client sends 99,999,999 then 100,000,001 VND initial cash | Both ignored; persisted grant remains 100,000,000 | Boundary/error | Branch #119 Tue |
-| TC-US03-01 | US03 market | Search lowercase ticker and company text | Matching stored symbols and source/timestamp | Normal | Planned #124 Vu |
-| TC-US03-02 | US03 market | Unknown symbol or failed DB read | 404 detail / 503 read with recovery; entered query preserved | Error | Planned #124 Vu |
-| TC-US03-03 | US03 market | Query lengths 50 and 51 | 50 preserved; 51st character safely trimmed | Boundary | Planned #124 Vu |
+| TC-US03-01 | US03 market | Search mixed-case ticker and lowercase company text; view a stale stored quote | Matching stored symbol; source, quote time and stale state reflect the temporary DB; stale detail is marked delayed | Normal/integrity | Branch #124 Vu |
+| TC-US03-02 | US03 market | Unknown symbol or failed DB read | Unknown HTML/JSON detail returns 404; storage failures return 503; entered query preserved on HTML search failure | Error | Branch #124 Vu |
+| TC-US03-03 | US03 market | Query lengths 49, 50 and 51 | 49 and 50 preserved; 51st character safely trimmed | Boundary | Branch #124 Vu |
+| TC-US03-04 | US03 market | Search for a query with no stored matches | 200 page preserves query and shows "No stocks match" empty state | Empty result | Branch #124 Vu |
 | TC-US04-01 | US04 buy | Preview and buy one HPG share | Preview writes nothing; confirmed trade/cash/holding exact | Normal | Branch #117 Thanh |
 | TC-US04-02 | US04 buy | Quantity zero | `INVALID_QUANTITY`; no trade | Error/boundary | Branch #117 Thanh |
 | TC-US04-03 | US04 buy | Quote ages 900 and 901 seconds | 900 allowed; 901 `QUOTE_STALE`, no write | Boundary | Branch #117 Thanh |
@@ -58,7 +59,7 @@ all team PRs have merged. A screenshot is pending; the current branch is not a
 substitute for the final `main` run.
 
 | Case IDs | Test location and exact pytest function | State |
-|---|---|---|
+| -------- | --------------------------------------- | ----- |
 | TC-US04-01 | `tests/test_buy_m4.py::test_tc_us04_01_preview_has_no_write_then_buy_records_exact_amount` | Branch |
 | TC-US04-02 | `tests/test_buy_m4.py::test_tc_us04_02_zero_quantity_is_rejected_without_trade` | Branch |
 | TC-US04-03 | `tests/test_buy_m4.py::test_tc_us04_03_quote_age_boundary` (900/901 parameters) | Branch |
@@ -73,7 +74,10 @@ substitute for the final `main` run.
 | TC-US02-01 | `tests/test_auth_m4.py::test_tc_us02_01_registration_grants_exactly_once` | Branch #119 |
 | TC-US02-02 | `tests/test_auth_m4.py::test_tc_us02_02_login_logout_cycles_never_regrant` | Branch #119 |
 | TC-US02-03 | `tests/test_auth_m4.py::test_tc_us02_03_client_supplied_balances_are_ignored` | Branch #119 |
-| TC-US03-01–03 | #124 to add exact paths after reviewed merge | Planned |
+| TC-US03-01 | `tests/test_market_search.py::test_tc_us03_01_search_is_case_insensitive_and_returns_stored_quote_metadata`; `tests/test_market_search.py::test_detail_html_and_stale_states` | Branch #124 |
+| TC-US03-02 | `tests/test_market_search.py::test_tc_us03_02_unknown_ticker_and_storage_failures_return_errors` (HTML and JSON 404; HTML/API 503) | Branch #124 |
+| TC-US03-03 | `tests/test_market_search.py::test_tc_us03_03_search_query_length_boundary` (49/50/51 parameters) | Branch #124 |
+| TC-US03-04 | `tests/test_market_search.py::test_tc_us03_04_search_with_no_matches_shows_empty_result` | Branch #124 |
 | TC-US05-01–03 | #120 to add exact paths after reviewed merge | Planned |
 | TC-US06-01–03 | #122 to add exact paths after #81/#103 merge | Planned |
 
@@ -129,3 +133,37 @@ $ python -m pytest "tests/test_auth_m4.py::test_tc_us01_03_password_minimum_boun
 
 The mutation is absent from the branch. The complete US01/US02 file passes as
 part of the full suite after restoration.
+
+### Deliberate mutation, 31 October - TC-US03-03
+
+Temporarily changed the market query limit in both directions. Reducing the
+limit to 49 made the 50- and 51-character cases fail, while the 49-character
+case passed:
+
+```text
+$ python -m pytest tests/test_market_search.py -k "tc_us03_03 and (50 or 51)" -q
+FAILED test_tc_us03_03_search_query_length_boundary[50]
+FAILED test_tc_us03_03_search_query_length_boundary[51]
+=========================== 2 failed, 9 deselected in 0.34s ===================
+```
+
+Increasing the limit to 51 made only the 51-character case fail:
+
+```text
+$ python -m pytest tests/test_market_search.py -k tc_us03_03 -v
+FAILED test_tc_us03_03_search_query_length_boundary[51]
+================== 1 failed, 2 passed, 8 deselected in 0.45s ==================
+```
+
+Restored the 50-character limit and reran all three boundary cases:
+
+```text
+$ python -m pytest tests/test_market_search.py -k tc_us03_03 -v
+======================= 3 passed, 8 deselected in 0.40s =======================
+```
+
+The mutation is absent from the worktree.
+
+After restoration, the local working-tree suite passed with
+`python -m pytest`: **290 passed, 2 skipped**. This is branch-local evidence,
+not the required clean-clone run from `main`.
