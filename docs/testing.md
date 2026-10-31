@@ -52,8 +52,30 @@ Every planned ID must be added to a test name or comment by its issue owner.
 
 ## 3. Automated tests
 
-From the repository root after following [SETUP](SETUP.md), run `pytest` in the
-activated virtual environment. For the final evidence, run
+`requirements.txt` contains application/runtime dependencies and is deliberately
+not the source for test tools. Install the test dependencies into the same
+virtual environment used for the app. The server-rendered tests need `pytest`:
+
+```text
+python -m pip install pytest
+python -m pytest -q tests/test_market_states.py
+```
+
+Browser regression scripts additionally need Playwright 1.63.0 and, for the
+Edge-specific checks on Windows, Microsoft Edge installed:
+
+```text
+python -m pip install playwright==1.63.0
+python scripts/check_market_keyboard_focus_ui.py --evidence-dir docs/images/ui/market-four-states
+```
+
+To install both test tools at once, use
+`python -m pip install pytest playwright==1.63.0`. These packages are
+development/QA-only and are intentionally not added to the runtime
+`requirements.txt`.
+
+For the full suite, run `pytest` from the repository root in the activated
+virtual environment. For final evidence, run
 `python -m pytest -v` and capture **all test names** in the screenshot after
 all team PRs have merged. A screenshot is pending; the current branch is not a
 substitute for the final `main` run.
@@ -80,6 +102,8 @@ substitute for the final `main` run.
 | TC-US03-04 | `tests/test_market_search.py::test_tc_us03_04_search_with_no_matches_shows_empty_result` | Branch #124 |
 | TC-US05-01–03 | #120 to add exact paths after reviewed merge | Planned |
 | TC-US06-01–03 | #122 to add exact paths after #81/#103 merge | Planned |
+| #125 Market read states | `tests/test_market_states.py` | Branch #125 |
+| #125 Keyboard refresh focus | `scripts/check_market_keyboard_focus_ui.py` | Branch #125; requires Playwright and Edge |
 
 The 27 October PR #128 worktree check selected its `src` explicitly because a
 reused virtual environment was editable-installed from an older worktree:
