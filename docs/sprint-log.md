@@ -597,3 +597,13 @@ velocity **pending review and merge**. The team has not yet recorded each
 member's acceptance of this new allocation. #114 remains open until that
 confirmation and its planning PR are complete. #115 remains open until actual
 final evidence, merge counts and submission are reconciled.
+
+**Planning acceptance check, 31 October:** The PO confirmed that all four
+members accepted the 10-point assignment. This records the PO's confirmation,
+not invented individual meeting minutes. The reviewed planning PR #127 merged
+on 27 October. The carried-over Portfolio PR #103 also merged on 27 October;
+its pending #122 tests and #123 independent setup check remain distinct work.
+The original commitment stays 40 points (10 each). Chart issue #130 was a
+separate, reviewed 2-point stretch addition, not a retroactive change to the
+equal planning baseline. Final accepted points and velocity belong in #115
+after the remaining work is reviewed; no wrap-up is claimed here.

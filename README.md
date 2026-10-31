@@ -9,10 +9,12 @@
 · [SETUP](docs/SETUP.md).
 
 The team is building executable tests and four-state UI evidence for P0 stories
-US01–US06 and US10. Portfolio issue #81 and PR #103 are carried into this sprint;
-the PR currently conflicts with `main` and requires Long's repair and peer review.
-The merged app already supports account access, stored Market data, and virtual
-Buy/Sell; Portfolio must not be presented as complete until its PR merges.
+US01–US06 and US10. Portfolio issue #81 was carried into this sprint; its
+reviewed PR #103 merged on 27 October, and the Portfolio screen is now on
+`main`. Long's #122 tests and #123 independent SETUP run remain separate
+acceptance work. The merged app supports account access, stored Market data,
+virtual Buy/Sell and Portfolio; feature availability does not replace the M4
+test evidence.
 
 Sprint 4 commitment is **40 points, 10 per member**. The team targets the first
 reviewable PR from every member by 29 October, leaving 31 October–2 November
@@ -27,9 +29,10 @@ submit before the end of 20 October. [Issues](https://github.com/SE-FDA-NEU-AI66
 · [Sprint plan](docs/sprint-log.md#sprint-3---milestone-3)
 · [UI dossier](docs/ui.md) · [SETUP](docs/SETUP.md).
 
-Current checkout: real registration/login/logout and the database-backed market are implemented.
-Main includes authenticated previews, virtual purchases and explicit simulation quotes through merged PR #92.
-Search/detail, sell and portfolio are still pending; see the table and linked evidence.
+At the historical M3 snapshot, registration/login/logout and the database-backed
+market were implemented. Authenticated previews, virtual purchases and explicit
+simulation quotes reached main through PR #92; later M3 work is recorded in
+the table below rather than presented as the current Sprint 4 status.
 
 | P0 story | Where the user starts | Current status |
 |----------|-----------------------|----------------|
