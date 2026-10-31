@@ -49,6 +49,7 @@
       if (!response.ok) {
         const hints = {AUTH_REQUIRED:" Sign in again, then return to trade.", CSRF_FAILED:" Reload the form before trying again.", ACCOUNT_DISABLED:" Contact the project operator."};
         const e = new Error((data.error?.message || "Request rejected. Reload the form and try again.") + (hints[data.error?.code] || ""));
+        e.code = data.error?.code;
         // A server/proxy 5xx may follow a commit; treat the result as uncertain.
         e.rejected = response.status < 500; throw e;
       }
@@ -86,7 +87,10 @@
       confirm.disabled = !data.can_submit;
     } catch (e) {
       if (sequence === generation) {
-        byId("order-error").textContent = e.rejected ? e.message : "Could not load a preview. Your stock and quantity are saved; select Preview order to retry.";
+        byId("order-error").textContent = e.code === "QUOTE_UNAVAILABLE"
+          ? `${e.message} If using simulation, generate demo quotes, then preview again.`
+          : e.rejected ? e.message
+          : "Could not load a preview. Your stock and quantity are saved; select Preview order to retry.";
         byId("order-status").textContent = "Preview unavailable. Review the message below.";
       }
     }

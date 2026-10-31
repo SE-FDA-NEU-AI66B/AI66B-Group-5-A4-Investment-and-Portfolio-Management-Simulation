@@ -121,7 +121,9 @@ def test_tc_us10_02_reducing_quantity_clears_warning(account_db):
 
 
 def test_tc_us10_03_cash_shortfall_recheck_does_not_write(account_db):
+    before_preview = state(account_db)
     estimate = preview(account_db, 1)
+    assert state(account_db) == before_preview
     set_cash(account_db, PRICE - 1)
     before = state(account_db)
     with pytest.raises(OrderError) as error:

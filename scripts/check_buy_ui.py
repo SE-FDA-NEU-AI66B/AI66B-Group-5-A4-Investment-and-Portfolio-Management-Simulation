@@ -55,7 +55,26 @@ def main(loss_mode="disconnect", evidence_dir=None):
                 page.get_by_role("button", name="Register", exact=True).click()
                 expect(page.get_by_role("button", name="Log out")).to_be_visible()
                 page.get_by_role("link", name="Buy shares", exact=True).click()
-                page.get_by_label("Stock symbol").fill("HPG")
+                expect(page.locator("#preview-placeholder")).to_be_visible()
+                expect(page.get_by_role("button", name="Confirm buy")).to_be_disabled()
+                capture(page, "empty")
+                page.route("**/api/market/quotes", lambda route: route.fulfill(
+                    status=503, content_type="application/json", body='{"error":"read failed"}'))
+                page.reload()
+                expect(page.locator("#stock-picker-status")).to_contain_text("Could not load stocks")
+                symbol = page.get_by_label("Stock symbol")
+                symbol.fill("HPG")
+                expect(page.get_by_role("button", name="Retry stock list")).to_be_visible()
+                capture(page, "picker-read-failure")
+                page.unroute("**/api/market/quotes")
+                page.get_by_role("button", name="Retry stock list").click()
+                expect(page.locator("#stock-picker-status")).to_contain_text("stocks available")
+                assert symbol.input_value() == "HPG"
+                symbol.focus()
+                symbol.press("ArrowDown")
+                symbol.press("Enter")
+                assert symbol.input_value() == "HPG"
+                assert symbol.evaluate("input => document.activeElement === input")
                 quantity = page.get_by_label("Number of shares")
                 for invalid_quantity in ("0", "-1", "1.5"):
                     quantity.fill(invalid_quantity)
@@ -67,14 +86,67 @@ def main(loss_mode="disconnect", evidence_dir=None):
                     expect(page.locator("#estimate")).to_be_hidden()
                     if invalid_quantity == "0":
                         capture(page, "zero-quantity")
+                page.route("**/api/orders/preview", lambda route: route.fulfill(
+                    status=503, content_type="application/json",
+                    body='{"error":{"code":"QUOTE_UNAVAILABLE","message":"No valid price is available. Return to Market and try again later."}}'))
+                quantity.fill("1")
+                expect(page.locator("#order-error")).to_contain_text("generate demo quotes")
+                expect(page.get_by_role("button", name="Confirm buy")).to_be_disabled()
+                assert symbol.input_value() == "HPG" and quantity.input_value() == "1"
+                capture(page, "quote-unavailable")
+                page.unroute("**/api/orders/preview")
+                page.get_by_role("button", name="Preview order").click()
+                expect(page.get_by_role("button", name="Confirm buy")).to_be_enabled()
+                page.route("**/api/orders/preview", lambda route: route.abort())
+                page.get_by_role("button", name="Preview order").click()
+                expect(page.locator("#order-error")).to_contain_text("stock and quantity are saved")
+                expect(page.get_by_role("button", name="Confirm buy")).to_be_disabled()
+                assert symbol.input_value() == "HPG" and quantity.input_value() == "1"
+                capture(page, "preview-read-failure")
+                page.unroute("**/api/orders/preview")
+                page.get_by_role("button", name="Preview order").click()
+                expect(page.get_by_role("button", name="Confirm buy")).to_be_enabled()
+                page.evaluate("""() => {
+                    const original = window.fetch;
+                    window.__releasePreview = null;
+                    window.fetch = (url, options) => url === '/api/orders/preview'
+                        ? new Promise(resolve => {
+                            window.__releasePreview = () => resolve(original(url, options));
+                          })
+                        : original(url, options);
+                    window.__restoreFetch = () => { window.fetch = original; };
+                }""")
                 page.get_by_label("Number of shares").fill("4000")
+                expect(page.locator("#order-status")).to_contain_text("Loading preview")
+                capture(page, "loading")
+                page.evaluate("window.__releasePreview()")
+                page.evaluate("window.__restoreFetch()")
                 assert quantity.evaluate("(input) => input.validationMessage") == ""
                 expect(page.locator("#order-error")).to_contain_text(
                     "Exceeds available balance by 12,000,000 VND")
                 expect(page.get_by_role("button", name="Confirm buy")).to_be_disabled()
                 expect(page.locator("#order-status")).to_have_text("Adjust the quantity to continue.")
                 capture(page, "shortfall")
+                page.set_viewport_size({"width": 390, "height": 844})
+                assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
+                capture(page, "shortfall-mobile")
+                page.set_viewport_size({"width": 1200, "height": 850})
                 page.get_by_label("Number of shares").fill("1000")
+                expect(page.get_by_role("button", name="Confirm buy")).to_be_enabled()
+                capture(page, "corrected-preview")
+                with closing(sqlite3.connect(database)) as connection, connection:
+                    connection.execute(
+                        "UPDATE price_quote SET quoted_at=? WHERE instrument_id="
+                        "(SELECT id FROM instrument WHERE symbol='HPG')",
+                        (datetime.now(timezone.utc).isoformat(),),
+                    )
+                page.get_by_role("button", name="Confirm buy").click()
+                expect(page.locator("#order-error")).to_contain_text("Price changed")
+                expect(page.get_by_role("button", name="Confirm buy")).to_be_disabled()
+                capture(page, "quote-changed")
+                with closing(sqlite3.connect(database)) as connection:
+                    assert connection.execute("SELECT COUNT(*) FROM trade").fetchone()[0] == 0
+                page.get_by_role("button", name="Preview order").click()
                 expect(page.get_by_role("button", name="Confirm buy")).to_be_enabled()
                 page.get_by_role("button", name="Confirm buy").click()
                 expect(page.locator("#result")).to_contain_text("72,000,000 VND")
@@ -135,14 +207,16 @@ def main(loss_mode="disconnect", evidence_dir=None):
                 report = {"scenario": loss_mode, "passed": True, "observations": observations,
                           "database_assertions": {"trades": 2, "cash_vnd": 71_972_000, "shares": 1001},
                           "limitations": ["Author QA, not independent-machine acceptance.",
-                                          "Page captures exclude browser chrome/address bar; not M3 submission screenshots.",
-                                          "Stale quote is a controlled temporary-database fixture.",
-                                          "Portfolio transition remains pending #81."]}
+                                          "Page captures exclude browser chrome/address bar.",
+                                          "Picker/read failures and QUOTE_UNAVAILABLE use intercepted failures; no provider call is claimed.",
+                                          "Stale and changed quotes use a controlled temporary-database fixture.",
+                                          "Portfolio valuation is outside #116; the link is visible."]}
                 (evidence_dir / f"buy-{loss_mode}.json").write_text(
                     json.dumps(report, indent=2) + "\n", encoding="utf-8")
-            print(f"PASS ({loss_mode}): real registration/login/logout, guest guard, shortage/correction, "
-                  "persisted buy, demo refresh and ambiguous committed-order handling; "
-                  "no fake auth, no provider calls, portfolio acceptance still pending #81.")
+            print(f"PASS ({loss_mode}): real registration/login/logout, guest guard, "
+                  "empty/loading/error/success states, keyboard picker, mobile layout, "
+                  "shortage/correction, persisted buy, quote recovery and ambiguous "
+                  "committed-order handling; no fake auth or provider calls.")
         finally:
             server.shutdown()
             server.server_close()
