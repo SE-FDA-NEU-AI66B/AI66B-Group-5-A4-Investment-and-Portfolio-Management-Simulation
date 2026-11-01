@@ -1,0 +1,55 @@
+{
+  "passed": true,
+  "observations": [
+    {
+      "state": "success",
+      "viewport": "1440x1000",
+      "at_utc": "2026-10-31T11:12:59.348990+00:00"
+    },
+    {
+      "state": "success",
+      "viewport": "390x844",
+      "at_utc": "2026-10-31T11:12:59.413795+00:00"
+    },
+    {
+      "state": "keyboard-focus",
+      "viewport": "1440x1000",
+      "at_utc": "2026-10-31T11:13:14.389097+00:00"
+    },
+    {
+      "state": "keyboard-focus",
+      "viewport": "390x844",
+      "at_utc": "2026-10-31T11:13:17.388696+00:00"
+    },
+    {
+      "state": "error",
+      "viewport": "1440x1000",
+      "at_utc": "2026-10-31T11:13:20.438560+00:00"
+    },
+    {
+      "state": "error",
+      "viewport": "390x844",
+      "at_utc": "2026-10-31T11:13:20.508253+00:00"
+    },
+    {
+      "state": "loading",
+      "viewport": "1440x1000",
+      "at_utc": "2026-10-31T11:13:24.210170+00:00"
+    },
+    {
+      "state": "loading",
+      "viewport": "390x844",
+      "at_utc": "2026-10-31T11:13:24.300586+00:00"
+    },
+    {
+      "state": "empty",
+      "viewport": "1440x1000",
+      "at_utc": "2026-10-31T11:13:24.439472+00:00"
+    },
+    {
+      "state": "empty",
+      "viewport": "390x844",
+      "at_utc": "2026-10-31T11:13:24.524145+00:00"
+    }
+  ]
+}

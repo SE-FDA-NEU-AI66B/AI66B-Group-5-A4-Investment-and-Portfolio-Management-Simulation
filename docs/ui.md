@@ -322,6 +322,56 @@ search preserves the entered text. Arrow keys, Enter, Escape and Tab work.
 See [observed screens and reproducible checks](market-buy-ui-evidence.md).
 These author page captures are not the PDF address-bar screenshots.
 
+### 2.8 Market quote refresh and four states - #125
+
+On this branch, the Market list presents four read states: a polite loading
+status while the three-second quote GET is pending; an empty message for no
+quotes or no search matches; the stored snapshot with each quote's original
+source and timestamp; and a read-error status with a **Try again** action.
+Transient read failures leave the current rows, source, timestamp, and search
+text in place. Retry and automatic refresh use only the idempotent quote GET.
+When a successful poll replaces quote rows or watchboard tiles, keyboard focus
+returns to the matching Detail, Buy, or watchboard link; polling does not move
+focus from the Search field or its current text selection.
+
+Server-rendered state coverage is in `tests/test_market_states.py`:
+
+```text
+python -m pytest -q tests/test_market_states.py
+```
+
+It verifies visible retry on initial read failure, hidden retry on success,
+query preservation, no database creation on reads, and distinct empty/no-match
+messages. The separate browser regression for keyboard focus is
+`scripts/check_market_keyboard_focus_ui.py`; run it with the project's
+Playwright/Edge setup:
+
+```text
+python scripts/check_market_keyboard_focus_ui.py --evidence-dir docs/images/ui/market-four-states
+```
+
+The browser check verifies focus remains on Detail, Buy, watchboard, and Search
+across refreshes, including Search's text selection. It also simulates a
+transient 503 at desktop/mobile, checks that the query, displayed snapshot,
+provider timestamp, and source stay unchanged, and verifies **Try again**
+recovers with a quote GET. It captures the before/after focus screenshots below.
+The four-state captures from the author browser run are:
+[success desktop](images/ui/market-four-states/market-success-1440.png)
+and [mobile](images/ui/market-four-states/market-success-390.png);
+[empty desktop](images/ui/market-four-states/market-empty-1440.png)
+and [mobile](images/ui/market-four-states/market-empty-390.png);
+[loading desktop](images/ui/market-four-states/market-loading-1440.png)
+and [mobile](images/ui/market-four-states/market-loading-390.png);
+[error desktop](images/ui/market-four-states/market-error-1440.png)
+and [mobile](images/ui/market-four-states/market-error-390.png).
+Keyboard comparison: before, [desktop](images/ui/market-four-states/market-keyboard-before-1440.png)
+and [mobile](images/ui/market-four-states/market-keyboard-before-390.png);
+after, [desktop](images/ui/market-four-states/market-keyboard-focus-1440.png)
+and [mobile](images/ui/market-four-states/market-keyboard-focus-390.png).
+The before captures use the unmodified `HEAD` script; the after captures use
+this branch's focus-restoring script. All captures are author-run
+implementation evidence, not independent review or merge evidence.
+
 ## 3. Error messages
 
 Every row separates two things: the **API message**, which is the exact string
@@ -415,7 +465,7 @@ endpoint and ownership change is documented in design.md in this same PR;
 implementation belongs to #76, review/agreement to #75, wireframes to #86.
 All story statuses above remain unchanged until the UI actually works.
 
-### Integration evidence — 18 October 2026 (PR #92 branch)
+### Integration evidence - 18 October 2026 (PR #92 branch)
 
 Real browser navigation, without typed deep links: Home → Market → Buy shares
 (guest guard) → Register → Market → Buy shares → shortage/correction → confirmed
