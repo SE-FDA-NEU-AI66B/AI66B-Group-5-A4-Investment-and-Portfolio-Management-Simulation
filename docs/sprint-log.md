@@ -607,3 +607,76 @@ The original commitment stays 40 points (10 each). Chart issue #130 was a
 separate, reviewed 2-point stretch addition, not a retroactive change to the
 equal planning baseline. Final accepted points and velocity belong in #115
 after the remaining work is reviewed; no wrap-up is claimed here.
+
+### Wrap-up status - 2 November 2026, 23:00 (UTC+7)
+
+This is a status record, not the final entry. It is written before the LMS
+cutoff (3 November 00:00 UTC+7) from GitHub state on `main` at `537bf99`.
+Open items are listed as open. The final completed points and velocity are
+entered only after #118 and #126 land and this section is reviewed.
+
+**Points.** Committed baseline: **40** (10 per member). Completed with evidence
+on `main` today: **35**. Still open: **5** (#115, #118, #126). Velocity is
+**35, provisional**. If #118 and #126 are accepted before the cutoff it becomes
+**39**, and **40** when #115 itself closes after review. No remaining item is
+counted before it is accepted.
+
+| Issue | Pts | Owner | Status | Evidence |
+|---|---:|---|---|---|
+| #81 Portfolio carry-over | 5 | Long | Closed 27 Oct | PR #103, reviewed by @VuSiSi, merged 27 Oct |
+| #114 Backlog and plan | 1 | Thanh | Closed 2 Nov | PRs #127, #138 (approved by @VuSiSi); acceptance recorded 31 Oct |
+| #116 Buy error states | 3 | Thanh | Closed 2 Nov | PRs #128, #137; `docs/buy-states.md`; `scripts/check_buy_ui.py` |
+| #117 US04/US10 tests | 3 | Thanh | Closed 2 Nov | PR #128; `tests/test_buy_m4.py`; mutation in `docs/testing.md` section 4 |
+| #119 US01/US02 tests | 4 | Tue | Closed 28 Oct | PR #132; `tests/test_auth_m4.py` |
+| #120 US05 tests | 4 | Tue | Closed 2 Nov | PR #133; `tests/test_sell_m4.py` |
+| #121 Boundary audit | 2 | Tue | Closed 2 Nov | PR #134; `docs/testing-audit.md`; checker and its tests |
+| #122 US06 tests | 3 | Long | Closed 2 Nov | PR #140; `tests/test_portfolio_m4.py` |
+| #123 Independent clean clone | 2 | Long | Closed 2 Nov | PR #142; `docs/SETUP.md`; six `pytest -v` screenshots |
+| #124 US03 tests | 4 | Vu | Closed 31 Oct | PR #135; `tests/test_market_search.py` |
+| #125 Market four states | 4 | Vu | Closed 1 Nov | PR #136; `tests/test_market_states.py` |
+| #118 Testing dossier | 2 | Thanh | **Open** | PR #139 awaiting @VuSiSi's re-review; see below |
+| #126 Final PDF | 2 | Vu | **Open** | Export is made only from the merged dossier; not done yet |
+| #115 This wrap-up | 1 | Thanh | **Open** | Closed only after this section is reviewed and merged |
+
+The separate #130 chart issue (2 points, closed 27 October) was a reviewed
+stretch addition and is not part of the 40-point baseline or the 35 above.
+The 5 points of #81 are counted once, in Sprint 4: Sprint 3 recorded the story
+as unfinished, and the PR merged inside this sprint with a review.
+
+**Per-member requirements** (at least 1 merged PR, 1 review given, 1 closed
+issue and 1 authored test; reviews are GitHub "Review changes" entries):
+
+| Member | Merged PR | Review given | Closed issue | Authored test | Met |
+|---|---|---|---|---|---|
+| @bianh13 | #127, #128, #129, #131, #137, #138 | APPROVED #132, #133, #134, #135, #136 | #114, #116, #117, #130 | `tests/test_buy_m4.py` | Yes |
+| @nguyentue110 | #132, #133, #134 | COMMENTED #128; APPROVED #140, #142 | #119, #120, #121 | `tests/test_auth_m4.py`, `tests/test_sell_m4.py` | Yes |
+| @longbk761-bot | #103, #140, #142 | **None yet** | #81, #122, #123 | `tests/test_portfolio_m4.py` | **No: review missing** |
+| @VuSiSi | #135, #136 | APPROVED #103, #127, #128, #129, #131, #137, #138 | #124, #125 | `tests/test_market_search.py`, `tests/test_market_states.py` | Yes |
+
+Team totals on `main`: 14 PRs merged since 23 October, each with a non-author
+APPROVED review, and 12 issues closed in the milestone (above the minimum of 4
+PRs and 5 issues). Reviews are listed from GitHub; planned reviewers in the
+rotation above are assignments, not evidence.
+
+**Unfinished or unreconciled work, stated as it stands:**
+
+1. **Long has no review given yet.** The requirement is not met until Long
+   gives a substantive review on a PR that is still open. PR #139 is the only
+   open PR. A review is not counted until it exists on GitHub.
+2. **#118 / PR #139 is not merged.** The dossier maps all 34 executable nodes
+   and records both clean-clone runs, but it awaits @VuSiSi's re-review. The
+   independent run by Long (`fc47196`, 312 passed, 2 skipped) predates the five
+   US05 tests; the later run on `main` (320 passed, 2 skipped on `6381e55`,
+   323 passed on `537bf99`) was done by the author and is not independent
+   evidence. A second independent run was requested on #139 and has not
+   happened yet.
+3. **#126 PDF is not exported.** `Team05_M4.pdf` is made only from the merged
+   dossier, so it depends on item 2.
+4. **Screenshot, PDF and project-board reconciliation is not done.** The board
+   and final PDF cannot be checked against `main` until items 2 and 3 land.
+5. **Review and retrospective** are recorded only after those events happen.
+   If no retrospective is held, this log will say so.
+
+This section will be updated, not replaced silently, when items 1-4 change.
+The issue #115 is not closed by this pull request's merge until the final
+entry exists and has been reviewed.
