@@ -79,6 +79,20 @@ def set_quote_time(path, stamp):
         )
 
 
+def refresh_http_session(path):
+    current = datetime.now(timezone.utc)
+    with closing(sqlite3.connect(path)) as connection, connection:
+        connection.execute(
+            "UPDATE auth_session SET created_at=?, expires_at=?, last_seen_at=?"
+            " WHERE id=1",
+            (
+                current.isoformat(),
+                (current + timedelta(hours=1)).isoformat(),
+                current.isoformat(),
+            ),
+        )
+
+
 def snapshot(path):
     with closing(sqlite3.connect(path)) as connection:
         return tuple(
@@ -196,6 +210,7 @@ def test_tc_us05_04_changed_and_stale_quote_are_refused_before_commit(sell_db):
 def test_tc_us05_05_sell_route_rejects_oversell_before_write(sell_db):
     buy(sell_db, 500)
     set_price(sell_db, SELL_PRICE)
+    refresh_http_session(sell_db)
     set_quote_time(sell_db, datetime.now(timezone.utc).isoformat())
     app = create_app({
         'TESTING': True,
