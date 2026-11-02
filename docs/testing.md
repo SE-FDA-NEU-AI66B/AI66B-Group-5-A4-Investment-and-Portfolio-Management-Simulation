@@ -1,8 +1,8 @@
-# Milestone 4 testing dossier — working draft
+# Milestone 4 testing dossier
 
-This document is incomplete until every case below has an executable test on
-`main`, the final clean-clone run is captured, and another member reviews it.
-The status column distinguishes current branch evidence from planned work.
+Every P0 case below names an executable test that exists on `main`. Section 3
+records the independent clean-clone run (#123) and the latest full run on
+`main`, and says which commit each one used.
 
 ## 1. What we test, and why
 
@@ -19,10 +19,9 @@ failure with no writes, and authentication before presentation-only details.
 
 ## 2. Test cases for every P0 story
 
-`On main` means the named test exists in a merged PR. `Branch` means the test
-exists only in a linked, unmerged PR and is not final automated evidence.
-`Planned` means the case is assigned but is not counted as automated evidence.
-Every planned ID must be added to a test name or comment by its issue owner.
+`On main (#PR)` means the named test exists on `main` and was merged through
+that reviewed PR. No P0 case is counted as automated evidence before its test
+is on `main`; at this revision no case remains branch-only or planned.
 
 | ID | Story | Input | Expected result | Kind | Status/owner |
 |---|---|---|---|---|---|
@@ -41,18 +40,17 @@ Every planned ID must be added to a test name or comment by its issue owner.
 | TC-US04-01 | US04 buy | Preview and buy one HPG share | Preview writes nothing; confirmed trade/cash/holding exact | Normal | On main (#128) Thanh |
 | TC-US04-02 | US04 buy | Quantity zero | `INVALID_QUANTITY`; no trade | Error/boundary | On main (#128) Thanh |
 | TC-US04-03 | US04 buy | Quote ages 900 and 901 seconds | 900 allowed; 901 `QUOTE_STALE`, no write | Boundary | On main (#128) Thanh |
-| TC-US05-01 | US05 sell | Sell part of held position | Proceeds, cash, remainder and cost basis exact | Normal | Planned #120 Tue |
-| TC-US05-02 | US05 sell | Request more than held | `INSUFFICIENT_SHARES`; no writes | Error | Planned #120 Tue |
-| TC-US05-03 | US05 sell | Quantity 0, 1, exactly held, held + 1 | 0 and overheld refused; 1/exact held accepted | Boundary | Planned #120 Tue |
+| TC-US05-01 | US05 sell | Sell part of held position | Proceeds, cash, remainder and cost basis exact | Normal | On main (#133) Tue |
+| TC-US05-02 | US05 sell | Request more than held | `INSUFFICIENT_SHARES`; no writes | Error | On main (#133) Tue |
+| TC-US05-03 | US05 sell | Quantity 0, 1, exactly held, held + 1 | 0 and overheld refused; 1/exact held accepted | Boundary | On main (#133) Tue |
+| TC-US05-04 | US05 sell | Quote timestamp changes, then quote is 901+ seconds old | `QUOTE_CHANGED` / `QUOTE_STALE`; no writes | Error/boundary | On main (#133) Tue |
+| TC-US05-05 | US05 sell | HTTP preview then oversell confirmation | Route returns 409 `INSUFFICIENT_SHARES`; no writes | Error/route | On main (#133) Tue |
 | TC-US06-01 | US06 portfolio | New signed-in account with zero holdings | Empty state, total = cash, visible Browse the market link | Normal/boundary | On main (#140) Long |
 | TC-US06-02 | US06 portfolio | One holding and a current quote | Only own holding, cash, valuation and P&L exact integers | Normal | On main (#140) Long |
 | TC-US06-03 | US06 portfolio | Guest, revoked session, disabled account or second account requests first account's data | 401 for guest/invalid session; second account sees only its own data; private holdings never leak | Error | On main (#140) Long |
 | TC-US06-04 | US06 portfolio | Holding with no quote row; holding with a two-hour-old quote | No-quote holding shown as incomplete (value/P&L null, not 0, total flagged); old quote flagged delayed but still valued | Error | On main (#140) Long |
 | TC-US06-05 | US06 portfolio | Quantity 1 and 1,000,000; cost 0; one-VND gain/loss on 20,000 cost | Exact integer value/P&L/total; percent half-up (+0.01 / -0.01), null when cost is 0 | Boundary | On main (#140) Long |
 | TC-US06-06 | US06 portfolio | Quote age 900 and 901 seconds; 300 and 301 seconds in the future | 900 and +300 current; 901 and +301 delayed | Boundary | On main (#140) Long |
-| TC-US10-01 | US10 cash warning | Cash equals one-share cost, then one VND below | Exact balance allows; shortfall blocks with warning | Boundary/error | Branch #117 Thanh |
-| TC-US10-02 | US10 cash warning | Preview 2 shares with cash for 1, then reduce to 1 | Warning clears and confirmation becomes available; no preview writes | Normal recovery | Branch #117 Thanh |
-| TC-US10-03 | US10 cash warning | Cash falls one VND below cost after preview | Confirmation refuses with no trade or balance change | Error/race | Branch #117 Thanh |
 | TC-US10-01 | US10 cash warning | Cash equals one-share cost, then one VND below | Exact balance allows; shortfall blocks with warning | Boundary/error | On main (#128) Thanh |
 | TC-US10-02 | US10 cash warning | Preview 2 shares with cash for 1, then reduce to 1 | Warning clears and confirmation becomes available; no preview writes | Normal recovery | On main (#128) Thanh |
 | TC-US10-03 | US10 cash warning | Cash falls one VND below cost after preview | Confirmation refuses with no trade or balance change | Error/race | On main (#128) Thanh |
@@ -81,18 +79,12 @@ To install both test tools at once, use
 development/QA-only and are intentionally not added to the runtime
 `requirements.txt`.
 
-For the full suite, run `pytest` from the repository root in the activated
-virtual environment. For final evidence, run
-`python -m pytest -v` and capture **all test names** in the screenshot after
-all team PRs have merged. A screenshot is pending; the current branch is not a
-substitute for the final `main` run.
+For the full suite, follow [SETUP](SETUP.md) from a clean clone, put the new
+venv on PATH and run plain `pytest -v` from the repository root:
 
-From a clean clone after following [SETUP](SETUP.md), put the new venv on PATH
-and run plain `pytest -v` from the repository root. Capture **all test names**
-and the summary in an unedited terminal screenshot after all P0 test PRs have
-merged. Record the exact main commit and independent tester (#123) alongside
-the screenshot. The final screenshot is pending; this branch is not a
-substitute for that run.
+```text
+pytest -v
+```
 
 | Case IDs | Test location and exact pytest function | State |
 |---|---|---|
@@ -114,7 +106,11 @@ substitute for that run.
 | TC-US03-02 | `tests/test_market_search.py::test_tc_us03_02_unknown_ticker_and_storage_failures_return_errors` | On main (#135) |
 | TC-US03-03 | `tests/test_market_search.py::test_tc_us03_03_search_query_length_boundary` (49/50/51 parameters) | On main (#135) |
 | TC-US03-04 | `tests/test_market_search.py::test_tc_us03_04_search_with_no_matches_shows_empty_result` | On main (#135) |
-| TC-US05-01–03 | #120 to add exact paths after reviewed merge | Planned |
+| TC-US05-01 | `tests/test_sell_m4.py::test_tc_us05_01_partial_then_full_sale_preserves_cash_and_cost_basis` | On main (#133) |
+| TC-US05-02 | `tests/test_sell_m4.py::test_tc_us05_02_oversell_is_refused_without_writes` | On main (#133) |
+| TC-US05-03 | `tests/test_sell_m4.py::test_tc_us05_03_quantity_boundaries` (0/1/1000/1001 parameters) | On main (#133) |
+| TC-US05-04 | `tests/test_sell_m4.py::test_tc_us05_04_changed_and_stale_quote_are_refused_before_commit` | On main (#133) |
+| TC-US05-05 | `tests/test_sell_m4.py::test_tc_us05_05_sell_route_rejects_oversell_before_write` | On main (#133) |
 | TC-US06-01 | `tests/test_portfolio_m4.py::test_tc_us06_01_empty_holdings_total_equals_cash_with_browse_market` | On main (#140) |
 | TC-US06-02 | `tests/test_portfolio_m4.py::test_tc_us06_02_one_holding_current_quote_exact_integer_values` and `tests/test_portfolio_m4.py::test_tc_us06_02_only_the_signed_in_accounts_holding_is_counted` | On main (#140) |
 | TC-US06-03 | `tests/test_portfolio_m4.py::test_tc_us06_03_guest_gets_401_and_no_private_data`, `tests/test_portfolio_m4.py::test_tc_us06_03_second_account_never_receives_the_first_accounts_data`, `tests/test_portfolio_m4.py::test_tc_us06_03_revoked_session_or_disabled_account_gets_401` (2 parameters) | On main (#140) |
@@ -124,17 +120,31 @@ substitute for that run.
 | #125 Market read states | `tests/test_market_states.py` | On main (#136) |
 | #125 Keyboard refresh focus | `scripts/check_market_keyboard_focus_ui.py` | On main (#136); requires Playwright and Edge |
 
-PR #133 carries the proposed US05 tests and is now wall-clock independent, but
-it must resolve its `docs/testing.md` conflict before it can be counted as
-on-main evidence. The final clean-clone screenshot remains pending under #123.
+### Full-suite results
 
-The 27 October PR #128 worktree check selected its `src` explicitly because a
-reused virtual environment was editable-installed from an older worktree:
-**236 passed, 2 skipped**. An author check on main `6eba4b0` ran plain
-`pytest -q` on 1 November: **293 passed, 2 skipped**. Neither is the
-independent clean-clone result. Long's #123 must repeat the setup on another
-machine after the remaining test PRs merge; the final document will record that
-exact main SHA, full `pytest -v` result and terminal screenshot.
+| Run | Commit | Who / where | Result |
+|---|---|---|---|
+| Independent clean clone (#123, #142) | `fc47196` (`main` after #140) | Long, separate Windows 11 machine, fresh folder and venv, 2 November | **312 passed, 2 skipped** (314 collected) |
+| Clean clone of current `main` | `6381e55` (`main` after #133 and #142) | @bianh13, fresh `git clone` into a new folder, new Python 3.13 venv with `pip install -e . pytest`, no `PYTHONPATH`, 2 November | **320 passed, 2 skipped** (322 collected) |
+
+Long's run is the independent clean-clone evidence. Its unedited `pytest -v`
+output, with every test name, is in six overlapping screenshots:
+[1](images/m4/clean-clone-2026-11-02/pytest-v-1.png),
+[2](images/m4/clean-clone-2026-11-02/pytest-v-2.png),
+[3](images/m4/clean-clone-2026-11-02/pytest-v-3.png),
+[4](images/m4/clean-clone-2026-11-02/pytest-v-4.png),
+[5](images/m4/clean-clone-2026-11-02/pytest-v-5.png),
+[6](images/m4/clean-clone-2026-11-02/pytest-v-6.png). The machine, Python
+version, timings and the market page check are recorded under
+[Independent verification](SETUP.md#independent-verification) in SETUP.
+
+That run used `fc47196`, which was before #133 merged. It covers every P0 case
+except the five US05 tests in `tests/test_sell_m4.py`. The current-`main` row
+adds those tests. It ran on a fresh clone with a new venv and plain `pytest -v`,
+but it is an author run, not a second independent check.
+
+Earlier branch-local counts (236 passed on the #128 worktree on 27 October;
+293 passed on `6eba4b0` on 1 November) are superseded by the two runs above.
 
 ## 4. What the tests found
 
@@ -157,8 +167,8 @@ test_tc_us04_03_quote_age_boundary[901-False] PASSED
 ```
 
 This demonstrates that the boundary test fails when the inclusive time rule
-breaks. The final red/green evidence and full-suite screenshot will be added
-after independent review; the deliberate mutation is absent from this branch.
+breaks. The mutation is absent from `main`. @nguyentue110 independently
+reproduced it in the #121 audit (PR #134).
 
 ### Deliberate mutation, 28 October - TC-US01-03
 
@@ -232,3 +242,26 @@ absent from the branch):
 After each restore the same selection passed (4 passed; 1 passed; 1 passed).
 Fixtures use invented symbols (`XQA`, `XQB`) and explicit integers, so the
 expected values are derived by hand and no server or real database is needed.
+
+### Deliberate mutation, 30 October - TC-US05-03
+
+Temporarily changed the oversell guard in `src/virtutrade/orders/sell.py` from
+`quantity > held` to `quantity >= held`. Selling exactly the held quantity then
+raised `INSUFFICIENT_SHARES` instead of removing the holding:
+
+```text
+$ python -m pytest "tests/test_sell_m4.py::test_tc_us05_03_quantity_boundaries[1000-True]" -q
+FAILED tests/test_sell_m4.py::test_tc_us05_03_quantity_boundaries[1000-True]
+E   virtutrade.orders.errors.OrderError: You hold 1,000 HPG; the maximum you can sell is 1,000.
+1 failed
+```
+
+Restored the guard and reran the same case:
+
+```text
+$ python -m pytest "tests/test_sell_m4.py::test_tc_us05_03_quantity_boundaries[1000-True]" -q
+1 passed
+```
+
+The mutation is absent from the branch. The complete US05 file passes as part
+of the full suite after restoration.

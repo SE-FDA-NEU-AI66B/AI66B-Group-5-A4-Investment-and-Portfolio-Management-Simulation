@@ -87,6 +87,7 @@ prices are not live DNSE data. Restarting preserves the DB; Ctrl+C stops the app
 | Market data is unavailable (503) | Check DATABASE_PATH/permissions, then run init-db with the server's environment; inspect terminal logs for the actual DB error. |
 | Linux cannot create venv | Install the OS's matching venv support (Debian/Ubuntu: python3-venv), then repeat creation. |
 | No quotes yet | DB exists but has no quotes; run init-db and reload. |
+| `UnicodeEncodeError: 'charmap' codec can't encode character` during `pip install -e .` (Windows) | The checkout path contains non-ASCII characters (e.g. `D:\Học tập\...`); Python 3.11 on Windows writes the editable-install `.pth` file in cp1252. Clone into an ASCII-only path such as `D:\code\`. Alternatively run `setx PYTHONUTF8 1`, open a new terminal and reinstall; the variable must stay set whenever the venv is used. |
 
 ## Tests
 
@@ -133,28 +134,46 @@ pytest -v
 On macOS/Linux, use `.venv/bin/pytest -v`. Capture the complete test-name and
 summary output with the checked-out commit SHA after the P0 test PRs have
 merged. Do not set `PYTHONPATH` to another checkout or substitute selected
-tests for the full run. Long's independent-machine result is tracked by #123;
-an author run is not that evidence.
+tests for the full run. Long's independent-machine result for #123 is recorded
+under [Independent verification](#independent-verification) below. An author
+run is not that evidence.
 
 ## Independent verification
 
 A non-author must follow these updated module-install/run commands on a
 different machine from a clean clone and record the exact tested commit.
 Earlier runs using root app.py do not verify this src-layout revision.
-The placeholders below remain pending until the actual run is recorded.
+The run below was recorded for Milestone 4 under #123.
 
 | Field | Value |
 |-------|-------|
-| Tested by | TESTER_NAME |
-| Date | TESTER_DATE |
-| OS | TESTER_OS |
-| Python | TESTER_PY |
-| Git | TESTER_GIT |
-| Commit SHA | TESTER_SHA |
-| Elapsed (clone to page loaded) | TESTER_MIN minutes |
-| Tests | TESTER_TESTS |
-| Result | TESTER_RESULT |
-| Notes | TESTER_NOTES |
+| Tested by | Bùi Khang Long (`longbk761-bot`) |
+| Date | 2 November 2026, 20:53–21:14 UTC+7 |
+| OS | Microsoft Windows 11 Pro 10.0.26200 (Build 26200) |
+| Python | 3.11.9 |
+| Git | 2.53.0.windows.2 |
+| Commit SHA | `fc47196da39c3019ff67a68c9047ef21db223361` (`main` after PR #140) |
+| Elapsed (clone to page loaded) | 4 minutes (20:53:58 to 20:57:45 UTC+7) |
+| Tests | `python -m pytest -v` from the repository root in the activated venv: 314 collected |
+| Result | **312 passed, 2 skipped in 52.53 s**; `/market` showed "Market snapshot", "12 symbols · VND", HPG 28,000 and FPT 120,000 (Demo / seed) |
+| Notes | Fresh folder `D:\m4-check`; commands run in Git Bash (MINGW64) as the equivalent of the PowerShell block above, using `.venv/Scripts/python.exe`. `.env` was copied from `.env.example` with no edits; no real credentials or database dump were used. After the run `git status` showed a clean tree except the untracked `pytest-v.txt` output file. The board URL in README opened. Open PRs #133, #134 and #139 were not yet merged at this SHA. |
+
+Evidence: [market page](images/m4/clean-clone-2026-11-02/market-page.png);
+`date` at [clone start](images/m4/clean-clone-2026-11-02/date-start.png) and
+[page loaded](images/m4/clean-clone-2026-11-02/date-page-loaded.png);
+`python -m pytest -v` with every test name in six overlapping screenshots:
+[1](images/m4/clean-clone-2026-11-02/pytest-v-1.png),
+[2](images/m4/clean-clone-2026-11-02/pytest-v-2.png),
+[3](images/m4/clean-clone-2026-11-02/pytest-v-3.png),
+[4](images/m4/clean-clone-2026-11-02/pytest-v-4.png),
+[5](images/m4/clean-clone-2026-11-02/pytest-v-5.png),
+[6](images/m4/clean-clone-2026-11-02/pytest-v-6.png).
+
+**Reproducible failure found during #123:** the tester's usual checkout under
+`D:\Học tập\...` failed at `pip install -e .` with `UnicodeEncodeError`
+(Windows, Python 3.11, cp1252). The clean clone above used an ASCII-only path and
+passed, including `tests/test_cli.py`, which requires the installed package.
+The workaround is now listed under Troubleshooting.
 
 **PO local clean-clone check, 3 October:** Windows/Python 3.10.11, main commit
 `b5fdb0f`; fresh venv and database, repeated init-db, tests and lint passed.
