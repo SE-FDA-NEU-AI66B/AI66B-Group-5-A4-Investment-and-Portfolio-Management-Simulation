@@ -43,9 +43,12 @@ Every planned ID must be added to a test name or comment by its issue owner.
 | TC-US05-01 | US05 sell | Sell part of held position | Proceeds, cash, remainder and cost basis exact | Normal | Planned #120 Tue |
 | TC-US05-02 | US05 sell | Request more than held | `INSUFFICIENT_SHARES`; no writes | Error | Planned #120 Tue |
 | TC-US05-03 | US05 sell | Quantity 0, 1, exactly held, held + 1 | 0 and overheld refused; 1/exact held accepted | Boundary | Planned #120 Tue |
-| TC-US06-01 | US06 portfolio | New signed-in account with zero holdings | Empty state and total = cash | Normal/boundary | Planned #81/#122 Long |
-| TC-US06-02 | US06 portfolio | One holding and a current quote | Only own holding, cash, valuation and P&L exact | Normal/boundary | Planned #81/#122 Long |
-| TC-US06-03 | US06 portfolio | Guest or second account requests first account's data | 401/private holdings never leak | Error | Planned #81/#122 Long |
+| TC-US06-01 | US06 portfolio | New signed-in account with zero holdings | Empty state, total = cash, visible Browse the market link | Normal/boundary | Branch #122 Long |
+| TC-US06-02 | US06 portfolio | One holding and a current quote | Only own holding, cash, valuation and P&L exact integers | Normal | Branch #122 Long |
+| TC-US06-03 | US06 portfolio | Guest, revoked session, disabled account or second account requests first account's data | 401 for guest/invalid session; second account sees only its own data; private holdings never leak | Error | Branch #122 Long |
+| TC-US06-04 | US06 portfolio | Holding with no quote row; holding with a two-hour-old quote | No-quote holding shown as incomplete (value/P&L null, not 0, total flagged); old quote flagged delayed but still valued | Error | Branch #122 Long |
+| TC-US06-05 | US06 portfolio | Quantity 1 and 1,000,000; cost 0; one-VND gain/loss on 20,000 cost | Exact integer value/P&L/total; percent half-up (+0.01 / -0.01), null when cost is 0 | Boundary | Branch #122 Long |
+| TC-US06-06 | US06 portfolio | Quote age 900 and 901 seconds; 300 and 301 seconds in the future | 900 and +300 current; 901 and +301 delayed | Boundary | Branch #122 Long |
 | TC-US10-01 | US10 cash warning | Cash equals one-share cost, then one VND below | Exact balance allows; shortfall blocks with warning | Boundary/error | Branch #117 Thanh |
 | TC-US10-02 | US10 cash warning | Preview 2 shares with cash for 1, then reduce to 1 | Warning clears and confirmation becomes available; no preview writes | Normal recovery | Branch #117 Thanh |
 | TC-US10-03 | US10 cash warning | Cash falls one VND below cost after preview | Confirmation refuses with no trade or balance change | Error/race | Branch #117 Thanh |
@@ -101,7 +104,12 @@ substitute for the final `main` run.
 | TC-US03-03 | `tests/test_market_search.py::test_tc_us03_03_search_query_length_boundary` (49/50/51 parameters) | Branch #124 |
 | TC-US03-04 | `tests/test_market_search.py::test_tc_us03_04_search_with_no_matches_shows_empty_result` | Branch #124 |
 | TC-US05-01–03 | #120 to add exact paths after reviewed merge | Planned |
-| TC-US06-01–03 | #122 to add exact paths after #81/#103 merge | Planned |
+| TC-US06-01 | `tests/test_portfolio_m4.py::test_tc_us06_01_empty_holdings_total_equals_cash_with_browse_market` | Branch #122 |
+| TC-US06-02 | `tests/test_portfolio_m4.py::test_tc_us06_02_one_holding_current_quote_exact_integer_values` and `::test_tc_us06_02_only_the_signed_in_accounts_holding_is_counted` | Branch #122 |
+| TC-US06-03 | `tests/test_portfolio_m4.py::test_tc_us06_03_guest_gets_401_and_no_private_data`, `::test_tc_us06_03_second_account_never_receives_the_first_accounts_data`, `::test_tc_us06_03_revoked_session_or_disabled_account_gets_401` (2 parameters) | Branch #122 |
+| TC-US06-04 | `tests/test_portfolio_m4.py::test_tc_us06_04_missing_quote_is_incomplete_and_never_valued_as_zero` and `::test_tc_us06_04_delayed_quote_is_flagged_but_keeps_its_value` | Branch #122 |
+| TC-US06-05 | `tests/test_portfolio_m4.py::test_tc_us06_05_quantity_value_and_percent_boundaries` (6 parameters) | Branch #122 |
+| TC-US06-06 | `tests/test_portfolio_m4.py::test_tc_us06_06_quote_age_boundary` (900/901 and +300/+301 parameters) | Branch #122 |
 | #125 Market read states | `tests/test_market_states.py` | Branch #125 |
 | #125 Keyboard refresh focus | `scripts/check_market_keyboard_focus_ui.py` | Branch #125; requires Playwright and Edge |
 
@@ -191,3 +199,19 @@ The mutation is absent from the worktree.
 After restoration, the local working-tree suite passed with
 `python -m pytest`: **290 passed, 2 skipped**. This is branch-local evidence,
 not the required clean-clone run from `main`.
+
+### Deliberate mutations, 28 October - TC-US06-04 and TC-US06-06
+
+Three temporary changes were made under `src/virtutrade/portfolio/`, each run
+against the new test, then restored with `git checkout` (the mutations are
+absent from the branch):
+
+| Mutation | Test that turned red | Evidence |
+|---|---|---|
+| `service.py`: `age > STALE_AFTER_SECONDS` changed to `>=` | `test_tc_us06_06_quote_age_boundary[900-False]` | `assert True is False` (900 s wrongly delayed); 1 failed, 3 passed |
+| `repository.py`: `LEFT JOIN price_quote` changed to `JOIN` | `test_tc_us06_04_missing_quote_is_incomplete_and_never_valued_as_zero` | `KeyError: 'XQB'` (holding without a quote vanished); 1 failed |
+| `service.py`: unpriced holding counted as value 0 and `unpriced_count` forced to 0 | `test_tc_us06_04_missing_quote_is_incomplete_and_never_valued_as_zero` | `valuation_complete` stayed `True`; 1 failed |
+
+After each restore the same selection passed (4 passed; 1 passed; 1 passed).
+Fixtures use invented symbols (`XQA`, `XQB`) and explicit integers, so the
+expected values are derived by hand and no server or real database is needed.
