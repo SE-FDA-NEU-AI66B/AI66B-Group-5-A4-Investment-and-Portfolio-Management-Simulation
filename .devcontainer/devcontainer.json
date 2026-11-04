@@ -5,7 +5,7 @@
   // and Flask) instead of the image's global pipx pytest.
   "name": "VirtuTrade (Python 3.12)",
   "image": "mcr.microsoft.com/devcontainers/python:1-3.12-bookworm",
-  "postCreateCommand": "python3 -m venv .venv && .venv/bin/python -m pip install -e . pytest && ([ -f .env ] || cp .env.example .env) && .venv/bin/python -m virtutrade init-db",
+  "postCreateCommand": "python3 -m venv .venv && .venv/bin/python -m pip install -e '.[dev]' && ([ -f .env ] || cp .env.example .env) && .venv/bin/python -m virtutrade init-db",
   "remoteEnv": {
     "VIRTUAL_ENV": "${containerWorkspaceFolder}/.venv",
     "PATH": "${containerWorkspaceFolder}/.venv/bin:${containerEnv:PATH}"
