@@ -114,6 +114,16 @@ macOS / Linux:
 .venv/bin/pytest -v
 ```
 
+GitHub Codespaces: the repository's [devcontainer](../.devcontainer/devcontainer.json)
+creates `.venv`, installs the checkout plus `pytest`, copies `.env` and runs
+`init-db` when the codespace is created, and puts `.venv/bin` first on PATH, so
+plain `pytest -v` works in a new terminal. A codespace created before this file
+existed must be rebuilt once (Command Palette → **Codespaces: Rebuild
+Container**). Without a rebuild, bare `pytest` is the image's global pipx copy
+and every test module fails to collect with `ModuleNotFoundError: No module
+named 'virtutrade'`; use `.venv/bin/python -m pip install pytest` and
+`.venv/bin/pytest -v` instead.
+
 Alternatively, run `source .venv/bin/activate` and then `pytest`. Tests use
 temporary SQLite files and do not require a running server, real credentials,
 or the app's persistent database. Capture the full `python -m pytest -v`

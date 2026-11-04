@@ -1,0 +1,23 @@
+{
+  // GitHub Codespaces / VS Code Dev Containers setup.
+  // Python 3.12 matches CI. The project venv is put first on PATH so the
+  // literal `pytest -v` runs the venv's pytest (which can import virtutrade
+  // and Flask) instead of the image's global pipx pytest.
+  "name": "VirtuTrade (Python 3.12)",
+  "image": "mcr.microsoft.com/devcontainers/python:1-3.12-bookworm",
+  "postCreateCommand": "python3 -m venv .venv && .venv/bin/python -m pip install -e . pytest && ([ -f .env ] || cp .env.example .env) && .venv/bin/python -m virtutrade init-db",
+  "remoteEnv": {
+    "VIRTUAL_ENV": "${containerWorkspaceFolder}/.venv",
+    "PATH": "${containerWorkspaceFolder}/.venv/bin:${containerEnv:PATH}"
+  },
+  "forwardPorts": [5000],
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-python.python"],
+      "settings": {
+        "python.defaultInterpreterPath": "${containerWorkspaceFolder}/.venv/bin/python",
+        "python.testing.pytestEnabled": true
+      }
+    }
+  }
+}
