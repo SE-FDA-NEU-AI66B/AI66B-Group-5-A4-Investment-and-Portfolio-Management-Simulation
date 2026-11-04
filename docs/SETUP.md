@@ -42,7 +42,7 @@ cp .env.example .env
 ## Configuration and database
 
 | Variable | Default | Meaning |
-|----------|---------|---------|
+| -------- | ------- | ------- |
 | DATABASE_PATH | `instance/virtutrade.db` | Relative paths resolve from the repository, not the shell's current directory |
 | HOST | `127.0.0.1` | Local development interface |
 | PORT | `5000` | Change to 5001 if occupied |
@@ -72,7 +72,7 @@ updating an old checkout, rerun the install command in its virtual environment.
 
 ## How to know it worked
 
-Open **http://127.0.0.1:5000/market**. The page says “Market snapshot” and “12
+Open **<http://127.0.0.1:5000/market>**. The page says “Market snapshot” and “12
 symbols · VND”; HPG is 28,000 VND and FPT is 120,000 VND on a fresh seed. Rows
 show Demo / seed, UTC timestamps and warnings after 15 minutes. These fixed
 prices are not live DNSE data. Restarting preserves the DB; Ctrl+C stops the app.
@@ -80,10 +80,10 @@ prices are not live DNSE data. Restarting preserves the DB; Ctrl+C stops the app
 ## Troubleshooting
 
 | Symptom | Fix |
-|---------|-----|
+| ------- | --- |
 | No module named virtutrade | From the cloned repo root, rerun the venv Python with `-m pip install -e .`; run the app using that same Python. |
 | No module named flask/dotenv | Run pip and app with the same venv Python shown above; reinstall requirements. |
-| Address/port already in use | Set PORT=5001 in `.env`, restart and open http://127.0.0.1:5001/market. |
+| Address/port already in use | Set PORT=5001 in `.env`, restart and open <http://127.0.0.1:5001/market>. |
 | Market data is unavailable (503) | Check DATABASE_PATH/permissions, then run init-db with the server's environment; inspect terminal logs for the actual DB error. |
 | Linux cannot create venv | Install the OS's matching venv support (Debian/Ubuntu: python3-venv), then repeat creation. |
 | No quotes yet | DB exists but has no quotes; run init-db and reload. |
@@ -111,13 +111,16 @@ macOS / Linux:
 
 ```bash
 .venv/bin/python -m pip install pytest
-.venv/bin/pytest -v
+.venv/bin/python -m pytest -v
 ```
 
-Alternatively, run `source .venv/bin/activate` and then `pytest`. Tests use
-temporary SQLite files and do not require a running server, real credentials,
-or the app's persistent database. Capture the full `python -m pytest -v`
-output for the Milestone 4 submission after all reviewed tests have merged.
+Keep both commands on `.venv/bin/python`; a bare `python`, `python3` or `pip`
+may refer to a different installation, where neither pytest nor the editable
+VirtuTrade package is installed. Alternatively, run `source .venv/bin/activate`
+first, then use `python -m pip install pytest` and `python -m pytest -v`. Tests
+use temporary SQLite files and do not require a running server, real
+credentials, or the app's persistent database. Capture the full test output
+for the Milestone 4 submission after all reviewed tests have merged.
 
 Run the full suite; auth and buy tests use real temporary SQLite databases and do not change the
 running demo's data. CI installs `pytest`, `pytest-cov` and `ruff` separately
@@ -146,7 +149,7 @@ Earlier runs using root app.py do not verify this src-layout revision.
 The run below was recorded for Milestone 4 under #123.
 
 | Field | Value |
-|-------|-------|
+| ----- | ----- |
 | Tested by | Bùi Khang Long (`longbk761-bot`) |
 | Date | 2 November 2026, 20:53–21:14 UTC+7 |
 | OS | Microsoft Windows 11 Pro 10.0.26200 (Build 26200) |
@@ -180,7 +183,6 @@ The workaround is now listed under Troubleshooting.
 See [handoff evidence](m2-po-handoff.md). A local author check does not satisfy
 the independent-machine condition above.
 
-
 ## Local simulation and authenticated buy (PR #92)
 
 Set `QUOTE_MODE=simulation` and `DATABASE_PATH=instance/simulation.db` in the
@@ -194,7 +196,7 @@ ignored local `.env`, choosing a NEW database path. Then run:
 On macOS/Linux use `.venv/bin/python` for the same commands. `init-demo` refuses
 existing files; to continue an existing simulation, run the server and use
 Generate demo quotes. Do not delete a database that holds work you need.
-Open http://127.0.0.1:5000/ and click Register. For a disposable classroom account
+Open <http://127.0.0.1:5000/> and click Register. For a disposable classroom account
 use `learner@example.test` with a password of your own choice (8–128 characters);
 no preset password or real account is required. The initial grant is 100,000,000 VND.
 
