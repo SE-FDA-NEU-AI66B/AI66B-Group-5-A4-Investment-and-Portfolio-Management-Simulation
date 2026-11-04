@@ -91,14 +91,15 @@ prices are not live DNSE data. Restarting preserves the DB; Ctrl+C stops the app
 
 ## Tests
 
-`pytest` is a development-only dependency and is deliberately not in
-`requirements.txt`. Install it with the same venv Python, then run the suite
+The test tools (`pytest`, `pytest-cov`, `ruff`) are development-only and are
+deliberately not in `requirements.txt`. They are pinned in the `dev` extra of
+`pyproject.toml`; install them with the same venv Python, then run the suite
 from the repository root.
 
 PowerShell:
 
 ```powershell
-.\.venv\Scripts\python.exe -m pip install pytest
+.\.venv\Scripts\python.exe -m pip install -e ".[dev]"
 .\.venv\Scripts\pytest.exe -v
 ```
 
@@ -110,9 +111,18 @@ same suite without changing the machine's execution policy.
 macOS / Linux:
 
 ```bash
-.venv/bin/python -m pip install pytest
+.venv/bin/python -m pip install -e ".[dev]"
 .venv/bin/pytest -v
 ```
+
+GitHub Codespaces: the repository's [devcontainer](../.devcontainer/devcontainer.json)
+creates `.venv`, installs the checkout with the `dev` extra, copies `.env` and runs
+`init-db` when the codespace is created, and puts `.venv/bin` first on PATH, so
+plain `pytest -v` works in a new terminal. A codespace created before this file
+existed must be rebuilt once (Command Palette → **Codespaces: Rebuild
+Container**). Without a rebuild, bare `pytest` is the image's global pipx copy,
+which cannot import the app; the run stops with a message naming the missing
+module and the venv commands above (`.venv/bin/pytest -v`).
 
 Alternatively, run `source .venv/bin/activate` and then `pytest`. Tests use
 temporary SQLite files and do not require a running server, real credentials,
@@ -120,8 +130,7 @@ or the app's persistent database. Capture the full `python -m pytest -v`
 output for the Milestone 4 submission after all reviewed tests have merged.
 
 Run the full suite; auth and buy tests use real temporary SQLite databases and do not change the
-running demo's data. CI installs `pytest`, `pytest-cov` and `ruff` separately
-and runs on Python 3.12.
+running demo's data. CI installs the same `dev` extra and runs on Python 3.12.
 
 For the final Milestone 4 screenshot on a fresh clone, install this checkout in
 its new venv as above, then run the **unmodified** suite with the venv on PATH:
