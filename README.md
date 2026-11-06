@@ -21,6 +21,21 @@ reviewable PR from every member by 29 October, leaving 31 October–2 November
 for integration checks and submission evidence.
 
 
+## Live charts and free hosting
+
+Each stock page has a TradingView-style candlestick chart (1m, 5m, 15m, 1H, 1D)
+with volume, crosshair values and automatic updates. With DNSE credentials, the
+`stream` worker stores real OHLC history and live one-minute candles
+([DNSE notes](docs/DNSE.md#candles-for-the-price-chart)). Without them, a
+practice simulator (`python -m virtutrade simulate`, or `MARKET_FEED=simulation`
+inside the web process) keeps prices and candles moving. Every simulated or
+illustrative chart is labelled as generated, never as market data.
+
+[Deployment guide](docs/DEPLOY.md): a Google Cloud e2-micro VM keeps the
+database and the feed running for free; Render is a demo that resets; and the
+repository opens ready-to-run in GitHub Codespaces.
+
+
 ## Sprint 3 / Milestone 3: historical plan
 
 **Product Owner:** @bianh13 · **Scrum Master:** @longbk761-bot (Long).

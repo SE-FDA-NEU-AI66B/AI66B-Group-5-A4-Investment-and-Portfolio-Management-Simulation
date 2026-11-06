@@ -234,6 +234,7 @@ def test_real_local_websocket_auth_ping_reconnect_and_browser_api(database):
                 assert subscription["channels"] == [
                     {"name": "tick.G1.json", "symbols": ["HPG"]},
                     {"name": "security_definition.G1.json", "symbols": ["HPG"]},
+                    {"name": "ohlc.1.json", "symbols": ["HPG"]},
                 ]
                 await socket.send('{"action":"subscribed"}')
                 await socket.send('{"action":"ping"}')

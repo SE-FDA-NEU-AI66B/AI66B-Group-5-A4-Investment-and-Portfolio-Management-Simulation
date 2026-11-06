@@ -5,6 +5,7 @@ from dataclasses import asdict
 from flask import Blueprint, current_app, jsonify, render_template, request
 
 from virtutrade.market.errors import MarketDataUnavailable
+from virtutrade.market.history import RESOLUTIONS, price_history
 from virtutrade.market.service import (
     VIETNAM,
     filter_quotes,
@@ -100,5 +101,39 @@ def quote_json(symbol):
             response.status_code = 404
         else:
             response = jsonify(quote=quote_payload(quote))
+    response.headers['Cache-Control'] = 'no-store'
+    return response
+
+
+def api_error(status, code, message, **details):
+    response = jsonify(error={'code': code, 'message': message, 'details': details})
+    response.status_code = status
+    return response
+
+
+@api_blueprint.get('/bars/<symbol>')
+def bars_json(symbol):
+    symbol = symbol.strip().upper()[:20]
+    resolution = request.args.get('resolution', '1D')
+    if resolution not in RESOLUTIONS:
+        response = api_error(400, 'INVALID_RESOLUTION', 'Choose a supported chart interval.',
+                             supported=list(RESOLUTIONS))
+    else:
+        reader = current_app.extensions['market_reader_factory']()
+        try:
+            quote = find_quote(market_snapshot(reader), symbol)
+            history = None if quote is None else price_history(reader, quote, resolution)
+        except MarketDataUnavailable:
+            current_app.logger.exception('Could not load candle history')
+            response = api_error(503, 'HISTORY_UNAVAILABLE',
+                                 'Chart data is temporarily unavailable. Try again.')
+        else:
+            if quote is None:
+                response = api_error(404, 'TICKER_NOT_FOUND', 'Ticker not found', symbol=symbol)
+            else:
+                source, candles = history
+                response = jsonify(symbol=symbol, resolution=resolution, source=source,
+                                   quote=quote_payload(quote),
+                                   bars=[asdict(candle) for candle in candles])
     response.headers['Cache-Control'] = 'no-store'
     return response

@@ -20,6 +20,9 @@ from virtutrade.dnse.repository import read_symbols, write_dnse_event
 
 URL = "wss://ws-openapi.dnse.com.vn/v1/stream?encoding=json"
 LOGGER = logging.getLogger(__name__)
+CHANNELS = ("tick.G1.json", "security_definition.G1.json", "ohlc.1.json")
+# DNSE allows 200 streams per connection; each symbol uses one per channel.
+MAX_SYMBOLS = 200 // len(CHANNELS)
 
 
 class FeedError(Exception):
@@ -54,14 +57,14 @@ class Settings:
         symbols = tuple(sorted({symbol.strip().upper() for symbol in symbols}))
         if (
             not symbols
-            or len(symbols) > 100
+            or len(symbols) > MAX_SYMBOLS
             or any(
                 not re.fullmatch(r"[A-Z][A-Z0-9]{2,9}", symbol) or symbol not in known
                 for symbol in symbols
             )
         ):
             raise FeedError(
-                "DNSE_SYMBOLS must contain 1-100 tickers already in instrument."
+                f"DNSE_SYMBOLS must contain 1-{MAX_SYMBOLS} tickers already in instrument."
             )
         return cls(key, secret, symbols)
 
@@ -169,6 +172,9 @@ async def control_message(socket, message):
 
 
 async def session(socket, settings, database):
+    # Imported here: bars reuses this module's InvalidEvent and the REST signer.
+    from virtutrade.dnse.bars import parse_stream_bar, write_bars
+
     welcome = decode(await asyncio.wait_for(socket.recv(), timeout=15))
     await control_message(socket, welcome)
     if not (welcome.get("session_id") or welcome.get("sid")):
@@ -190,13 +196,14 @@ async def session(socket, settings, database):
                 "action": "subscribe",
                 "channels": [
                     {"name": name, "symbols": list(settings.symbols)}
-                    for name in ("tick.G1.json", "security_definition.G1.json")
+                    for name in CHANNELS
                 ],
             }
         )
     )
     LOGGER.info(
-        "Authenticated; requested G1 tick/reference streams for %d symbols.",
+        "Authenticated; requested G1 tick/reference and 1-minute candle streams "
+        "for %d symbols.",
         len(settings.symbols),
     )
     async for raw in socket:
@@ -205,7 +212,11 @@ async def session(socket, settings, database):
             action = await control_message(socket, message)
             if action == "subscribed":
                 LOGGER.info("DNSE acknowledged subscription.")
-            if action or message.get("T") not in ("t", "sd"):
+            if action or message.get("T") not in ("t", "sd", "b", "bc"):
+                continue
+            if message["T"] in ("b", "bc"):
+                bar = parse_stream_bar(message, settings.symbols)
+                await asyncio.to_thread(write_bars, database, [bar])
                 continue
             event = parse_event(message, settings.symbols)
         except ValueError:

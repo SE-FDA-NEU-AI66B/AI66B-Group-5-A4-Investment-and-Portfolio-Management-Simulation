@@ -110,7 +110,9 @@ def trade_form():
         symbol=request.args.get("symbol", ""),
         side=side,
         csrf_token=token_provider() if token_provider and signed_in else "",
-        simulation=current_app.config.get("QUOTE_MODE") == "simulation",
+        # A running simulator keeps quotes fresh; resetting them would jump prices.
+        simulation=current_app.config.get("QUOTE_MODE") == "simulation"
+        and current_app.config.get("MARKET_FEED") != "simulation",
         auth_ready=signed_in and "orders_identity" in current_app.extensions,
     )
 

@@ -929,3 +929,21 @@ main{max-width:1600px;margin-top:25px;padding:0 28px}
 
 @media(max-width:1000px){.change-chart{grid-template-columns:1fr}}
 @media(max-width:700px){.change-chart{padding:4px 12px 12px}.change-chart-row{grid-template-columns:68px minmax(0,1fr) 62px;gap:7px}.change-chart-symbol{display:block}.change-chart-symbol small{display:block}.price-comparison-row dd{grid-template-columns:minmax(0,1fr) 110px;gap:8px}.price-comparison-row strong{font-size:10px}}
+
+/* Candlestick chart on the stock detail page. */
+.price-chart-panel{margin-top:24px;border:1px solid #303541;border-radius:9px;background:#15181f}
+.price-chart-panel .section-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;padding:18px 20px 8px}
+.chart-toolbar{display:inline-flex;border:1px solid #303541;border-radius:7px;overflow:hidden}
+.chart-toolbar button{min-width:44px;min-height:34px;padding:0 12px;border:0;border-right:1px solid #303541;background:#1b1e26;color:#a1a9b8;font:inherit;font-size:12px;font-weight:650;cursor:pointer}
+.chart-toolbar button:last-child{border-right:0}
+.chart-toolbar button:hover{background:#242832;color:#edf0f5}
+.chart-toolbar button[aria-pressed="true"]{background:#38202a;color:#ff9eaa}
+.chart-toolbar button:focus-visible{outline:2px solid #ff9eaa;outline-offset:-2px}
+.chart-notice{margin:4px 20px 0;padding:10px 12px;border:1px solid #6b5520;border-radius:7px;background:#2a2414;color:#f1c65d;font-size:12px;line-height:1.6}
+.chart-legend{display:flex;flex-wrap:wrap;gap:4px 14px;min-height:20px;padding:10px 20px 0;font-size:12px;color:#a1a9b8;font-variant-numeric:tabular-nums}
+.chart-legend strong{font-weight:650}
+.price-chart{height:420px;margin:6px 8px 0}
+.chart-footer{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:6px 20px 16px}
+.chart-footer p{margin:0;font-size:11px;line-height:1.7;color:#a1a9b8}
+.chart-footer p.delayed{color:#f1c65d}
+@media(max-width:700px){.price-chart{height:320px;margin:4px 0 0}.price-chart-panel .section-heading{padding:16px 14px 6px}.chart-legend,.chart-footer{padding-left:14px;padding-right:14px}.chart-notice{margin:4px 14px 0}}
