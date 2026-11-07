@@ -41,10 +41,11 @@ LOGGER = logging.getLogger(__name__)
 URL = "https://services.entrade.com.vn/chart-api/v2/ohlcs/stock"
 USER_AGENT = "VirtuTrade/0.1 (student paper-trading project; read-only, polls once a minute)"
 POLL_SECONDS = 60
-# Daily candles change once a session; refresh them every 15th pass.
+# Hourly and daily candles change slowly; refresh them every 15th pass
+# (recent hours are rebuilt from minutes in between).
 DAILY_PASSES = 15
-FIRST_WINDOW = {"1": 5 * 86400, "1D": 700 * 86400}
-REPAIR_WINDOW = {"1": 86400, "1D": 10 * 86400}
+FIRST_WINDOW = {"1": 5 * 86400, "1H": 400 * 86400, "1D": 1830 * 86400}
+REPAIR_WINDOW = {"1": 86400, "1H": 3 * 86400, "1D": 10 * 86400}
 
 
 def history_request(symbol, resolution, start, end):
@@ -107,6 +108,8 @@ class PublicMarket:
         for symbol in self.symbols:
             try:
                 minutes = self.candles(symbol, "1", now)
+                if daily_pass or (symbol, "1H") not in self.loaded:
+                    self.candles(symbol, "1H", now)
                 daily = self.candles(symbol, "1D", now) if (
                     daily_pass or (symbol, "1D") not in self.loaded) else []
             except (snapshot.SnapshotUnavailable, InvalidEvent):

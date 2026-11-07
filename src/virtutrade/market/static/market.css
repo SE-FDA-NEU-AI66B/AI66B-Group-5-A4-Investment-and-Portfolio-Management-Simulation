@@ -989,3 +989,8 @@ main{max-width:1600px;margin-top:25px;padding:0 28px}
 .watch-toggle[aria-pressed="true"]{color:#f1c65d}
 .watch-toggle:focus-visible,.watch-remove:focus-visible{outline:2px solid #ff9eaa;outline-offset:1px}
 @media(max-width:700px){.watch-grid{grid-template-columns:1fr;padding:10px 12px 4px}.chart-ma-summary{margin:6px 14px 0}}
+
+/* Chart interval dropdown. */
+.interval-select select{min-height:34px;padding:0 34px 0 12px;border:1px solid #303541;border-radius:7px;background:#1b1e26 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23a1a9b8'/%3E%3C/svg%3E") no-repeat right 12px center;color:#edf0f5;font:inherit;font-size:12px;font-weight:650;appearance:none;cursor:pointer}
+.interval-select select:hover{background-color:#242832}
+.interval-select select:focus-visible{outline:2px solid #ff9eaa;outline-offset:1px}

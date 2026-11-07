@@ -23,7 +23,7 @@ for integration checks and submission evidence.
 
 ## Live charts and free hosting
 
-Each stock page has a TradingView-style candlestick chart (1m, 5m, 15m, 1H, 1D)
+Each stock page has a TradingView-style candlestick chart (15m, 1H, 4H, 1D, 1W, 1M)
 with volume, crosshair values and automatic updates. With DNSE credentials, the
 `stream` worker stores real OHLC history and live one-minute candles
 ([DNSE notes](docs/DNSE.md#candles-for-the-price-chart)). Without them, a

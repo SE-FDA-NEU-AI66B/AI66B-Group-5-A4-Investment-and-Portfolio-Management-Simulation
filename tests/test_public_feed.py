@@ -71,6 +71,7 @@ def test_refresh_stores_real_candles_quote_and_previous_session_reference(databa
         21500, "2026-11-05T17:00:00.000000000Z")
     assert one(database, "SELECT COUNT(*) FROM price_bar WHERE resolution = '1'") == (2,)
     assert one(database, "SELECT COUNT(*) FROM price_bar WHERE resolution = '1D'") == (2,)
+    assert one(database, "SELECT COUNT(*) FROM price_bar WHERE resolution = '1H'") == (2,)
 
     client = create_app({"DATABASE": str(database), "TESTING": True, "QUOTE_MODE": "dnse"}).test_client()
     quote = client.get("/api/market/quotes/HPG").get_json()["quote"]
@@ -79,7 +80,7 @@ def test_refresh_stores_real_candles_quote_and_previous_session_reference(databa
     assert chart["source"] == "dnse" and [bar["close"] for bar in chart["bars"]] == [21500, 21200]
 
 
-def test_daily_candles_refresh_only_every_fifteenth_pass(database):
+def test_hourly_and_daily_candles_refresh_only_every_fifteenth_pass(database):
     calls = []
 
     def counting(symbol, resolution, start, end):
@@ -89,8 +90,9 @@ def test_daily_candles_refresh_only_every_fifteenth_pass(database):
     market = public.PublicMarket(database, ["HPG"], fetch=counting, clock=lambda: NOW)
     for _ in range(public.DAILY_PASSES + 1):
         market.refresh()
-    daily = [window for resolution, window in calls if resolution == "1D"]
-    assert daily == [public.FIRST_WINDOW["1D"], public.REPAIR_WINDOW["1D"]]
+    for slow in ("1H", "1D"):
+        assert [window for resolution, window in calls if resolution == slow] == [
+            public.FIRST_WINDOW[slow], public.REPAIR_WINDOW[slow]]
     minutes = [window for resolution, window in calls if resolution == "1"]
     assert minutes[0] == public.FIRST_WINDOW["1"] and set(minutes[1:]) == {public.REPAIR_WINDOW["1"]}
 

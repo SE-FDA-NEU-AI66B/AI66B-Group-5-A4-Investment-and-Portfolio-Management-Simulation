@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS price_quote (
 );
 CREATE TABLE IF NOT EXISTS price_bar (
     instrument_id INTEGER NOT NULL REFERENCES instrument(id),
-    resolution TEXT NOT NULL CHECK(resolution IN ('1', '1D')),
+    resolution TEXT NOT NULL CHECK(resolution IN ('1', '1H', '1D')),
     bar_time INTEGER NOT NULL CHECK(bar_time > 0),
     open_vnd INTEGER NOT NULL CHECK(open_vnd > 0),
     high_vnd INTEGER NOT NULL CHECK(high_vnd >= open_vnd AND high_vnd >= close_vnd),

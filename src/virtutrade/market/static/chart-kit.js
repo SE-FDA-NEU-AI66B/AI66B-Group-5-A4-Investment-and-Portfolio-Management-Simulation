@@ -3,7 +3,11 @@
 window.VirtuTradeCharts = (() => {
   const money = new Intl.NumberFormat("en-US");
   const VIETNAM_OFFSET = 7 * 3600;
-  const UP = "#39d69c", DOWN = "#ff667b";
+  // TradingView's own muted candle colours: easier on the eye than the page's bright text greens/reds.
+  const UP = "#26a69a", DOWN = "#ef5350";
+  const UP_VOLUME = "rgba(38,166,154,.28)", DOWN_VOLUME = "rgba(239,83,80,.28)";
+  // These intervals plot one candle per trading day, week or month.
+  const DAILY = new Set(["1D", "1W", "1M"]);
   const AVERAGES = [
     {period: 20, color: "#f1c65d"},
     {period: 50, color: "#5b9cf6"},
@@ -13,9 +17,9 @@ window.VirtuTradeCharts = (() => {
   const DEFAULT_AVERAGES = [20, 50];
 
   // The chart draws in UTC; shift intraday bars so axes read in Vietnam time,
-  // and give daily bars their Vietnam trading date.
+  // and give daily, weekly and monthly bars their Vietnam date.
   function chartTime(bar, resolution) {
-    if (resolution !== "1D") return bar.time + VIETNAM_OFFSET;
+    if (!DAILY.has(resolution)) return bar.time + VIETNAM_OFFSET;
     const day = new Date((bar.time + VIETNAM_OFFSET) * 1000);
     return {year: day.getUTCFullYear(), month: day.getUTCMonth() + 1, day: day.getUTCDate()};
   }
@@ -89,7 +93,7 @@ window.VirtuTradeCharts = (() => {
     let enabled = savedAverages();
     let averages = new Map();
     const toCandle = bar => ({time: chartTime(bar, resolution), open: bar.open, high: bar.high, low: bar.low, close: bar.close});
-    const toVolume = bar => ({time: chartTime(bar, resolution), value: bar.volume, color: bar.close >= bar.open ? "rgba(57,214,156,.35)" : "rgba(255,102,123,.35)"});
+    const toVolume = bar => ({time: chartTime(bar, resolution), value: bar.volume, color: bar.close >= bar.open ? UP_VOLUME : DOWN_VOLUME});
 
     function drawAverages() {
       for (const [period, line] of lines) {
@@ -107,7 +111,7 @@ window.VirtuTradeCharts = (() => {
       setBars(next, nextResolution, fresh) {
         const sameScale = nextResolution === resolution;
         resolution = nextResolution;
-        chart.timeScale().applyOptions({timeVisible: resolution !== "1D", secondsVisible: false});
+        chart.timeScale().applyOptions({timeVisible: !DAILY.has(resolution), secondsVisible: false});
         if (!fresh && sameScale && appendOnly(bars, next)) {
           for (const bar of next.slice(bars.length - 1)) { candles.update(toCandle(bar)); volume.update(toVolume(bar)); }
         } else {
@@ -140,5 +144,5 @@ window.VirtuTradeCharts = (() => {
     };
   }
 
-  return {AVERAGES, money, chartTime, movingAverage, position, savedAverages, saveAverages, appendOnly, createCandleChart};
+  return {AVERAGES, DAILY, money, chartTime, movingAverage, position, savedAverages, saveAverages, appendOnly, createCandleChart};
 })();

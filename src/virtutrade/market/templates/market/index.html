@@ -6,7 +6,7 @@
   <div class="page-heading terminal-heading"><div><div class="eyebrow">VIRTUTRADE / EQUITIES</div><h1>Market terminal.</h1><p class="intro">Your price board. Your next virtual trade.</p></div><span class="page-note">Vietnam equities <span>VND &middot; UTC+7</span></span></div>
   <section id="watchboard" class="market-panel watchboard" aria-labelledby="watch-heading">
     <div class="section-heading"><div><h2 id="watch-heading">Watchlist</h2><p>Up to 6 stocks, saved in this browser. Select &#9734; in the price board to add one.</p></div>
-      <div class="chart-controls"><div class="chart-toolbar" role="group" aria-label="Watchlist chart interval">{% for value, label in [('15', '15m'), ('1H', '1H'), ('1D', '1D')] %}<button type="button" data-resolution="{{ value }}" aria-pressed="false">{{ label }}</button>{% endfor %}</div>
+      <div class="chart-controls"><label class="interval-select"><span class="sr-only">Watchlist chart interval</span><select data-interval>{% for value, label in [('15', '15 minutes'), ('1H', '1 hour'), ('4H', '4 hours'), ('1D', '1 day'), ('1W', '1 week'), ('1M', '1 month')] %}<option value="{{ value }}"{% if value == '1D' %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
       <div class="chart-toolbar average-toolbar" role="group" aria-label="Moving averages">{% for period in [20, 50, 200] %}<button type="button" data-average="{{ period }}" aria-pressed="false" hidden><span class="average-swatch ma{{ period }}" aria-hidden="true"></span>MA{{ period }}</button>{% endfor %}</div></div></div>
     <p id="watch-status" class="watch-status" role="status"></p>
     <div id="watch-grid" class="watch-grid"></div>

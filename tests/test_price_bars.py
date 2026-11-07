@@ -6,7 +6,7 @@ import hashlib
 import hmac
 import json
 import sqlite3
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from urllib.error import HTTPError
 from urllib.parse import parse_qs, unquote, urlparse
@@ -123,11 +123,11 @@ def test_history_backfills_then_repairs_and_prunes_old_minutes(database):
         connection.execute("INSERT INTO price_bar VALUES (1, '1', ?, 1, 1, 1, 1, 1)",
                            (NOW - bars.MINUTE_RETENTION_SECONDS - 60,))
     history = bars.BarHistory(SETTINGS, database, fetch=fetch, clock=lambda: NOW)
-    assert history.refresh() == 4
+    assert history.refresh() == 6
     history.refresh()
-    assert calls[:4] == [("FPT", "1", bars.FIRST_WINDOW["1"]), ("FPT", "1D", bars.FIRST_WINDOW["1D"]),
-                         ("HPG", "1", bars.FIRST_WINDOW["1"]), ("HPG", "1D", bars.FIRST_WINDOW["1D"])]
-    assert {window for _, _, window in calls[4:]} == set(bars.REPAIR_WINDOW.values())
+    assert calls[:6] == [(symbol, resolution, bars.FIRST_WINDOW[resolution])
+                         for symbol in ("FPT", "HPG") for resolution in ("1", "1H", "1D")]
+    assert {window for _, _, window in calls[6:]} == set(bars.REPAIR_WINDOW.values())
     assert [row[1] for row in stored(database)] == [NOW - 60, NOW - 60]
 
 
@@ -151,7 +151,7 @@ def test_unavailable_symbol_keeps_stored_bars_and_continues(database):
         return udf([NOW - 60], [24.0], [24.1], [23.9], [24.05], [10])
 
     history = bars.BarHistory(SETTINGS, database, fetch=flaky, clock=lambda: NOW)
-    assert history.refresh() == 2
+    assert history.refresh() == 3
     assert {row[0] for row in stored(database)} == {"HPG"}
     assert ("FPT", "1") not in history.loaded
 
@@ -249,6 +249,8 @@ def test_api_serves_stored_dnse_candles_and_never_illustrates_them(database):
 
 def test_api_errors_are_safe_and_structured(database, tmp_path):
     client = create_app({"DATABASE": str(database), "TESTING": True}).test_client()
+    for removed in ("2", "1", "5"):
+        assert client.get(f"/api/market/bars/HPG?resolution={removed}").status_code == 400
     bad = client.get("/api/market/bars/HPG?resolution=2")
     assert bad.status_code == 400 and bad.get_json()["error"]["code"] == "INVALID_RESOLUTION"
     assert client.get("/api/market/bars/NOPE").get_json()["error"]["code"] == "TICKER_NOT_FOUND"
@@ -266,7 +268,7 @@ def test_database_created_before_candles_reads_as_empty_history(database):
 
 def test_demo_quotes_get_labelled_repeatable_history_ending_at_the_stored_price(database):
     client = create_app({"DATABASE": str(database), "TESTING": True}).test_client()
-    for resolution in ("1", "5", "15", "1H", "1D"):
+    for resolution in ("15", "1H", "4H", "1D", "1W", "1M"):
         data = client.get(f"/api/market/bars/HPG?resolution={resolution}").get_json()
         assert data["source"] == "illustrative"
         candles = data["bars"]
@@ -326,3 +328,60 @@ def test_websocket_session_stores_streamed_one_minute_bars(database):
     asyncio.run(session(socket, Settings("k", "s", ("HPG",)), database))
     assert {"name": "ohlc.1.json", "symbols": ["HPG"]} in socket.sent[-1]["channels"]
     assert stored(database) == [("HPG", NOW, 24000, 24300, 23900, 24200, 800)]
+
+
+def test_hourly_bars_make_4h_candles_with_recent_hours_rebuilt_from_minutes(database):
+    dnse_app(database)
+    reader = SQLiteQuoteRepository(str(database), provider_only=True)
+    # Stored hourly bars for Monday 09:00-14:00 Vietnam time, plus minutes for 14:00
+    # that are more complete than the stored (still forming) 14:00 hour.
+    monday = int(datetime(2026, 11, 2, 2, 0, tzinfo=timezone.utc).timestamp())
+    hours = [monday + 3600 * offset for offset in (0, 1, 2, 4, 5)]
+    bars.write_bars(database, [bars.Bar("HPG", "1H", stamp, 24000, 24200, 23900, 24100, 100)
+                               for stamp in hours])
+    bars.write_bars(database, [bars.Bar("HPG", "1", hours[-1] + 60 * index, 24100, 24400, 24000,
+                                        24300, 50) for index in range(3)])
+    quote = Quote("HPG", "Hoa Phat", 24300, None, "2026-11-02T07:02:00Z", "dnse")
+    later = datetime(2026, 11, 2, 8, 0, tzinfo=timezone.utc)
+    source, hourly = price_history(reader, quote, "1H", now=later)
+    assert source == "dnse" and [candle.time for candle in hourly] == hours
+    assert (hourly[-1].high, hourly[-1].close, hourly[-1].volume) == (24400, 24300, 150)
+    _, four = price_history(reader, quote, "4H", now=later)
+    # 4-hour buckets open at 07:00 and 11:00 Vietnam time: one morning, one afternoon candle.
+    morning, afternoon = monday - 7200, monday + 7200
+    assert [(candle.time, candle.volume) for candle in four] == [(morning, 200), (afternoon, 350)]
+
+
+def test_daily_bars_make_weekly_and_monthly_candles_in_vietnam_time(database):
+    client = dnse_app(database).test_client()
+    days = [datetime(2026, 10, day, tzinfo=timezone.utc) for day in (29, 30)] +            [datetime(2026, 11, day, tzinfo=timezone.utc) for day in (2, 3)]
+    bars.write_bars(database, [bars.Bar("HPG", "1D", int(day.timestamp()), 24000 + index * 100,
+                                        25000, 23000, 24050 + index * 100, 10)
+                               for index, day in enumerate(days)])
+    weekly = client.get("/api/market/bars/HPG?resolution=1W").get_json()["bars"]
+    vn = timezone(timedelta(hours=7))
+    monday_oct26 = int(datetime(2026, 10, 26, tzinfo=vn).timestamp())
+    monday_nov2 = int(datetime(2026, 11, 2, tzinfo=vn).timestamp())
+    assert [(bar["time"], bar["open"], bar["close"], bar["volume"]) for bar in weekly][:2] == [
+        (monday_oct26, 24000, 24150, 20), (monday_nov2, 24200, 24350, 20)]
+    monthly = client.get("/api/market/bars/HPG?resolution=1M").get_json()["bars"]
+    assert [bar["time"] for bar in monthly][:2] == [int(datetime(2026, 10, 1, tzinfo=vn).timestamp()),
+                                                    int(datetime(2026, 11, 1, tzinfo=vn).timestamp())]
+
+
+def test_candle_table_from_before_hourly_bars_is_upgraded_in_place(tmp_path):
+    path = tmp_path / "old.db"
+    init_database(path)
+    with sqlite3.connect(path) as connection:
+        connection.execute("DROP TABLE price_bar")
+        connection.execute(
+            "CREATE TABLE price_bar (instrument_id INTEGER NOT NULL REFERENCES instrument(id), "
+            "resolution TEXT NOT NULL CHECK(resolution IN ('1', '1D')), bar_time INTEGER NOT NULL, "
+            "open_vnd INTEGER NOT NULL, high_vnd INTEGER NOT NULL, low_vnd INTEGER NOT NULL, "
+            "close_vnd INTEGER NOT NULL, volume INTEGER NOT NULL, "
+            "PRIMARY KEY(instrument_id, resolution, bar_time))")
+        connection.execute("INSERT INTO price_bar VALUES (1, '1D', 100, 10, 12, 9, 11, 5)")
+    init_database(path)
+    assert bars.write_bars(path, [bars.Bar("ACB", "1H", NOW, 10, 12, 9, 11, 5)]) == 1
+    with sqlite3.connect(path) as connection:
+        assert connection.execute("SELECT COUNT(*) FROM price_bar").fetchone() == (2,)

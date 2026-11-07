@@ -245,7 +245,7 @@ The code approval and merge do not waive those criteria.
 The stock detail page draws candlesticks with TradingView Lightweight Charts
 5.2.1, vendored in `market/static/` with its licence and the required
 TradingView attribution. It reads `GET /api/market/bars/<symbol>?resolution=`
-with `1`, `5`, `15`, `1H` or `1D`, the same public, read-only way the market
+with `15`, `1H`, `4H`, `1D`, `1W` or `1M`, the same public, read-only way the market
 table reads quotes. The browser never sees provider credentials.
 
 `dnse/bars.py` stores provider candles in `price_bar` (integer VND, unix-second
@@ -253,10 +253,10 @@ bar opens, with range checks in the schema):
 
 - **History:** the signed `GET /price/ohlc?type=STOCK&symbol=&resolution=&from=&to=`
   route returns parallel `t/o/h/l/c/v` arrays, the keys the official SDK reads.
-  The first pass loads 700 days of daily and 5 days of one-minute bars per
-  symbol. Every fifth latest-trade pass (about five minutes) then repairs the
-  last day of minutes and ten days of daily bars. Minute bars older than 30 days
-  are pruned.
+  The first pass loads five years of daily, 400 days of hourly and 5 days of
+  one-minute bars per symbol. Every fifth latest-trade pass (about five minutes)
+  then repairs the last day of minutes, three days of hours and ten days of
+  daily bars. Minute bars older than 30 days are pruned.
 - **Live:** the WebSocket also subscribes `ohlc.1.json`. Forming (`T=b`) and
   closed (`T=bc`) one-minute bars are upserted. A bar is replaced only by one
   with at least as much volume, so an older REST snapshot cannot shrink a bar
@@ -267,9 +267,11 @@ bar opens, with range checks in the schema):
   latest-trade refresh keep running, because a key may allow quotes but not
   candles.
 
-`market/history.py` groups one-minute bars into 5/15/60-minute candles and
-builds today's daily candle from today's minutes until DNSE's daily bar
-arrives. In DNSE mode the chart only ever shows provider candles; with none
+`market/history.py` groups one-minute bars into 15-minute candles and hourly
+bars into 1H and 4H candles (4H opens at 07:00 and 11:00 Vietnam time: one
+morning and one afternoon candle per session), rebuilding the latest hours from
+minutes. Daily bars make daily, weekly (from Monday) and monthly candles, and
+today's daily candle comes from today's minutes until DNSE's daily bar arrives. In DNSE mode the chart only ever shows provider candles; with none
 stored yet it says it is waiting.
 
 **Not yet verified against the live provider:** on 7 November 2026 the team's

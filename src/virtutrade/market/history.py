@@ -1,8 +1,9 @@
 """Candle history for charts, without HTTP or SQL.
 
-DNSE quotes use stored provider bars: one-minute bars are grouped into 5/15/60
-minute candles, and today's daily candle is built from today's minute bars until
-the provider's daily bar arrives. Simulation quotes use the candles recorded by
+DNSE quotes use stored provider bars. One-minute bars make 15-minute candles;
+hourly bars make 1H and 4H candles, with the latest hours rebuilt from minutes;
+daily bars make daily, weekly and monthly candles, with today's daily candle
+built from minutes until the provider's daily bar arrives. Simulation quotes use the candles recorded by
 the practice simulator, preceded by an illustrative backfill. Demo seed quotes
 have no history, so they get a deterministic illustrative series. Generated
 candles are always labelled as such and never feed an order.
@@ -16,21 +17,25 @@ from datetime import datetime, timedelta, timezone
 from virtutrade.market.models import Candle
 from virtutrade.market.service import VIETNAM, parse_timestamp
 
-# Requested resolution -> (stored resolution, candle seconds, lookback seconds).
+# Requested resolution -> (stored resolution, candle size, lookback seconds).
+# Sizes are seconds, or "week"/"month" for calendar candles in Vietnam time.
 RESOLUTIONS = {
-    "1": ("1", 60, 7 * 86400),
-    "5": ("1", 300, 14 * 86400),
     "15": ("1", 900, 30 * 86400),
-    "1H": ("1", 3600, 30 * 86400),
+    "1H": ("1H", 3600, 120 * 86400),
+    "4H": ("1H", 4 * 3600, 400 * 86400),
     "1D": ("1D", 86400, 700 * 86400),
+    "1W": ("1D", "week", 1830 * 86400),
+    "1M": ("1D", "month", 1830 * 86400),
 }
 MAX_CANDLES = 500
-# Enough candles for a 200-period moving average to show.
+# Enough candles for a 200-period moving average to show; monthly history stops
+# at ten years, since the Vietnamese exchange only opened in 2000.
 ILLUSTRATIVE_COUNT = 400
+ILLUSTRATIVE_MONTHS = 120
 # Continuous-matching sessions in minutes after midnight, Vietnam time.
 SESSIONS = ((9 * 60, 11 * 60 + 30), (13 * 60, 14 * 60 + 45))
-VOLATILITY = {"1": 0.0012, "5": 0.0025, "15": 0.004, "1H": 0.007, "1D": 0.018}
-VOLUME_SHARE = {"1": 1 / 270, "5": 1 / 54, "15": 1 / 18, "1H": 1 / 5, "1D": 1}
+VOLATILITY = {"15": 0.004, "1H": 0.007, "4H": 0.012, "1D": 0.018, "1W": 0.04, "1M": 0.08}
+VOLUME_SHARE = {"15": 1 / 18, "1H": 1 / 5, "4H": 1 / 2, "1D": 1, "1W": 5, "1M": 21}
 
 
 def price_history(reader, quote, resolution, *, now=None):
@@ -55,10 +60,15 @@ def price_history(reader, quote, resolution, *, now=None):
 def stored_candles(reader, symbol, resolution, now):
     stored, size, lookback = RESOLUTIONS[resolution]
     since = int(now.timestamp()) - lookback
+    recent = int(now.timestamp()) - 3 * 86400
     if stored == "1D":
-        daily = reader.fetch_bars(symbol, "1D", since)
-        minutes = reader.fetch_bars(symbol, "1", int(now.timestamp()) - 3 * 86400)
-        return with_today(daily, minutes)
+        daily = with_today(reader.fetch_bars(symbol, "1D", since),
+                           reader.fetch_bars(symbol, "1", recent))
+        return daily if size == 86400 else calendar(daily, size)
+    if stored == "1H":
+        hourly = with_recent(reader.fetch_bars(symbol, "1H", since),
+                             aggregate(reader.fetch_bars(symbol, "1", recent), 3600))
+        return aggregate(hourly, size)
     return aggregate(reader.fetch_bars(symbol, "1", since), size)
 
 
@@ -71,26 +81,60 @@ def backfill(quote, first, resolution):
             if candle.time < first.time]
 
 
+def merge_into(result, start, candle):
+    """Add an ordered candle to the bucket opening at `start`."""
+    if result and result[-1].time == start:
+        last = result[-1]
+        result[-1] = Candle(start, last.open, max(last.high, candle.high),
+                            min(last.low, candle.low), candle.close, last.volume + candle.volume)
+    else:
+        result.append(Candle(start, candle.open, candle.high, candle.low,
+                             candle.close, candle.volume))
+
+
 def aggregate(candles, size):
-    """Group ordered candles into buckets of `size` seconds (UTC+7 is whole hours)."""
+    """Group ordered candles into buckets of `size` seconds.
+
+    Vietnam is UTC+7, so hour buckets line up with local hours, and 4-hour
+    buckets open at 07:00 and 11:00 local time: one morning and one afternoon
+    candle per session.
+    """
     if size == 60:
         return list(candles)
     result = []
     for candle in candles:
-        start = candle.time - candle.time % size
-        if result and result[-1].time == start:
-            last = result[-1]
-            result[-1] = Candle(start, last.open, max(last.high, candle.high),
-                                min(last.low, candle.low), candle.close,
-                                last.volume + candle.volume)
-        else:
-            result.append(Candle(start, candle.open, candle.high, candle.low,
-                                 candle.close, candle.volume))
+        merge_into(result, candle.time - candle.time % size, candle)
     return result
 
 
 def vietnam_date(stamp):
     return datetime.fromtimestamp(stamp, VIETNAM).date()
+
+
+def vietnam_midnight(day):
+    return int(datetime(day.year, day.month, day.day, tzinfo=VIETNAM).timestamp())
+
+
+def period_start(day, unit):
+    """First day of the week (Monday) or month containing `day`."""
+    return day - timedelta(days=day.weekday()) if unit == "week" else day.replace(day=1)
+
+
+def calendar(daily, unit):
+    """Group daily candles into weeks or months, in Vietnam time."""
+    result = []
+    for candle in daily:
+        merge_into(result, vietnam_midnight(period_start(vietnam_date(candle.time), unit)), candle)
+    return result
+
+
+def with_recent(stored, rebuilt):
+    """Let candles rebuilt from minutes replace the latest stored ones and extend them."""
+    if stored:
+        rebuilt = [candle for candle in rebuilt if candle.time >= stored[-1].time]
+    if not rebuilt:
+        return list(stored)
+    return [candle for candle in stored if candle.time < rebuilt[0].time] + rebuilt
 
 
 def with_today(daily, minutes):
@@ -103,8 +147,7 @@ def with_today(daily, minutes):
             continue
         bar = extra.get(day)
         if bar is None:
-            start = int(datetime(day.year, day.month, day.day, tzinfo=VIETNAM).timestamp())
-            extra[day] = Candle(start, candle.open, candle.high, candle.low,
+            extra[day] = Candle(vietnam_midnight(day), candle.open, candle.high, candle.low,
                                 candle.close, candle.volume)
         else:
             extra[day] = Candle(bar.time, bar.open, max(bar.high, candle.high),
@@ -129,26 +172,33 @@ def session_starts(end, resolution, count):
     """Bar open times (unix seconds) inside Vietnam sessions, oldest first."""
     local = end.astimezone(VIETNAM)
     times = []
+    size = RESOLUTIONS[resolution][1]
     if resolution == "1D":
         day = local.date()
         while len(times) < count:
             if day.weekday() < 5:
-                times.append(int(datetime(day.year, day.month, day.day,
-                                          tzinfo=VIETNAM).timestamp()))
+                times.append(vietnam_midnight(day))
             day -= timedelta(days=1)
         return times[::-1]
-    step = RESOLUTIONS[resolution][1]
-    cursor = int(local.timestamp()) - int(local.timestamp()) % step
+    if size in ("week", "month"):
+        first = period_start(local.date(), size)
+        while len(times) < count:
+            times.append(vietnam_midnight(first))
+            first = period_start(first - timedelta(days=1), size)
+        return times[::-1]
+    cursor = int(local.timestamp()) - int(local.timestamp()) % size
     while len(times) < count:
         moment = datetime.fromtimestamp(cursor, VIETNAM)
         minute = moment.hour * 60 + moment.minute
-        if moment.weekday() < 5 and any(start <= minute < stop for start, stop in SESSIONS):
+        # Keep candles that overlap a session (a 4H candle opens at 07:00 or 11:00).
+        if moment.weekday() < 5 and any(minute < stop and minute + size // 60 > start
+                                        for start, stop in SESSIONS):
             times.append(cursor)
-        cursor -= step
+        cursor -= size
     return times[::-1]
 
 
-def illustrative_candles(quote, resolution, *, now=None, count=ILLUSTRATIVE_COUNT):
+def illustrative_candles(quote, resolution, *, now=None, count=None):
     """A repeatable random walk ending at the stored quote; for demo charts only.
 
     History is anchored to the stored previous close, so earlier candles stay
@@ -158,6 +208,7 @@ def illustrative_candles(quote, resolution, *, now=None, count=ILLUSTRATIVE_COUN
         end = parse_timestamp(quote.quoted_at)
     except (ValueError, TypeError, AttributeError):
         end = now or datetime.now(timezone.utc)
+    count = count or (ILLUSTRATIVE_MONTHS if resolution == "1M" else ILLUSTRATIVE_COUNT)
     rng = random.Random(f"{quote.symbol}:{resolution}")
     sigma = VOLATILITY[resolution]
     anchor = quote.previous_close_vnd or quote.price_vnd

@@ -7,7 +7,7 @@
   document.documentElement.dataset.watchlist = "ready";
   const grid = document.getElementById("watch-grid");
   const status = document.getElementById("watch-status");
-  const resolutionButtons = Array.from(board.querySelectorAll("[data-resolution]"));
+  const interval = board.querySelector("[data-interval]");
   const averageButtons = Array.from(board.querySelectorAll("[data-average]"));
   const LIST_KEY = "virtutrade:watchlist";
   const RESOLUTION_KEY = "virtutrade:watch-resolution";
@@ -34,10 +34,17 @@
 
   let resolution = "1D";
   try { resolution = localStorage.getItem(RESOLUTION_KEY) || "1D"; } catch { /* optional */ }
-  if (!resolutionButtons.some(button => button.dataset.resolution === resolution)) resolution = "1D";
+  if (!Array.from(interval.options).some(option => option.value === resolution)) resolution = "1D";
   let enabled = chartsReady ? kit.savedAverages() : new Set();
 
   const cards = new Map();
+  let statusTimer;
+  // Announce a change, then clear it so a stale message does not linger.
+  function announce(message, seconds = 4) {
+    clearTimeout(statusTimer);
+    status.textContent = message;
+    statusTimer = setTimeout(() => { status.textContent = ""; }, seconds * 1000);
+  }
   const element = (tag, className, text) => {
     const node = document.createElement(tag);
     if (className) node.className = className;
@@ -150,7 +157,7 @@
       if (mine === entry.request) entry.card.classList.add("stale");
     } finally {
       if (poll && mine === entry.request && cards.has(entry.symbol) && !document.hidden) {
-        entry.timer = setTimeout(() => refresh(entry, false), resolution === "1D" ? 60000 : 15000);
+        entry.timer = setTimeout(() => refresh(entry, false), kit?.DAILY.has(resolution) ? 60000 : 15000);
       }
     }
   }
@@ -192,13 +199,13 @@
   function toggle(symbol) {
     if (symbols.includes(symbol)) {
       symbols = symbols.filter(item => item !== symbol);
-      status.textContent = `${symbol} removed from your watchlist.`;
+      announce(`${symbol} removed from your watchlist.`);
     } else if (symbols.length >= MAX) {
-      status.textContent = `Your watchlist holds up to ${MAX} stocks. Remove one with × first.`;
+      announce(`Your watchlist holds up to ${MAX} stocks. Remove one with × first.`, 6);
       return;
     } else {
       symbols = [...symbols, symbol];
-      status.textContent = `${symbol} added to your watchlist.`;
+      announce(`${symbol} added to your watchlist.`);
     }
     saveList();
     render();
@@ -212,17 +219,17 @@
       const next = remove.closest(".watch-card")?.nextElementSibling?.querySelector("[data-unwatch]");
       toggle(remove.dataset.unwatch);
       // Keep keyboard focus inside the board after the card disappears.
-      (next || board.querySelector("[data-unwatch]") || resolutionButtons[0])?.focus();
+      (next || board.querySelector("[data-unwatch]") || interval)?.focus();
     }
   });
 
-  function selectResolution(next) {
+  function chooseInterval(next) {
     resolution = next;
-    for (const button of resolutionButtons) button.setAttribute("aria-pressed", String(button.dataset.resolution === next));
+    interval.value = next;
     try { localStorage.setItem(RESOLUTION_KEY, next); } catch { /* optional */ }
     for (const entry of cards.values()) { entry.view?.clear(); refresh(entry, true); }
   }
-  for (const button of resolutionButtons) button.addEventListener("click", () => selectResolution(button.dataset.resolution));
+  interval.addEventListener("change", () => chooseInterval(interval.value));
 
   function applyAverages(periods) {
     enabled = new Set(periods);
@@ -249,7 +256,7 @@
     if (!document.hidden) for (const entry of cards.values()) refresh(entry, false);
   });
 
-  for (const button of resolutionButtons) button.setAttribute("aria-pressed", String(button.dataset.resolution === resolution));
+  interval.value = resolution;
   applyAverages(enabled);
   render();
 })();
