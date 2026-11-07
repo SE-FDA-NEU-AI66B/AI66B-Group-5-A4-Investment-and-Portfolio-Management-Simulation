@@ -947,3 +947,45 @@ main{max-width:1600px;margin-top:25px;padding:0 28px}
 .chart-footer p{margin:0;font-size:11px;line-height:1.7;color:#a1a9b8}
 .chart-footer p.delayed{color:#f1c65d}
 @media(max-width:700px){.price-chart{height:320px;margin:4px 0 0}.price-chart-panel .section-heading{padding:16px 14px 6px}.chart-legend,.chart-footer{padding-left:14px;padding-right:14px}.chart-notice{margin:4px 14px 0}}
+
+/* Moving-average controls, shared by the stock chart and the watchlist. */
+.chart-controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.average-swatch{display:inline-block;width:10px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle;background:currentColor}
+.average-swatch.ma20{color:#f1c65d}.average-swatch.ma50{color:#5b9cf6}.average-swatch.ma200{color:#c084fc}
+.average-toolbar button[aria-pressed="false"] .average-swatch{opacity:.45}
+.legend-average{color:var(--average-color)}
+.chart-ma-summary{margin:6px 20px 0;font-size:12px;line-height:1.6;color:#c9cfda;min-height:19px}
+
+/* Watchlist board at the top of Market. */
+.watchboard{margin-bottom:15px}
+.watchboard .section-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.watch-status{margin:0 18px;min-height:0;font-size:12px;color:#f1c65d}
+.watch-status:empty{display:none}
+.watch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;padding:12px 18px 6px}
+.watch-card{border:1px solid #303541;border-radius:8px;background:#15181f;min-width:0;display:flex;flex-direction:column}
+.watch-card.stale{border-color:#6b5520}
+.watch-card-head{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:start;padding:12px 12px 4px}
+.watch-symbol{color:inherit;text-decoration:none;min-width:0}
+.watch-symbol strong{display:block;font-size:16px}
+.watch-symbol small{display:block;color:#a1a9b8;font-size:11px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.watch-symbol:hover strong{text-decoration:underline;text-underline-offset:4px}
+.watch-price{text-align:right;font-variant-numeric:tabular-nums}
+.watch-price strong{display:block;font-size:17px}
+.watch-price small{display:block;font-size:11px;margin-top:3px}
+.watch-remove{width:28px;height:28px;border:1px solid #303541;border-radius:6px;background:#1b1e26;color:#a1a9b8;font-size:16px;line-height:1;cursor:pointer}
+.watch-remove:hover{color:#edf0f5;background:#242832}
+.watch-chart{height:150px;margin:2px 4px 0}
+.watch-card-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 12px 10px;flex-wrap:wrap}
+.watch-averages{display:flex;flex-wrap:wrap;gap:5px}
+.average-chip{border:1px solid color-mix(in srgb,var(--average-color) 45%,transparent);color:var(--average-color);border-radius:5px;padding:2px 6px;font-size:10px;font-weight:650}
+.watch-empty{grid-column:1/-1;margin:8px 0;padding:22px;border:1px dashed #303541;border-radius:8px;color:#a1a9b8;font-size:13px;text-align:center}
+.watch-attribution{padding-top:4px}
+.watch-attribution a{color:#a1a9b8}
+
+/* ☆ beside each symbol in the price board. */
+.symbol-cell{display:flex;align-items:center;gap:8px}
+.watch-toggle{flex:none;width:30px;height:30px;border:1px solid transparent;border-radius:6px;background:transparent;color:#77808f;font-size:16px;cursor:pointer}
+.watch-toggle:hover{border-color:#303541;color:#edf0f5}
+.watch-toggle[aria-pressed="true"]{color:#f1c65d}
+.watch-toggle:focus-visible,.watch-remove:focus-visible{outline:2px solid #ff9eaa;outline-offset:1px}
+@media(max-width:700px){.watch-grid{grid-template-columns:1fr;padding:10px 12px 4px}.chart-ma-summary{margin:6px 14px 0}}

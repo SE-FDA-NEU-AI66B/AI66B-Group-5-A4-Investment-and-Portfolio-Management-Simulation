@@ -22,10 +22,11 @@ RESOLUTIONS = {
     "5": ("1", 300, 14 * 86400),
     "15": ("1", 900, 30 * 86400),
     "1H": ("1", 3600, 30 * 86400),
-    "1D": ("1D", 86400, 400 * 86400),
+    "1D": ("1D", 86400, 700 * 86400),
 }
 MAX_CANDLES = 500
-ILLUSTRATIVE_COUNT = 180
+# Enough candles for a 200-period moving average to show.
+ILLUSTRATIVE_COUNT = 400
 # Continuous-matching sessions in minutes after midnight, Vietnam time.
 SESSIONS = ((9 * 60, 11 * 60 + 30), (13 * 60, 14 * 60 + 45))
 VOLATILITY = {"1": 0.0012, "5": 0.0025, "15": 0.004, "1H": 0.007, "1D": 0.018}

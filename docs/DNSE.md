@@ -253,7 +253,7 @@ bar opens, with range checks in the schema):
 
 - **History:** the signed `GET /price/ohlc?type=STOCK&symbol=&resolution=&from=&to=`
   route returns parallel `t/o/h/l/c/v` arrays, the keys the official SDK reads.
-  The first pass loads 400 days of daily and 5 days of one-minute bars per
+  The first pass loads 700 days of daily and 5 days of one-minute bars per
   symbol. Every fifth latest-trade pass (about five minutes) then repairs the
   last day of minutes and ten days of daily bars. Minute bars older than 30 days
   are pruned.
@@ -278,3 +278,26 @@ latest-trade route, so the key itself is no longer accepted. The parser follows
 the official SDK and is covered by fixture tests (`tests/test_price_bars.py`).
 A run with a valid key must still compare stored candles with the DNSE board
 before the candles count as accepted market data.
+
+## Real candles without a key (unofficial)
+
+`dnse/public.py` (`python -m virtutrade public-feed`, or `MARKET_FEED=dnse-public`
+in the web process, both with `QUOTE_MODE=dnse`) reads
+`https://services.entrade.com.vn/chart-api/v2/ohlcs/stock`, the unauthenticated
+endpoint behind DNSE's own web price board. It returns the same `t/o/h/l/c/v`
+arrays, so candles reuse the parsing and storage above.
+
+- It sends no credentials, only a User-Agent naming this student project. It polls
+  one-minute candles once a minute and daily candles every 15 minutes.
+- The latest one-minute candle becomes the stored `dnse` quote, timestamped at the
+  minute it opened, so it never looks fresher than it is. The previous session's
+  daily close becomes the reference price for the current session.
+- Older polls never replace newer quotes, a failed symbol keeps its stored data,
+  and simulation databases are refused, the same as the signed worker.
+
+On 7 November 2026 this endpoint returned real data for all 12 seeded symbols.
+For example, HPG closed at 21,200 VND on 6 November against a 21,500 reference
+(-1.40%), and there were 475 daily candles. **It is not part of the documented
+OpenAPI:** DNSE may change or block it at any time, and its terms of use have not
+been reviewed for this project. Treat it as a stopgap until a valid API key
+restores the signed feed.

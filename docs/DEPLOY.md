@@ -81,20 +81,30 @@ repository into `/opt/virtutrade`, creates the database in
 automatically on the first visit. To use your own domain, point it at the VM and
 run `SITE_ADDRESS=your.domain bash setup.sh`.
 
-It starts with the **practice simulator**, so the site works before any DNSE
-setup. Running the script again updates the code and keeps the database and
+It starts with **real DNSE prices** from the credential-free public feed (see the
+caveat below). Outside trading hours those prices are older than 15 minutes, so
+orders are refused until the next session, as the order rules require. Running the script again updates the code and keeps the database and
 settings.
 
 ### Switch to real DNSE data
+
+**Without a key (the default after setup):** `QUOTE_MODE=dnse` with
+`FEED_COMMAND=public-feed`. This reads real candles from DNSE's public chart
+endpoint, the one behind DNSE's own web price board. It is unofficial and undocumented:
+DNSE may change or block it at any time, so it polls once a minute and identifies itself
+as a student project. Prefer the signed feed below as soon as a key works.
+
+**With a DNSE API key:**
 
 ```bash
 sudo nano /etc/virtutrade/virtutrade.env
 ```
 
-Set `QUOTE_MODE=dnse`, `FEED_COMMAND=stream`, and `DNSE_API_KEY` /
-`DNSE_API_SECRET`. Point `DATABASE_PATH` at a **new** file such as
-`/var/lib/virtutrade/dnse.db`: DNSE and simulation prices must never share a
-database, and both the worker and the simulator refuse to mix them. Then:
+Set `FEED_COMMAND=stream`, `DNSE_API_KEY` and `DNSE_API_SECRET`, and keep
+`QUOTE_MODE=dnse`. Both DNSE feeds store provider prices, so the same
+`/var/lib/virtutrade/dnse.db` keeps its candles and accounts. Never point a DNSE
+feed at a simulation database (or the simulator at a DNSE one): both refuse to
+mix generated and provider prices. Then:
 
 ```bash
 sudo -u virtutrade bash -c 'set -a; . /etc/virtutrade/virtutrade.env; set +a; cd /opt/virtutrade; .venv/bin/python -m virtutrade init-db'
@@ -122,7 +132,7 @@ exposed.
 | Logs | `journalctl -u virtutrade-web -u virtutrade-feed -f` |
 | Restart after changing settings | `sudo systemctl restart virtutrade-web virtutrade-feed` |
 | Update to the latest `main` | `bash setup.sh` |
-| Back up the database | `sudo systemctl stop virtutrade-feed && sudo cp /var/lib/virtutrade/virtutrade.db ~/virtutrade-$(date +%F).db && sudo systemctl start virtutrade-feed` |
+| Back up the database | `sudo systemctl stop virtutrade-feed && sudo cp /var/lib/virtutrade/dnse.db ~/virtutrade-$(date +%F).db && sudo systemctl start virtutrade-feed` |
 
 ## Option 2: Render free (demo only)
 
@@ -130,6 +140,11 @@ The repository contains a Blueprint, `render.yaml`. In Render choose
 **New → Blueprint**, select this repository and apply. It runs the practice
 simulator inside the web process (`MARKET_FEED=simulation`) with a generated
 `SECRET_KEY`.
+
+For real prices instead of the simulator, change three variables in the Render dashboard:
+`QUOTE_MODE=dnse`, `MARKET_FEED=dnse-public` and `DATABASE_PATH=instance/dnse.db`, and
+replace `init-demo` with `init-db` in the start command. No secret is needed. Candle history
+is downloaded again on each start, so only accounts and trades are lost when it sleeps.
 
 Read Render's limits before sharing the link. The service sleeps after 15 idle
 minutes and loses its files on every restart, so the next visitor finds a fresh
@@ -154,8 +169,8 @@ app locally until it is fixed.
 | Variable | Values | Purpose |
 |---|---|---|
 | `QUOTE_MODE` | `seed`, `simulation`, `dnse` | Which quotes the site shows and trades on |
-| `MARKET_FEED` | `off`, `simulation`, `dnse` | Feed run **inside** the web process (single-service hosts) |
-| `FEED_COMMAND` | `simulate`, `stream` | Feed run by the separate `virtutrade-feed` service (Google Cloud) |
+| `MARKET_FEED` | `off`, `simulation`, `dnse`, `dnse-public` | Feed run **inside** the web process (single-service hosts) |
+| `FEED_COMMAND` | `simulate`, `stream`, `public-feed` | Feed run by the separate `virtutrade-feed` service (Google Cloud) |
 | `SIMULATION_TICK_SECONDS` | default `20` | Seconds between simulated price moves |
 | `TRUST_PROXY` | `1` or empty | Set only behind exactly one HTTPS proxy (Caddy, Render, Codespaces) |
 | `SECRET_KEY` | long random value | Signs sessions and CSRF tokens; keep it stable in production |

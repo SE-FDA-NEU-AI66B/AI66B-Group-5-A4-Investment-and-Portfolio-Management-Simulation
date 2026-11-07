@@ -12,7 +12,7 @@ import sqlite3
 import threading
 
 LOGGER = logging.getLogger(__name__)
-FEEDS = ('off', 'dnse', 'simulation')
+FEEDS = ('off', 'dnse', 'dnse-public', 'simulation')
 
 
 def run_dnse(database):
@@ -22,6 +22,14 @@ def run_dnse(database):
 
     init_database(database)
     asyncio.run(run_market_feed(Settings.from_environment(database), database))
+
+
+def run_dnse_public(database, stop):
+    from virtutrade.database import init_database
+    from virtutrade.dnse.public import run_public_feed
+
+    init_database(database)
+    run_public_feed(database, stop=stop)
 
 
 def run_simulation(database, interval, stop):
@@ -46,6 +54,8 @@ def start_background_feed(app, *, stop=None):
         try:
             if kind == 'dnse':
                 run_dnse(database)
+            elif kind == 'dnse-public':
+                run_dnse_public(database, stop)
             else:
                 run_simulation(database, app.config.get('SIMULATION_TICK_SECONDS', 20), stop)
         except FeedError as exc:

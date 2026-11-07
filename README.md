@@ -27,8 +27,12 @@ Each stock page has a TradingView-style candlestick chart (1m, 5m, 15m, 1H, 1D)
 with volume, crosshair values and automatic updates. With DNSE credentials, the
 `stream` worker stores real OHLC history and live one-minute candles
 ([DNSE notes](docs/DNSE.md#candles-for-the-price-chart)). Without them, a
-practice simulator (`python -m virtutrade simulate`, or `MARKET_FEED=simulation`
-inside the web process) keeps prices and candles moving. Every simulated or
+credential-free `public-feed` reads real candles from DNSE's public chart
+endpoint (unofficial, see the DNSE notes), and a practice simulator
+(`python -m virtutrade simulate`, or `MARKET_FEED=simulation` inside the web
+process) keeps prices moving offline. A watchlist at the top of Market shows
+mini charts for up to six stocks, and every chart can overlay MA20, MA50 and
+MA200. Every simulated or
 illustrative chart is labelled as generated, never as market data.
 
 [Deployment guide](docs/DEPLOY.md): a Google Cloud e2-micro VM keeps the

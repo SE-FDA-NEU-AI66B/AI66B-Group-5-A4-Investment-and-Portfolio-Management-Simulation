@@ -8,70 +8,73 @@
   const source = document.getElementById("chart-source");
   const notice = document.getElementById("chart-notice");
   const legend = document.getElementById("chart-legend");
+  const summary = document.getElementById("chart-ma-summary");
   const retry = document.getElementById("chart-retry");
   const livePrice = document.getElementById("detail-price");
   const buttons = Array.from(panel.querySelectorAll("[data-resolution]"));
-  const money = new Intl.NumberFormat("en-US");
-  const VIETNAM_OFFSET = 7 * 3600;
+  const averageButtons = Array.from(panel.querySelectorAll("[data-average]"));
   const LABELS = {"1": "1-minute", "5": "5-minute", "15": "15-minute", "1H": "hourly", "1D": "daily"};
-  const UP = "#39d69c", DOWN = "#ff667b";
 
-  if (!window.LightweightCharts) {
+  if (!window.LightweightCharts || !window.VirtuTradeCharts) {
     status.textContent = "The chart library could not load. Prices above are still current.";
     container.hidden = true;
     return;
   }
-  const {createChart, CandlestickSeries, HistogramSeries, CrosshairMode} = window.LightweightCharts;
-  const chart = createChart(container, {
-    autoSize: true,
-    layout: {background: {color: "#15181f"}, textColor: "#a1a9b8", attributionLogo: true},
-    grid: {vertLines: {color: "#20242d"}, horzLines: {color: "#20242d"}},
-    rightPriceScale: {borderColor: "#2a2e38"},
-    timeScale: {borderColor: "#2a2e38", rightOffset: 4},
-    crosshair: {mode: CrosshairMode.Normal},
-    localization: {priceFormatter: value => money.format(Math.round(value))},
-  });
-  const candles = chart.addSeries(CandlestickSeries, {
-    upColor: UP, downColor: DOWN, borderUpColor: UP, borderDownColor: DOWN,
-    wickUpColor: UP, wickDownColor: DOWN, priceLineColor: "#77808f",
-  });
-  const volume = chart.addSeries(HistogramSeries, {priceScaleId: "volume", priceFormat: {type: "volume"}, lastValueVisible: false, priceLineVisible: false});
-  chart.priceScale("volume").applyOptions({scaleMargins: {top: 0.8, bottom: 0}});
-  candles.priceScale().applyOptions({scaleMargins: {top: 0.08, bottom: 0.25}});
+  const {money, position, savedAverages, saveAverages, createCandleChart} = window.VirtuTradeCharts;
+  const view = createCandleChart(container);
 
   let resolution = "1D";
   try { resolution = localStorage.getItem("virtutrade:chart-resolution") || "1D"; } catch { /* storage may be blocked */ }
   if (!buttons.some(button => button.dataset.resolution === resolution)) resolution = "1D";
-  let loaded = [];
   let timer;
   let request = 0;
 
-  // The chart draws in UTC; shift intraday bars so axes read in Vietnam time.
-  function chartTime(bar) {
-    if (resolution !== "1D") return bar.time + VIETNAM_OFFSET;
-    const day = new Date((bar.time + VIETNAM_OFFSET) * 1000);
-    return {year: day.getUTCFullYear(), month: day.getUTCMonth() + 1, day: day.getUTCDate()};
-  }
-  const toCandle = bar => ({time: chartTime(bar), open: bar.open, high: bar.high, low: bar.low, close: bar.close});
-  const toVolume = bar => ({time: chartTime(bar), value: bar.volume, color: bar.close >= bar.open ? "rgba(57,214,156,.35)" : "rgba(255,102,123,.35)"});
+  const tone = (a, b) => a > b ? "positive" : a < b ? "negative" : "neutral";
+  const arrow = place => place === "above" ? "▲" : place === "below" ? "▼" : "=";
 
-  function showLegend(bar) {
+  function showLegend(index) {
+    const bar = view.bars[index];
     if (!bar) { legend.textContent = ""; return; }
-    const change = bar.close - bar.open;
-    legend.replaceChildren(...[["O", bar.open], ["H", bar.high], ["L", bar.low], ["C", bar.close]].map(([label, value]) => {
+    const items = [["O", bar.open], ["H", bar.high], ["L", bar.low], ["C", bar.close]].map(([label, value]) => {
       const item = document.createElement("span");
       item.append(`${label} `);
-      const number = document.createElement("strong");
-      number.textContent = money.format(value);
-      number.className = change > 0 ? "positive" : change < 0 ? "negative" : "neutral";
-      item.append(number);
+      item.append(Object.assign(document.createElement("strong"), {textContent: money.format(value), className: tone(bar.close, bar.open)}));
       return item;
-    }), Object.assign(document.createElement("span"), {textContent: `Vol ${money.format(bar.volume)}`}));
+    });
+    items.push(Object.assign(document.createElement("span"), {textContent: `Vol ${money.format(bar.volume)}`}));
+    for (const {period, color, value} of view.averagesAt(index)) {
+      const item = document.createElement("span");
+      item.className = "legend-average";
+      item.style.setProperty("--average-color", color);
+      if (value === null) {
+        item.textContent = `MA${period} —`;
+      } else {
+        const place = position(bar.close, value);
+        item.append(`MA${period} ${money.format(Math.round(value))} `);
+        item.append(Object.assign(document.createElement("strong"), {
+          textContent: arrow(place), className: place === "above" ? "positive" : place === "below" ? "negative" : "neutral",
+          title: `Close is ${place} MA${period}`,
+        }));
+      }
+      items.push(item);
+    }
+    legend.replaceChildren(...items);
   }
-  chart.subscribeCrosshairMove(param => {
-    if (!param.time) { showLegend(loaded.at(-1)); return; }
-    const key = JSON.stringify(param.time);
-    showLegend(loaded.find(bar => JSON.stringify(chartTime(bar)) === key));
+
+  // One sentence on where the latest close sits against each enabled average.
+  function describeAverages() {
+    const index = view.bars.length - 1;
+    const last = view.bars[index];
+    const parts = view.averagesAt(index).map(({period, value}) => value === null
+      ? `MA${period} needs ${period} candles`
+      : `${position(last.close, value)} MA${period} (${money.format(Math.round(value))})`);
+    summary.textContent = last && parts.length
+      ? `Latest close ${money.format(last.close)}: ${parts.join(", ")}.`
+      : "Turn on MA20, MA50 or MA200 to compare the price with its moving averages.";
+  }
+
+  view.chart.subscribeCrosshairMove(param => {
+    showLegend(param.time ? view.indexAt(param.time) : view.bars.length - 1);
   });
 
   function updateQuote(quote) {
@@ -79,17 +82,6 @@
     livePrice.firstChild.textContent = `${money.format(quote.price_vnd)} `;
     const change = quote.change === null ? null : Number(quote.change);
     livePrice.className = `detail-price ${change === null ? "unclassified" : change > 0 ? "positive" : change < 0 ? "negative" : "neutral"}`;
-  }
-
-  const sameBar = (a, b) => a.time === b.time && a.open === b.open && a.high === b.high &&
-    a.low === b.low && a.close === b.close && a.volume === b.volume;
-
-  // True when only the newest candle changed or new candles were appended:
-  // the chart can then update in place, which only accepts the newest time.
-  function appendOnly(previous, next) {
-    if (!previous.length || next.length < previous.length || next.length - previous.length > 2) return false;
-    const last = previous.length - 1;
-    return next[last].time === previous[last].time && previous.slice(0, last).every((bar, index) => sameBar(bar, next[index]));
   }
 
   function render(data, fresh) {
@@ -101,21 +93,17 @@
       : generated ? "Illustrative history: generated from the stored demo price, not real market data. Orders use the stored quote only." : "";
     source.textContent = `${LABELS[resolution]} candles · ${data.source === "simulation" ? "practice simulator" : generated ? "generated for practice" : "DNSE market data"}`;
     if (!bars.length) {
-      candles.setData([]); volume.setData([]); loaded = [];
+      view.clear();
       status.textContent = generated ? "No candles to draw." : "Waiting for DNSE candles. They appear once the market-data worker has received history for this stock.";
       container.setAttribute("aria-label", `${symbol} price chart: no candles yet`);
-      showLegend(null);
+      showLegend(-1);
+      summary.textContent = "";
       return;
     }
-    if (!fresh && appendOnly(loaded, bars)) {
-      for (const bar of bars.slice(loaded.length - 1)) { candles.update(toCandle(bar)); volume.update(toVolume(bar)); }
-    } else {
-      candles.setData(bars.map(toCandle)); volume.setData(bars.map(toVolume));
-      if (fresh) chart.timeScale().fitContent();
-    }
-    loaded = bars;
+    view.setBars(bars, resolution, fresh);
     const last = bars.at(-1);
-    showLegend(last);
+    showLegend(bars.length - 1);
+    describeAverages();
     const daily = resolution === "1D";
     const stamp = new Intl.DateTimeFormat("en-GB", daily
       ? {timeZone: "Asia/Ho_Chi_Minh", day: "2-digit", month: "short", year: "numeric"}
@@ -146,7 +134,7 @@
       if (mine !== request) return;
       retry.hidden = false;
       status.classList.add("delayed");
-      status.textContent = loaded.length ? "Could not refresh the chart. Showing the last candles loaded." : "The chart could not load. Prices above are still available.";
+      status.textContent = view.bars.length ? "Could not refresh the chart. Showing the last candles loaded." : "The chart could not load. Prices above are still available.";
     } finally {
       // Hidden tabs stop polling; visibilitychange reloads when the tab returns.
       if (mine === request && !document.hidden) timer = setTimeout(() => load(false), resolution === "1D" ? 30000 : 5000);
@@ -155,14 +143,29 @@
 
   function select(next) {
     resolution = next;
-    chart.timeScale().applyOptions({timeVisible: next !== "1D", secondsVisible: false});
     for (const button of buttons) button.setAttribute("aria-pressed", String(button.dataset.resolution === next));
     try { localStorage.setItem("virtutrade:chart-resolution", next); } catch { /* optional */ }
-    loaded = [];
+    view.clear();
     load(true);
   }
+
+  function applyAverages(periods) {
+    view.setAverages(periods);
+    for (const button of averageButtons) button.setAttribute("aria-pressed", String(periods.has(Number(button.dataset.average))));
+    showLegend(view.bars.length - 1);
+    if (view.bars.length) describeAverages();
+  }
+
   for (const button of buttons) button.addEventListener("click", () => select(button.dataset.resolution));
-  retry.addEventListener("click", () => load(loaded.length === 0));
+  for (const button of averageButtons) button.addEventListener("click", () => {
+    const periods = view.enabled;
+    const period = Number(button.dataset.average);
+    if (periods.has(period)) periods.delete(period); else periods.add(period);
+    saveAverages(periods);
+    applyAverages(periods);
+  });
+  retry.addEventListener("click", () => load(view.bars.length === 0));
   document.addEventListener("visibilitychange", () => { if (!document.hidden) load(false); });
+  applyAverages(savedAverages());
   select(resolution);
 })();

@@ -26,7 +26,7 @@ MAX_BARS = 10000
 MAX_RESPONSE_BYTES = 2 * 1024 * 1024
 # The latest-trade loop runs every 60 seconds; refresh candles every fifth pass.
 BAR_REFRESH_PASSES = 5
-FIRST_WINDOW = {"1D": 400 * 86400, "1": 5 * 86400}
+FIRST_WINDOW = {"1D": 700 * 86400, "1": 5 * 86400}
 REPAIR_WINDOW = {"1D": 10 * 86400, "1": 86400}
 MINUTE_RETENTION_SECONDS = 30 * 86400
 

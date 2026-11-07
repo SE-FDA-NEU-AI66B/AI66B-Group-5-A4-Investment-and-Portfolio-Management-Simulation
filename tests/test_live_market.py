@@ -222,3 +222,44 @@ def test_forwarded_headers_are_ignored_unless_the_proxy_is_trusted(tmp_path):
     forged = register(direct, 'https://trade.example.app', **{
         'X-Forwarded-Proto': 'https', 'X-Forwarded-Host': 'trade.example.app'})
     assert forged.status_code == 403
+
+
+def test_market_page_offers_a_watchlist_and_hidden_star_buttons(tmp_path):
+    path = tmp_path / 'watch.db'
+    init_database(path)
+    page = create_app({'TESTING': True, 'DATABASE': str(path)}).test_client().get('/market').text
+    assert 'id="watchboard"' in page and 'id="watch-grid"' in page
+    for symbol in ('HPG', 'FPT', 'VNM'):
+        # Hidden until watchboard.js runs, so a page without JavaScript shows no dead button.
+        assert (f'data-watch="{symbol}" aria-pressed="false" aria-label="Watch {symbol}" hidden') in page
+    scripts = [page.index(name) for name in
+               ('lightweight-charts.standalone.production.js', 'chart-kit.js', 'watchboard.js')]
+    assert scripts == sorted(scripts)
+    assert 'https://www.tradingview.com/' in page
+
+
+def test_stock_page_offers_moving_average_toggles(tmp_path):
+    path = tmp_path / 'detail.db'
+    init_database(path)
+    page = create_app({'TESTING': True, 'DATABASE': str(path)}).test_client().get('/market/HPG').text
+    for period in (20, 50, 200):
+        assert f'data-average="{period}"' in page
+    assert 'id="chart-ma-summary"' in page
+    assert page.index('chart-kit.js') < page.index('price-chart.js')
+
+
+def test_illustrative_history_is_long_enough_for_a_200_period_average(tmp_path):
+    path = tmp_path / 'long.db'
+    init_database(path)
+    client = create_app({'TESTING': True, 'DATABASE': str(path)}).test_client()
+    for resolution in ('15', '1D'):
+        assert len(client.get(f'/api/market/bars/HPG?resolution={resolution}').get_json()['bars']) >= 200
+
+
+def test_public_feed_kind_starts_the_credential_free_feed(demo, monkeypatch):
+    from virtutrade import feeds
+    started = []
+    monkeypatch.setattr(feeds, 'run_dnse_public', lambda database, stop: started.append(database))
+    app = create_app({'TESTING': True, 'DATABASE': str(demo), 'MARKET_FEED': 'dnse-public'})
+    start_background_feed(app).join(timeout=5)
+    assert started == [str(demo)]
