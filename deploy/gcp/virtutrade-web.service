@@ -1,0 +1,22 @@
+[Unit]
+Description=VirtuTrade web app (gunicorn)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=virtutrade
+Group=virtutrade
+WorkingDirectory=/opt/virtutrade
+EnvironmentFile=/etc/virtutrade/virtutrade.env
+StateDirectory=virtutrade
+# One worker: a second worker would open a second market feed (see feeds.py).
+ExecStart=/opt/virtutrade/.venv/bin/gunicorn --workers 1 --threads 8 --bind 127.0.0.1:8000 --access-logfile - virtutrade.wsgi:app
+Restart=always
+RestartSec=5
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

@@ -29,7 +29,8 @@ Market, the stock picker and virtual order requests. Use
 `DATABASE_PATH=instance/dnse.db`, separate from simulation.
 DNSE_SYMBOLS is a comma-separated selection of known equity symbols;
 leave it empty to receive all instruments in the database (12 initially),
-or set e.g. `HPG,FPT,MWG`; at most 100 symbols (two streams each).
+or set e.g. `HPG,FPT,MWG`; at most 66 symbols (three streams each: ticks,
+reference prices and one-minute candles, inside the 200-stream connection limit).
 Never share the file.
 
 ```text
@@ -238,3 +239,65 @@ new live-price or provider-board comparison. Seed rows remain explicitly seed.
 Keep #59 open at zero completed points until the outstanding provider-board
 unit/value/timestamp comparison and independent live acceptance are complete.
 The code approval and merge do not waive those criteria.
+
+## Candles for the price chart
+
+The stock detail page draws candlesticks with TradingView Lightweight Charts
+5.2.1, vendored in `market/static/` with its licence and the required
+TradingView attribution. It reads `GET /api/market/bars/<symbol>?resolution=`
+with `1`, `5`, `15`, `1H` or `1D`, the same public, read-only way the market
+table reads quotes. The browser never sees provider credentials.
+
+`dnse/bars.py` stores provider candles in `price_bar` (integer VND, unix-second
+bar opens, with range checks in the schema):
+
+- **History:** the signed `GET /price/ohlc?type=STOCK&symbol=&resolution=&from=&to=`
+  route returns parallel `t/o/h/l/c/v` arrays, the keys the official SDK reads.
+  The first pass loads 700 days of daily and 5 days of one-minute bars per
+  symbol. Every fifth latest-trade pass (about five minutes) then repairs the
+  last day of minutes and ten days of daily bars. Minute bars older than 30 days
+  are pruned.
+- **Live:** the WebSocket also subscribes `ohlc.1.json`. Forming (`T=b`) and
+  closed (`T=bc`) one-minute bars are upserted. A bar is replaced only by one
+  with at least as much volume, so an older REST snapshot cannot shrink a bar
+  the stream has already grown.
+- Prices are thousands of VND, converted with Decimal and rounded to whole VND.
+  A single malformed bar is skipped; a malformed envelope is rejected.
+- HTTP 401/403 on OHLC pauses candle history only. The quote stream and the
+  latest-trade refresh keep running, because a key may allow quotes but not
+  candles.
+
+`market/history.py` groups one-minute bars into 5/15/60-minute candles and
+builds today's daily candle from today's minutes until DNSE's daily bar
+arrives. In DNSE mode the chart only ever shows provider candles; with none
+stored yet it says it is waiting.
+
+**Not yet verified against the live provider:** on 7 November 2026 the team's
+key returned HTTP 401 for both `/price/ohlc` and the previously working
+latest-trade route, so the key itself is no longer accepted. The parser follows
+the official SDK and is covered by fixture tests (`tests/test_price_bars.py`).
+A run with a valid key must still compare stored candles with the DNSE board
+before the candles count as accepted market data.
+
+## Real candles without a key (unofficial)
+
+`dnse/public.py` (`python -m virtutrade public-feed`, or `MARKET_FEED=dnse-public`
+in the web process, both with `QUOTE_MODE=dnse`) reads
+`https://services.entrade.com.vn/chart-api/v2/ohlcs/stock`, the unauthenticated
+endpoint behind DNSE's own web price board. It returns the same `t/o/h/l/c/v`
+arrays, so candles reuse the parsing and storage above.
+
+- It sends no credentials, only a User-Agent naming this student project. It polls
+  one-minute candles once a minute and daily candles every 15 minutes.
+- The latest one-minute candle becomes the stored `dnse` quote, timestamped at the
+  minute it opened, so it never looks fresher than it is. The previous session's
+  daily close becomes the reference price for the current session.
+- Older polls never replace newer quotes, a failed symbol keeps its stored data,
+  and simulation databases are refused, the same as the signed worker.
+
+On 7 November 2026 this endpoint returned real data for all 12 seeded symbols.
+For example, HPG closed at 21,200 VND on 6 November against a 21,500 reference
+(-1.40%), and there were 475 daily candles. **It is not part of the documented
+OpenAPI:** DNSE may change or block it at any time, and its terms of use have not
+been reviewed for this project. Treat it as a stopgap until a valid API key
+restores the signed feed.

@@ -16,14 +16,17 @@
 
   function element(tag, text, className) { const node = document.createElement(tag); node.textContent = text; if (className) node.className = className; return node; }
   function update(quotes) {
-    const activeLink = document.activeElement instanceof HTMLAnchorElement ? document.activeElement : null;
-    const focusRoot = activeLink?.closest("#quote-rows, #ticker-strip");
-    const focusHref = focusRoot ? activeLink.getAttribute("href") : null;
+    // Rows are rebuilt each refresh: remember the focused link or ☆ button to restore it.
+    const focusKey = node => node.dataset.watch ? `watch:${node.dataset.watch}` : node.getAttribute("href");
+    const active = document.activeElement;
+    const focused = active instanceof HTMLAnchorElement || active?.matches?.("button[data-watch]") ? active : null;
+    const focusRoot = focused?.closest("#quote-rows, #ticker-strip");
+    const focusTarget = focusRoot ? focusKey(focused) : null;
     const fragment = document.createDocumentFragment();
     for (const quote of quotes) {
       const row = document.createElement("tr");
       const company = document.createElement("td");
-      const detail = element("a", "", "quote-link"); detail.href = `/market/${encodeURIComponent(quote.symbol)}`; detail.append(element("strong", quote.symbol), element("small", quote.name)); company.append(detail);
+      const detail = element("a", "", "quote-link"); detail.href = `/market/${encodeURIComponent(quote.symbol)}`; detail.append(element("strong", quote.symbol), element("small", quote.name)); const cell = element("div", "", "symbol-cell"); const star = element("button", "☆", "watch-toggle"); star.type = "button"; star.dataset.watch = quote.symbol; star.hidden = document.documentElement.dataset.watchlist !== "ready"; star.setAttribute("aria-pressed", "false"); star.setAttribute("aria-label", `Watch ${quote.symbol}`); cell.append(star, detail); company.append(cell);
       const hasReference = quote.change !== null && quote.previous_close_vnd !== null;
       const change = Number(quote.change);
       const changeCell = element("td", quote.change === null ? "—" : `${change > 0 ? "+" : ""}${quote.change}%`, `number ${direction(quote)}`);
@@ -40,8 +43,8 @@
     document.getElementById("instrument-total").textContent = `${quotes.length} symbols`;
     document.getElementById("symbol-count").textContent = query ? `${quotes.length} matching symbols · VND` : `${quotes.length} symbols · VND`;
     updateBoards(quotes);
-    if (focusRoot && focusHref) {
-      const replacement = Array.from(focusRoot.querySelectorAll("a[href]")).find(link => link.getAttribute("href") === focusHref);
+    if (focusRoot && focusTarget) {
+      const replacement = Array.from(focusRoot.querySelectorAll("a[href], button[data-watch]")).find(node => focusKey(node) === focusTarget);
       replacement?.focus({preventScroll: true});
     }
   }
