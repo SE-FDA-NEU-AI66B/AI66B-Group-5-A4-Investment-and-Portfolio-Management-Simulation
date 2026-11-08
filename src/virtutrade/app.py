@@ -1,6 +1,9 @@
 """Application factory: configure Flask and register each feature module."""
 
-from flask import Flask, redirect, url_for
+import os
+import sqlite3
+
+from flask import Flask, jsonify, redirect, url_for
 
 from virtutrade.accounts import blueprint as accounts_blueprint
 from virtutrade.accounts.routes import init_auth
@@ -42,5 +45,27 @@ def create_app(config=None):
     @app.get('/')
     def home():
         return redirect(url_for('market.index'))
+
+    @app.get('/health')
+    def health():
+        """200 when the database answers and holds quotes, 503 otherwise.
+
+        Never reveals paths, settings or account data; the commit lets a
+        reviewer match the running build to the v1.0 tag.
+        """
+        from virtutrade.database.health import quote_count
+        commit = (os.environ.get('RENDER_GIT_COMMIT') or os.environ.get('GIT_COMMIT') or '')[:7]
+        try:
+            quotes = quote_count(app.config['DATABASE'])
+        except sqlite3.Error as exc:
+            app.logger.warning('Health check failed: database unavailable (%s)', type(exc).__name__)
+            quotes = None
+        healthy = bool(quotes)
+        response = jsonify(status='ok' if healthy else 'unavailable',
+                           database='ok' if healthy else 'unavailable' if quotes is None else 'empty',
+                           quotes=quotes, mode=app.config.get('QUOTE_MODE'), commit=commit or None)
+        response.status_code = 200 if healthy else 503
+        response.headers['Cache-Control'] = 'no-store'
+        return response
 
     return app

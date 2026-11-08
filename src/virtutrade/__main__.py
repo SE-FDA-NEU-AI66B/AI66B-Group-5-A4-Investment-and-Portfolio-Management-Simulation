@@ -1,4 +1,4 @@
-"""Run with python -m virtutrade [run|init-db] after installing the checkout."""
+"""Run with python -m virtutrade [run|init-db|seed-test-accounts|...] after installing the checkout."""
 
 import argparse
 import os
@@ -10,12 +10,24 @@ from virtutrade.database import init_database
 def main():
     parser = argparse.ArgumentParser(prog='python -m virtutrade',
                                      description='VirtuTrade M2 walking skeleton')
-    parser.add_argument('command', nargs='?', choices=['run', 'init-db', 'init-demo', 'stream'], default='run')
+    parser.add_argument('command', nargs='?',
+                        choices=['run', 'init-db', 'init-demo', 'seed-test-accounts', 'stream'],
+                        default='run')
     args = parser.parse_args()
     application = create_app()
     if args.command == 'init-db':
         count = init_database(application.config['DATABASE'])
         print(f'Database ready: {count} price_quote rows (12 on a fresh database).')
+    elif args.command == 'seed-test-accounts':
+        import sqlite3
+
+        from virtutrade.accounts.demo import TEST_ACCOUNTS, seed_test_accounts
+        try:
+            created = seed_test_accounts(application.config['DATABASE'])
+        except sqlite3.Error:
+            parser.exit(1, 'Database unavailable; run init-db or init-demo first.\n')
+        print(f'Test accounts ready: {len(created)} created, '
+              f'{len(TEST_ACCOUNTS) - len(created)} already present (see README).')
     elif args.command == 'init-demo':
         from virtutrade.simulation.repository import init_demo
         if application.config.get('QUOTE_MODE') != 'simulation':
