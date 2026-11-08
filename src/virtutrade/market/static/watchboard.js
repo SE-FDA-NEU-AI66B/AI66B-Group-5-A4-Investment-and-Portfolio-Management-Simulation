@@ -180,6 +180,8 @@
       }
       grid.append(entry.card);
     });
+    // CSS picks the column count from the card count so rows stay even (6 = 3 + 3).
+    grid.dataset.count = String(symbols.length);
     grid.querySelector(".watch-empty")?.remove();
     if (!symbols.length) {
       grid.append(element("p", "watch-empty", "Your watchlist is empty. Select ☆ next to a stock in the price board to add it here."));

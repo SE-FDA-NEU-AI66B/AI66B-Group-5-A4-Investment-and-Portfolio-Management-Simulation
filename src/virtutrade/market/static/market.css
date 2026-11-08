@@ -994,3 +994,15 @@ main{max-width:1600px;margin-top:25px;padding:0 28px}
 .interval-select select{min-height:34px;padding:0 34px 0 12px;border:1px solid #303541;border-radius:7px;background:#1b1e26 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23a1a9b8'/%3E%3C/svg%3E") no-repeat right 12px center;color:#edf0f5;font:inherit;font-size:12px;font-weight:650;appearance:none;cursor:pointer}
 .interval-select select:hover{background-color:#242832}
 .interval-select select:focus-visible{outline:2px solid #ff9eaa;outline-offset:1px}
+
+/* Balanced watchlist rows: the column count follows the card count, never leaving
+   a single card alone on its own row (6 cards = 3 + 3, 4 = one row of 4). */
+.watch-grid{grid-template-columns:repeat(var(--watch-columns,3),minmax(0,1fr))}
+.watch-grid[data-count="0"],.watch-grid[data-count="1"]{--watch-columns:1}
+.watch-grid[data-count="2"],.watch-grid[data-count="4"]{--watch-columns:2}
+.watch-grid[data-count="3"],.watch-grid[data-count="6"]{--watch-columns:3}
+.watch-grid[data-count="5"]{--watch-columns:5}
+@media(min-width:1200px){.watch-grid[data-count="4"]{--watch-columns:4}}
+@media(max-width:1199px){.watch-grid[data-count="5"]{--watch-columns:3}}
+@media(max-width:899px){.watch-grid[data-count="3"],.watch-grid[data-count="4"],.watch-grid[data-count="6"]{--watch-columns:2}}
+@media(max-width:700px){.watch-grid{--watch-columns:1!important}}
