@@ -1,4 +1,56 @@
-# AI66B - Group 5 - Topic A4: Investment & Portfolio Management Simulation (Paper Trading)
+**Live app: <https://TODO-public-url>** · health check: `/health` <!-- TODO(#155): replace both after the first deploy -->
+
+# VirtuTrade: paper trading for Vietnamese stocks
+
+[![CI](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/actions/workflows/ci.yml?query=branch%3Amain)
+
+AI66B · Group 5 · Topic A4, Investment & Portfolio Management Simulation. Practise
+buying and selling Vietnamese stocks with 100,000,000 VND of virtual money. No real
+money moves and nothing needs to be installed: open the link on a phone or a laptop.
+
+The hosted app runs the practice market: prices and candles are generated and
+labelled **Simulated**, so orders work at any hour, including when the real market
+is closed. The code can also show real DNSE prices ([DNSE notes](docs/DNSE.md)).
+
+## Test accounts
+
+| Email | Password | Role |
+|---|---|---|
+| `investor1@virtutrade.test` | `PaperTrade-2026` | investor |
+| `investor2@virtutrade.test` | `PaperTrade-2026` | investor |
+| `investor3@virtutrade.test` | `PaperTrade-2026` | investor |
+
+Test values only, shared by every visitor; they hold virtual money only. Five wrong
+passwords lock an account for 15 minutes: use another one, or create your own with
+**Register**.
+
+## P0 stories: where each one starts
+
+Every story starts from the first page, **Market**, by clicking only.
+
+| Story | Start here |
+|---|---|
+| US01 Register / log in | **Register** or **Log in**, top right |
+| US02 Initial virtual capital | After **Register**: the header on Market shows 100,000,000 VND |
+| US03 Current market price | **Market**: the price board; search by symbol or company, then select a stock for its chart |
+| US04 Market buy | **Buy shares** in the menu, or **Buy ↗** on a row of the price board |
+| US05 Market sell | **Sell shares** in the menu (needs a holding from US04) |
+| US06 Portfolio holdings and P&L | **Portfolio** in the menu, after signing in |
+| US10 Balance warning | **Buy shares**: enter more shares than your cash covers; the preview shows the shortfall and blocks **Confirm** |
+
+## Team
+
+| Name | Student ID | GitHub | Sprint 5 role |
+|---|---|---|---|
+| Pham Huy Thanh | 11247351 | [bianh13](https://github.com/bianh13) | Product Owner / Developer |
+| Pham Quang Vu | 11247372 | [VuSiSi](https://github.com/VuSiSi) | Developer |
+| Nguyen Van Tue | 11247366 | [nguyentue110](https://github.com/nguyentue110) | Developer |
+| Bui Khang Long | 11247312 | [longbk761-bot](https://github.com/longbk761-bot) | Developer |
+
+Scrum Master for Sprint 5: TODO(#155) <!-- name the Sprint 5 SM and update the role column -->.
+Operations, release and rollback: [docs/operations.md](docs/operations.md).
+
+---
 
 ## Sprint 4 / Milestone 4: current work
 
@@ -90,12 +142,7 @@ reader interface so its rules can be tested without a server or database.
 
 ## Team Members
 
-| **Full Name** | **Student ID** | **GitHub Username** | **Role** | 
-|----|-------|----------|--------|
-| Pham Huy Thanh | 11247351 | bianh13 | Product Owner / Developer (Sprint 3) |
-| Pham Quang Vu | 11247372 | VuSiSi | Dev Team |
-| Nguyen Van Tue | 11247366 | nguyentue110 | Developer (Sprint 3); Scrum Master in Sprint 2 |
-| Bui Khang Long | 11247312 | longbk761-bot | Scrum Master / Developer (Sprint 3) |
+The team table is at the top of this README.
 
 > *Note: The Scrum Master role rotates every sprint. Each member will take on this role at least once during the semester.*
 
