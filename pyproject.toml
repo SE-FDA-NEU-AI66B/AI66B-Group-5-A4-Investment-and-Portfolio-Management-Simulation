@@ -21,6 +21,6 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 "virtutrade.accounts" = ["templates/accounts/*.html"]
-"virtutrade.market" = ["templates/market/*.html", "static/*.css", "static/*.js"]
+"virtutrade.market" = ["templates/market/*.html", "static/*.css", "static/*.js", "static/*.txt"]
 "virtutrade.orders" = ["templates/orders/*.html", "static/*.js"]
 "virtutrade.portfolio" = ["templates/portfolio/*.html", "static/*.css"]

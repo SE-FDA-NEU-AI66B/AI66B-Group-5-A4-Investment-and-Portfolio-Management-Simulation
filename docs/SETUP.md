@@ -116,9 +116,11 @@ macOS / Linux:
 ```
 
 GitHub Codespaces: the repository's [devcontainer](../.devcontainer/devcontainer.json)
-creates `.venv`, installs the checkout with the `dev` extra, copies `.env` and runs
-`init-db` when the codespace is created, and puts `.venv/bin` first on PATH, so
-plain `pytest -v` works in a new terminal. A codespace created before this file
+creates `.venv`, installs the checkout with the `dev` extra, copies
+`.devcontainer/demo.env` to `.env` (only if `.env` is missing), creates the
+practice-market database with `init-demo`, starts the app on port 5000 when you
+attach, and puts `.venv/bin` first on PATH, so plain `pytest -v` works in a new
+terminal. A codespace created before this file
 existed must be rebuilt once (Command Palette → **Codespaces: Rebuild
 Container**). Without a rebuild, bare `pytest` is the image's global pipx copy,
 which cannot import the app; the run stops with a message naming the missing
