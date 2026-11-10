@@ -29,6 +29,15 @@ def migrate_market_data(connection):
         connection.execute("ALTER TABLE price_quote_upgrade RENAME TO price_quote")
 
 
+    bars = connection.execute("SELECT sql FROM sqlite_master WHERE name='price_bar'").fetchone()
+    if bars and "'1H'" not in bars[0]:
+        # Candle tables created before hourly bars: widen the resolution CHECK, keep rows.
+        statement = SCHEMA.split("CREATE TABLE IF NOT EXISTS price_bar (")[1].split(";")[0]
+        connection.execute("CREATE TABLE price_bar_upgrade (" + statement)
+        connection.execute("INSERT INTO price_bar_upgrade SELECT * FROM price_bar")
+        connection.execute("DROP TABLE price_bar")
+        connection.execute("ALTER TABLE price_bar_upgrade RENAME TO price_bar")
+
     connection.execute("CREATE TABLE IF NOT EXISTS feature_migration (name TEXT PRIMARY KEY)")
     connection.execute("INSERT OR IGNORE INTO feature_migration VALUES ('dnse-reference-v1')")
     connection.execute("INSERT OR IGNORE INTO feature_migration VALUES ('simulation-source-v1')")

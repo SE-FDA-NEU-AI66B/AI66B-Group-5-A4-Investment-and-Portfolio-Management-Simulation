@@ -25,6 +25,17 @@ CREATE TABLE IF NOT EXISTS price_quote (
     quoted_at TEXT NOT NULL,
     source TEXT NOT NULL CHECK(source IN ('seed', 'dnse', 'simulation'))
 );
+CREATE TABLE IF NOT EXISTS price_bar (
+    instrument_id INTEGER NOT NULL REFERENCES instrument(id),
+    resolution TEXT NOT NULL CHECK(resolution IN ('1', '1H', '1D')),
+    bar_time INTEGER NOT NULL CHECK(bar_time > 0),
+    open_vnd INTEGER NOT NULL CHECK(open_vnd > 0),
+    high_vnd INTEGER NOT NULL CHECK(high_vnd >= open_vnd AND high_vnd >= close_vnd),
+    low_vnd INTEGER NOT NULL CHECK(low_vnd > 0 AND low_vnd <= open_vnd AND low_vnd <= close_vnd),
+    close_vnd INTEGER NOT NULL CHECK(close_vnd > 0),
+    volume INTEGER NOT NULL CHECK(volume >= 0),
+    PRIMARY KEY(instrument_id, resolution, bar_time)
+);
 CREATE TABLE IF NOT EXISTS holding (
     id INTEGER PRIMARY KEY,
     account_id INTEGER NOT NULL REFERENCES account(id),

@@ -1,0 +1,26 @@
+# Render Blueprint: a free practice-market demo. Render's free web services
+# sleep after 15 idle minutes and lose local files on every restart, so the
+# simulation database (accounts and trades included) starts fresh each time.
+# See docs/DEPLOY.md before choosing this over the Google Cloud VM.
+services:
+  - type: web
+    name: virtutrade
+    runtime: python
+    plan: free
+    buildCommand: pip install -e .
+    # init-demo refuses an existing database, so a restart keeps going.
+    startCommand: python -m virtutrade init-demo; exec gunicorn --workers 1 --threads 8 --bind 0.0.0.0:$PORT virtutrade.wsgi:app
+    healthCheckPath: /market
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.7
+      - key: QUOTE_MODE
+        value: simulation
+      - key: DATABASE_PATH
+        value: instance/simulation.db
+      - key: MARKET_FEED
+        value: simulation
+      - key: TRUST_PROXY
+        value: "1"
+      - key: SECRET_KEY
+        generateValue: true

@@ -4,6 +4,7 @@ import os
 import sqlite3
 
 from flask import Flask, jsonify, redirect, url_for
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from virtutrade.accounts import blueprint as accounts_blueprint
 from virtutrade.accounts.routes import init_auth
@@ -22,6 +23,9 @@ def create_app(config=None):
     app.config.update(load_config())
     if config:
         app.config.update(config)
+    if app.config.get('TRUST_PROXY'):
+        # Public scheme/host from the proxy keep Secure cookies and the origin check right.
+        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
     # Compose infrastructure here; controllers/services do not select a database.
     app.extensions['market_reader_factory'] = lambda: SQLiteQuoteRepository(
         app.config['DATABASE'], provider_only=app.config.get('QUOTE_MODE') == 'dnse')
