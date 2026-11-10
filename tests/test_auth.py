@@ -488,6 +488,34 @@ def test_same_origin_mismatch_rejected(client):
     assert response.get_json()['error']['code'] == 'CSRF_FAILED'
 
 
+def test_same_origin_ok_accepts_a_rewritten_origin_only_when_trusted():
+    host = 'demo-5000.app.github.dev'
+    origin = 'http://localhost:5000'
+    referer = 'https://demo-5000.app.github.dev/register'
+    assert service.same_origin_ok(host, origin, referer, trust_proxy=True)
+    assert not service.same_origin_ok(host, origin, referer)
+
+
+def test_trusted_proxy_accepts_codespaces_rewritten_origin(tmp_path):
+    database = tmp_path / 'codespaces.db'
+    init_database(database)
+    app = create_app({'TESTING': True, 'DATABASE': str(database),
+                      'SECRET_KEY': SECRET, 'TRUST_PROXY': True})
+    forwarded = {'X-Forwarded-Proto': 'https',
+                 'X-Forwarded-Host': 'demo-5000.app.github.dev',
+                 'Origin': 'http://localhost:5000',
+                 'Referer': 'https://demo-5000.app.github.dev/register',
+                 'X-CSRF-Token': mint_preauth_csrf(SECRET)}
+    with app.test_client() as agent:
+        response = agent.post('/api/accounts',
+                              json={'email': 'proxy@example.com',
+                                    'password': PASSWORD},
+                              headers=forwarded)
+    assert response.status_code == 201
+    assert response.get_json()['account']['email'] == 'proxy@example.com'
+    assert 'Secure' in response.headers['Set-Cookie']
+
+
 def test_orders_identity_and_csrf_callbacks(client):
     from flask import g, request
 
