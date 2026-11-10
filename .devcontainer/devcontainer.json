@@ -1,7 +1,7 @@
 {
   "name": "VirtuTrade",
   "image": "mcr.microsoft.com/devcontainers/python:1-3.12-bookworm",
-  "postCreateCommand": "python -m pip install -e . pytest ruff && { [ -f .env ] || cp .devcontainer/demo.env .env; } && { python -m virtutrade init-demo || true; }",
+  "postCreateCommand": "python -m pip install -e . pytest ruff && { [ -f .env ] || cp .devcontainer/demo.env .env; } && { python -m virtutrade init-demo || true; } && python -m virtutrade seed-test-accounts",
   "postAttachCommand": "python -m virtutrade run",
   "forwardPorts": [5000],
   "portsAttributes": {
