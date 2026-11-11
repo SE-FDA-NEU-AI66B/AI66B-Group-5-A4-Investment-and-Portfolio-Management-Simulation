@@ -9,6 +9,10 @@ description = "Team 05 paper-trading market walking skeleton"
 requires-python = ">=3.10"
 dynamic = ["dependencies"]
 
+[project.optional-dependencies]
+# Development tools, pinned so CI, Codespaces and every laptop run the same versions.
+dev = ["pytest==9.2.0", "pytest-cov==7.1.0", "ruff==0.17.3"]
+
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
 

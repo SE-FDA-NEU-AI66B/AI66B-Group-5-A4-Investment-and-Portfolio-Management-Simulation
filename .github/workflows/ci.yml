@@ -50,12 +50,10 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -e .
-          pip install pytest pytest-cov ruff
+          python -m pip install -e ".[dev]"
 
       - name: Lint
         run: ruff check . --output-format=github
-        continue-on-error: true   # Week 1-6: warn only. Remove this line from Sprint 2 onward.
 
       - name: Test
         run: pytest -v --cov --cov-report=term-missing --junitxml=junit.xml
@@ -99,7 +97,6 @@ jobs:
 
       - name: Lint
         run: npm run lint --if-present
-        continue-on-error: true   # Week 1-6: warn only. Remove this line from Sprint 2 onward.
 
       - name: Test
         run: npm test --if-present
