@@ -920,10 +920,9 @@ main{max-width:1600px;margin-top:25px;padding:0 28px}
 .price-comparison-row dt{font-size:11px;color:var(--muted);margin-bottom:8px}
 .price-comparison-row dd{margin:0;display:grid;grid-template-columns:minmax(0,1fr) 145px;align-items:center;gap:14px}
 .price-comparison-row strong{text-align:right;font-size:12px;font-variant-numeric:tabular-nums;white-space:nowrap}
-.comparison-track{display:block;height:14px;border-radius:3px;background:#252a35;overflow:hidden}
-.comparison-fill{display:block;height:100%;border-radius:3px}
-.comparison-fill.reference{background:#77808f}
-.comparison-fill.current{background:linear-gradient(90deg,#a72943,#ff667b)}
+.comparison-track{display:block;width:100%;height:14px;border-radius:3px;background:#252a35;overflow:hidden}
+.comparison-fill.reference{fill:#77808f}
+.comparison-fill.current{fill:url(#comparison-current)}
 .snapshot-comparison .board-caption{padding:5px 20px 18px}
 .comparison-unavailable{padding:4px 20px 18px;font-size:12px;color:var(--muted);line-height:1.7}
 
@@ -994,6 +993,9 @@ main{max-width:1600px;margin-top:25px;padding:0 28px}
 .interval-select select{min-height:34px;padding:0 34px 0 12px;border:1px solid #303541;border-radius:7px;background:#1b1e26 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23a1a9b8'/%3E%3C/svg%3E") no-repeat right 12px center;color:#edf0f5;font:inherit;font-size:12px;font-weight:650;appearance:none;cursor:pointer}
 .interval-select select:hover{background-color:#242832}
 .interval-select select:focus-visible{outline:2px solid #ff9eaa;outline-offset:1px}
+.interval-toolbar{flex-wrap:wrap;gap:4px;max-width:100%;overflow:visible;border:0}
+.chart-toolbar.interval-toolbar button,.chart-toolbar.interval-toolbar button:last-child{border:1px solid #303541;border-radius:6px}
+@media(max-width:700px){.price-chart-panel .chart-controls{width:100%}.price-chart-panel .interval-toolbar,.price-chart-panel .average-toolbar{flex:1 1 100%}}
 
 /* Balanced watchlist rows: the column count follows the card count, never leaving
    a single card alone on its own row (6 cards = 3 + 3, 4 = one row of 4). */

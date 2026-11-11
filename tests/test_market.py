@@ -61,6 +61,30 @@ def test_seed_source_and_delay_are_visible(database):
     assert b"not live DNSE quotes" in response.data
     assert b"Demo / seed" in response.data
     assert b"Price may be delayed" in response.data
+    assert b'aria-label="View HPG chart"' in response.data
+    assert b'href="/market/HPG"' in response.data
+    assert b'aria-label="View ACB chart"' in response.data
+    assert b'href="/market/ACB"' in response.data
+
+
+def test_detail_chart_intervals_are_keyboard_buttons_with_selected_state(database):
+    app = create_app({"TESTING": True, "DATABASE": str(database)})
+    response = app.test_client().get("/market/HPG")
+    assert response.status_code == 200
+    for interval in ("15", "1H", "4H", "1D", "1W", "1M"):
+        expected = f'data-interval="{interval}"'.encode()
+        assert expected in response.data
+    assert b'role="group" aria-label="Chart interval"' in response.data
+    assert b'data-interval="1D" aria-pressed="true"' in response.data
+
+
+def test_price_comparison_uses_svg_widths_not_template_css(database):
+    app = create_app({"TESTING": True, "DATABASE": str(database)})
+    response = app.test_client().get("/market/HPG")
+    assert response.status_code == 200
+    assert b'<rect class="comparison-fill reference" width="98.2"' in response.data
+    assert b'<rect class="comparison-fill current" width="100.0"' in response.data
+    assert b'style="width:{{' not in response.data
 
 
 def test_database_constraints_reject_invalid_quote(database):

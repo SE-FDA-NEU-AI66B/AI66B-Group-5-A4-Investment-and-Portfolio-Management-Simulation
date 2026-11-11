@@ -11,7 +11,7 @@
   const summary = document.getElementById("chart-ma-summary");
   const retry = document.getElementById("chart-retry");
   const livePrice = document.getElementById("detail-price");
-  const interval = panel.querySelector("[data-interval]");
+  const intervalButtons = Array.from(panel.querySelectorAll("[data-interval]"));
   const averageButtons = Array.from(panel.querySelectorAll("[data-average]"));
   const LABELS = {"15": "15-minute", "1H": "hourly", "4H": "4-hour", "1D": "daily", "1W": "weekly", "1M": "monthly"};
 
@@ -25,8 +25,8 @@
 
   let resolution = "1D";
   try { resolution = localStorage.getItem("virtutrade:chart-resolution") || "1D"; } catch { /* storage may be blocked */ }
-  // A saved interval that no longer exists (for example 1m or 5m) falls back to daily.
-  if (!Array.from(interval.options).some(option => option.value === resolution)) resolution = "1D";
+  // A saved interval that is no longer supported falls back to daily.
+  if (!intervalButtons.some(button => button.dataset.interval === resolution)) resolution = "1D";
   let timer;
   let request = 0;
 
@@ -144,7 +144,9 @@
 
   function choose(next) {
     resolution = next;
-    interval.value = next;
+    for (const button of intervalButtons) {
+      button.setAttribute("aria-pressed", String(button.dataset.interval === next));
+    }
     try { localStorage.setItem("virtutrade:chart-resolution", next); } catch { /* optional */ }
     view.clear();
     load(true);
@@ -157,7 +159,7 @@
     if (view.bars.length) describeAverages();
   }
 
-  interval.addEventListener("change", () => choose(interval.value));
+  for (const button of intervalButtons) button.addEventListener("click", () => choose(button.dataset.interval));
   for (const button of averageButtons) button.addEventListener("click", () => {
     const periods = view.enabled;
     const period = Number(button.dataset.average);

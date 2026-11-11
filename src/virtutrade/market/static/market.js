@@ -26,7 +26,7 @@
     for (const quote of quotes) {
       const row = document.createElement("tr");
       const company = document.createElement("td");
-      const detail = element("a", "", "quote-link"); detail.href = `/market/${encodeURIComponent(quote.symbol)}`; detail.append(element("strong", quote.symbol), element("small", quote.name)); const cell = element("div", "", "symbol-cell"); const star = element("button", "☆", "watch-toggle"); star.type = "button"; star.dataset.watch = quote.symbol; star.hidden = document.documentElement.dataset.watchlist !== "ready"; star.setAttribute("aria-pressed", "false"); star.setAttribute("aria-label", `Watch ${quote.symbol}`); cell.append(star, detail); company.append(cell);
+      const detail = element("a", "", "quote-link"); detail.href = `/market/${encodeURIComponent(quote.symbol)}`; detail.setAttribute("aria-label", `View ${quote.symbol} chart`); detail.append(element("strong", quote.symbol), element("small", quote.name)); const cell = element("div", "", "symbol-cell"); const star = element("button", "☆", "watch-toggle"); star.type = "button"; star.dataset.watch = quote.symbol; star.hidden = document.documentElement.dataset.watchlist !== "ready"; star.setAttribute("aria-pressed", "false"); star.setAttribute("aria-label", `Watch ${quote.symbol}`); cell.append(star, detail); company.append(cell);
       const hasReference = quote.change !== null && quote.previous_close_vnd !== null;
       const change = Number(quote.change);
       const changeCell = element("td", quote.change === null ? "—" : `${change > 0 ? "+" : ""}${quote.change}%`, `number ${direction(quote)}`);
@@ -50,7 +50,7 @@
   }
   function updateBoards(quotes) {
     const strip = document.getElementById("ticker-strip");
-    strip.replaceChildren(...quotes.slice(0, 6).map(quote => { const tile = element("a", "", "ticker-tile"); tile.href = `/market/${encodeURIComponent(quote.symbol)}`; tile.setAttribute("aria-label", `View ${quote.symbol} quote`); const title = element("span", quote.symbol); title.append(element("small", sourceName(quote))); tile.append(title, element("strong", money.format(quote.price_vnd), direction(quote)), element("small", quote.change === null ? "Reference unavailable" : `${Number(quote.change) > 0 ? "+" : ""}${quote.change}%`, direction(quote))); return tile; }));
+    strip.replaceChildren(...quotes.slice(0, 6).map(quote => { const tile = element("a", "", "ticker-tile"); tile.href = `/market/${encodeURIComponent(quote.symbol)}`; tile.setAttribute("aria-label", `View ${quote.symbol} chart`); const title = element("span", quote.symbol); title.append(element("small", sourceName(quote))); tile.append(title, element("strong", money.format(quote.price_vnd), direction(quote)), element("small", quote.change === null ? "Reference unavailable" : `${Number(quote.change) > 0 ? "+" : ""}${quote.change}%`, direction(quote))); return tile; }));
     const counts = {positive: 0, negative: 0, neutral: 0, unclassified: 0}; for (const quote of quotes) counts[direction(quote)]++;
     document.getElementById("breadth-board").replaceChildren(...[["positive", "Advancing"], ["negative", "Declining"], ["neutral", "Unchanged"], ["unclassified", "No reference"]].map(([key, label]) => { const cell = element("div", "", `breadth-cell ${key}`); cell.append(element("strong", String(counts[key])), element("span", label)); return cell; }));
     const monitored = quotes.filter(quote => quote.change !== null).sort((a, b) => Math.abs(Number(b.change)) - Math.abs(Number(a.change))).slice(0, 5);
