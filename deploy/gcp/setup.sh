@@ -61,6 +61,7 @@ if [ "$mode" = simulation ] && ! sudo test -f "$database"; then
 else
   as_app init-db  # Idempotent: adds new tables, keeps accounts and trades.
 fi
+as_app seed-test-accounts  # Adds only missing README test accounts.
 
 sudo install -m 644 "$APP/deploy/gcp/virtutrade-web.service" "$APP/deploy/gcp/virtutrade-feed.service" \
   /etc/systemd/system/
