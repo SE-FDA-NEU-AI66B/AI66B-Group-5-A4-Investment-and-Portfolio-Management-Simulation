@@ -35,6 +35,8 @@ npm-debug.log*
 .idea/
 .DS_Store
 Thumbs.db
+graphify-out/
+.gitattributes
 
 # M2 runtime and local tooling
 instance/
