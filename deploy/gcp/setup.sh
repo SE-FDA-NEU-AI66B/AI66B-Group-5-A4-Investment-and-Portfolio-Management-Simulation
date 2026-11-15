@@ -44,11 +44,16 @@ sudo python3 -m venv "$APP/.venv"
 sudo "$APP/.venv/bin/pip" install --quiet --upgrade pip
 sudo "$APP/.venv/bin/pip" install --quiet -e "$APP"
 
-if [ ! -f "$ENV_FILE" ]; then
+# /etc/virtutrade is root:virtutrade 750, so only sudo can see the file: a plain
+# [ -f ] is always false and would overwrite the settings on every update (#163).
+if ! sudo test -f "$ENV_FILE"; then
   sudo install -o root -g virtutrade -m 640 "$APP/deploy/gcp/virtutrade.env.example" "$ENV_FILE"
   secret=$(python3 -c 'import secrets; print(secrets.token_hex(32))')
   sudo sed -i "s/^SECRET_KEY=$/SECRET_KEY=$secret/" "$ENV_FILE"
 fi
+# /health reports this commit, so the live app can be matched to a tag.
+sudo sed -i '/^GIT_COMMIT=/d' "$ENV_FILE"
+echo "GIT_COMMIT=$(sudo git -C "$APP" rev-parse HEAD)" | sudo tee -a "$ENV_FILE" >/dev/null
 
 # Run a CLI command as the service user with the service settings.
 as_app() {

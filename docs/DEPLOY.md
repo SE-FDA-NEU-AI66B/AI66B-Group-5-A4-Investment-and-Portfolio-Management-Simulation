@@ -84,7 +84,14 @@ run `SITE_ADDRESS=your.domain bash setup.sh`.
 It starts with **real DNSE prices** from the credential-free public feed (see the
 caveat below). Outside trading hours those prices are older than 15 minutes, so
 orders are refused until the next session, as the order rules require. Running the script again updates the code and keeps the database and
-settings.
+settings. Each run also records the deployed commit as `GIT_COMMIT`, so
+`/health` shows which commit is live.
+
+**Practice market instead (orders work at any hour):** set
+`QUOTE_MODE=simulation`, `FEED_COMMAND=simulate` and
+`DATABASE_PATH=/var/lib/virtutrade/simulation.db` with `sudo nano
+/etc/virtutrade/virtutrade.env`, then run `bash setup.sh` again. It sees the new
+database is missing and runs `init-demo` and `seed-test-accounts`.
 
 ### Switch to real DNSE data
 
