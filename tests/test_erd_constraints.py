@@ -14,8 +14,8 @@ from virtutrade.database import SCHEMA
 
 ACCOUNT_COLUMNS = {"id", "email", "password_hash", "role", "status", "cash_vnd",
                    "created_at"}
-EXPECTED_TABLES = {"account", "instrument", "price_quote", "holding", "trade",
-                   "audit_event"}
+EXPECTED_TABLES = {"account", "instrument", "price_quote", "price_bar", "holding",
+                   "trade", "audit_event"}
 
 
 @pytest.fixture

@@ -99,14 +99,26 @@ def valid_preauth_csrf(secret, token, now=None):
                for slot in slots)
 
 
-def same_origin_ok(host, origin, referer):
+def _header_host(value):
+    return value.split('://', 1)[-1].split('/', 1)[0].lower()
+
+
+def same_origin_ok(host, origin, referer, *, trust_proxy=False):
     """Browsers send Origin (or Referer) on POSTs; non-browser API clients
-    send neither and skip this check but still need a CSRF token."""
+    send neither and skip this check but still need a CSRF token.
+
+    A trusted reverse proxy may rewrite Origin to its internal target while
+    preserving the browser's Referer (GitHub Codespaces sends
+    ``Origin: http://localhost:5000`` for a public HTTPS host). With
+    TRUST_PROXY on, accept either header; a cross-site browser request still
+    carries the attacker's own host in both, and headers cannot be forged by
+    page script.
+    """
     if not origin and not referer:
         return True
-    candidate = origin or referer
-    candidate_host = candidate.split('://', 1)[-1].split('/', 1)[0].lower()
-    return candidate_host == (host or '').lower()
+    candidates = (origin, referer) if trust_proxy else (origin or referer,)
+    return any(candidate and _header_host(candidate) == (host or '').lower()
+               for candidate in candidates)
 
 
 def seconds_until(locked_until_iso, now_iso_value):

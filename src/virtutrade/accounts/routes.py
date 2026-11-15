@@ -108,7 +108,9 @@ def _fail(exc):
 def _check_origin():
     origin = request.headers.get('Origin')
     referer = request.headers.get('Referer')
-    if not service.same_origin_ok(request.host, origin, referer):
+    trust_proxy = bool(current_app.config.get('TRUST_PROXY'))
+    if not service.same_origin_ok(request.host, origin, referer,
+                                  trust_proxy=trust_proxy):
         raise errors.CsrfFailed()
 
 

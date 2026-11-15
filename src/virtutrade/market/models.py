@@ -23,3 +23,14 @@ class Quote:
 class MarketQuote(Quote):
     change: Decimal | None
     stale: bool
+
+
+@dataclass(frozen=True)
+class Candle:
+    """One OHLCV bar in integer VND; time is unix seconds at the bar's open."""
+    time: int
+    open: int
+    high: int
+    low: int
+    close: int
+    volume: int

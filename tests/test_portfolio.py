@@ -309,6 +309,21 @@ def test_navigation_reaches_market_buy_and_sell(setup):
     assert b'href="/portfolio"' in client.get("/trade").data
 
 
+def test_held_symbol_links_to_its_chart_without_account_data(setup):
+    """#149: a holding row links to /market/<symbol> with an accessible name,
+    and the link carries no account id, email or session data."""
+    app, _ = setup
+    client = app.test_client()
+    order(client, register(client), "buy", 100)
+    page = client.get("/portfolio").data.decode()
+
+    assert ('<a class="quote-link" href="/market/HPG" aria-label="View HPG chart">'
+            in page)
+    chart_links = re.findall(r'class="quote-link" href="([^"]*)"', page)
+    assert chart_links == ["/market/HPG"]  # exactly the held symbol, no query
+    assert client.get(chart_links[0]).status_code == 200
+
+
 # --- Two-second budget (US06-AC5) -------------------------------------------
 
 

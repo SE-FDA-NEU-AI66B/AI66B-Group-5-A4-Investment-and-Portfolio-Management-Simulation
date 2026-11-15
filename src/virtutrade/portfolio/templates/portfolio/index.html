@@ -74,7 +74,7 @@
             <tbody>
               {% for position in portfolio.positions %}
               <tr>
-                <td><strong>{{ position.symbol }}</strong><small>{{ position.name }}</small></td>
+                <td><a class="quote-link" href="/market/{{ position.symbol|urlencode }}" aria-label="View {{ position.symbol }} chart"><strong>{{ position.symbol }}</strong><small>{{ position.name }}</small></a></td>
                 <td class="number">{{ position.quantity|vnd }}</td>
                 <td class="number">{{ position.average_cost_vnd|avg }}</td>
                 {% if position.priced %}

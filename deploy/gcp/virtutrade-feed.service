@@ -1,0 +1,23 @@
+[Unit]
+Description=VirtuTrade market feed (DNSE stream or practice simulator)
+After=network-online.target virtutrade-web.service
+Wants=network-online.target
+
+[Service]
+User=virtutrade
+Group=virtutrade
+WorkingDirectory=/opt/virtutrade
+EnvironmentFile=/etc/virtutrade/virtutrade.env
+StateDirectory=virtutrade
+# FEED_COMMAND is "stream" (DNSE, needs credentials) or "simulate".
+ExecStart=/opt/virtutrade/.venv/bin/python -m virtutrade ${FEED_COMMAND}
+# Credential or provider errors exit; wait a minute rather than hammer DNSE.
+Restart=on-failure
+RestartSec=60
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

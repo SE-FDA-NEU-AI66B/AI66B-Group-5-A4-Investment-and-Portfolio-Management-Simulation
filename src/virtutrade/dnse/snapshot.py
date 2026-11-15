@@ -10,7 +10,7 @@ import re
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from urllib.error import HTTPError, URLError
-from urllib.parse import quote
+from urllib.parse import quote, urlencode
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 from uuid import uuid4
 
@@ -37,14 +37,18 @@ def latest_request(settings, symbol):
     """Sign exactly one GET market-data route, using the official SDK protocol."""
     if symbol not in settings.symbols or not re.fullmatch(r"[A-Z][A-Z0-9]{2,9}", symbol):
         raise ValueError("Unsupported snapshot symbol")
-    path = f"/price/{symbol}/trades/latest"
+    return signed_request(settings, f"/price/{symbol}/trades/latest", {"boardId": "G1"})
+
+
+def signed_request(settings, path, query):
+    """Sign a read-only GET; the official protocol signs the path, not the query."""
     date = datetime.now(timezone.utc).strftime("%a, %d %b %Y %H:%M:%S %z")
     nonce = uuid4().hex
     value = f"(request-target): get {path}\ndate: {date}\nnonce: {nonce}"
     digest = hmac.new(settings.api_secret.encode(), value.encode(), hashlib.sha256).digest()
     signature = quote(base64.b64encode(digest).decode(), safe="")
     return Request(
-        f"https://openapi.dnse.com.vn{path}?boardId=G1",
+        f"https://openapi.dnse.com.vn{path}?{urlencode(query)}",
         headers={
             "Date": date,
             "x-api-key": settings.api_key,
@@ -118,9 +122,17 @@ def refresh_latest(settings, database, *, fetch=fetch_latest):
 
 
 async def refresh_loop(settings, database):
+    # Imported here: bars imports this module's signing helper.
+    from virtutrade.dnse.bars import BAR_REFRESH_PASSES, BarHistory
+
+    history = BarHistory(settings, database)
+    passes = 0
     while True:
         # Network I/O runs off the event loop so ticks and heartbeats continue.
         await asyncio.to_thread(refresh_latest, settings, database)
+        if passes % BAR_REFRESH_PASSES == 0:
+            await asyncio.to_thread(history.refresh)
+        passes += 1
         await asyncio.sleep(REFRESH_SECONDS)
 
 

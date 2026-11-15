@@ -20,4 +20,11 @@ def load_config():
     # sessions from a previous boot stop validating, which is the safe
     # default). Never ship a public placeholder: forgeable CSRF tokens follow.
     secret = os.environ.get('SECRET_KEY') or secrets.token_hex(32)
-    return {'DATABASE': str(database), 'SECRET_KEY': secret, 'QUOTE_MODE': os.environ.get('QUOTE_MODE', 'seed')}
+    # Only behind exactly one trusted reverse proxy (Caddy, Render, Codespaces):
+    # otherwise any client could forge X-Forwarded-* and defeat the origin check.
+    trust_proxy = os.environ.get('TRUST_PROXY') == '1'
+    # Which market feed runs inside the web process: off, dnse or simulation.
+    market_feed = os.environ.get('MARKET_FEED', 'off').strip().lower()
+    return {'DATABASE': str(database), 'SECRET_KEY': secret, 'QUOTE_MODE': os.environ.get('QUOTE_MODE', 'seed'),
+            'TRUST_PROXY': trust_proxy, 'MARKET_FEED': market_feed,
+            'SIMULATION_TICK_SECONDS': int(os.environ.get('SIMULATION_TICK_SECONDS', '20'))}
