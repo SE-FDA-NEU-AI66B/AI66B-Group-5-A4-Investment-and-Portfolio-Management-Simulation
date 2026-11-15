@@ -995,7 +995,7 @@ main{max-width:1600px;margin-top:25px;padding:0 28px}
 .interval-select select:focus-visible{outline:2px solid #ff9eaa;outline-offset:1px}
 .interval-toolbar{flex-wrap:wrap;gap:4px;max-width:100%;overflow:visible;border:0}
 .chart-toolbar.interval-toolbar button,.chart-toolbar.interval-toolbar button:last-child{border:1px solid #303541;border-radius:6px}
-@media(max-width:700px){.price-chart-panel .chart-controls{width:100%}.price-chart-panel .interval-toolbar,.price-chart-panel .average-toolbar{flex:1 1 100%}}
+@media(max-width:700px){.price-chart-panel .chart-controls{width:100%}.price-chart-panel .interval-toolbar{flex:1 1 100%}.price-chart-panel .average-toolbar{flex:0 1 auto}}
 
 /* Balanced watchlist rows: the column count follows the card count, never leaving
    a single card alone on its own row (6 cards = 3 + 3, 4 = one row of 4). */

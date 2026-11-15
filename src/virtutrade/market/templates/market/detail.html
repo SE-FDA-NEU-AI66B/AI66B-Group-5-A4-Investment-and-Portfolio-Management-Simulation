@@ -29,7 +29,21 @@
         <strong>{{ quote.previous_close_vnd|vnd }} VND</strong>
       </dd>
     </div>
-    <div class="price-comparison-row"><dt>Latest stored price</dt><dd><svg class="comparison-track" viewBox="0 0 100 14" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="comparison-current"><stop offset="0" stop-color="#a72943"></stop><stop offset="1" stop-color="#ff667b"></stop></linearGradient></defs><rect class="comparison-fill current" width="{{ ((quote.price_vnd / chart_peak) * 100)|round(1) }}" height="14" rx="3"></rect></svg><strong>{{ quote.price_vnd|vnd }} VND</strong></dd></div>
+    <div class="price-comparison-row">
+      <dt>Latest stored price</dt>
+      <dd>
+        <svg class="comparison-track" viewBox="0 0 100 14" preserveAspectRatio="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="comparison-current">
+              <stop offset="0" stop-color="#a72943"></stop>
+              <stop offset="1" stop-color="#ff667b"></stop>
+            </linearGradient>
+          </defs>
+          <rect class="comparison-fill current" width="{{ ((quote.price_vnd / chart_peak) * 100)|round(1) }}" height="14" rx="3"></rect>
+        </svg>
+        <strong>{{ quote.price_vnd|vnd }} VND</strong>
+      </dd>
+    </div>
   </dl>
   <p class="board-caption">{{ '+' if quote.change|float > 0 else '' }}{{ quote.change }}% versus reference. {{ 'Simulation / generated' if quote.source == 'simulation' else 'Demo / seed' if quote.source == 'seed' else 'DNSE' }} quote at {{ quote.quoted_at|local_time }}{% if quote.stale %}; price may be delayed{% endif %}.</p>
   {% else %}

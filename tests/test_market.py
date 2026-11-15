@@ -61,9 +61,9 @@ def test_seed_source_and_delay_are_visible(database):
     assert b"not live DNSE quotes" in response.data
     assert b"Demo / seed" in response.data
     assert b"Price may be delayed" in response.data
-    assert b'aria-label="View HPG chart"' in response.data
+    assert b'aria-label="View HPG chart, Hoa Phat Group"' in response.data
     assert b'href="/market/HPG"' in response.data
-    assert b'aria-label="View ACB chart"' in response.data
+    assert b'aria-label="View ACB chart, Asia Commercial Bank"' in response.data
     assert b'href="/market/ACB"' in response.data
 
 
