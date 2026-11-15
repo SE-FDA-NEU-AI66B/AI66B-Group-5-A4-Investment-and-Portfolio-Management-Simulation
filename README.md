@@ -1,4 +1,4 @@
-**Live app: <https://TODO-public-url>** · health check: `/health` <!-- TODO(#155): replace both after the first deploy -->
+**Live app: <https://35-206-119-222.sslip.io>** · health check: [`/health`](https://35-206-119-222.sslip.io/health)
 
 # VirtuTrade: paper trading for Vietnamese stocks
 
@@ -42,12 +42,12 @@ Every story starts from the first page, **Market**, by clicking only.
 
 | Name | Student ID | GitHub | Sprint 5 role |
 |---|---|---|---|
-| Pham Huy Thanh | 11247351 | [bianh13](https://github.com/bianh13) | Product Owner / Developer |
+| Pham Huy Thanh | 11247351 | [bianh13](https://github.com/bianh13) | Product Owner / Scrum Master / Developer |
 | Pham Quang Vu | 11247372 | [VuSiSi](https://github.com/VuSiSi) | Developer |
 | Nguyen Van Tue | 11247366 | [nguyentue110](https://github.com/nguyentue110) | Developer |
 | Bui Khang Long | 11247312 | [longbk761-bot](https://github.com/longbk761-bot) | Developer |
 
-Scrum Master for Sprint 5: TODO(#155) <!-- name the Sprint 5 SM and update the role column -->.
+Scrum Master for Sprint 5: [bianh13](https://github.com/bianh13) (Thanh).
 Operations, release and rollback: [docs/operations.md](docs/operations.md).
 
 ---
