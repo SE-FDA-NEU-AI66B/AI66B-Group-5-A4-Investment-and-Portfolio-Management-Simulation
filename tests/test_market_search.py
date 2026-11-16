@@ -124,6 +124,9 @@ def test_menu_has_no_sell_item_selling_starts_from_a_holding(tmp_path):
     client, _ = client_with_quotes(tmp_path)
     page = client.get('/market').data
     assert b'>Buy shares</a>' in page and b'>Sell shares</a>' not in page
+    assert b'class="brand-mark"' in page and b'<svg' in page
+    icon = client.get('/favicon.ico')
+    assert icon.status_code == 200 and icon.mimetype == 'image/svg+xml'
 
 
 def test_detail_html_and_stale_states(tmp_path):

@@ -1,5 +1,5 @@
 <header class="app-header">
-  <a class="brand" href="/market"><span class="brand-mark" aria-hidden="true">V</span>VirtuTrade<span class="brand-dot">.</span></a>
+  <a class="brand" href="/market"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" width="34" height="34" focusable="false"><defs><linearGradient id="vt-mark" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff5a76"/><stop offset="1" stop-color="#b8143c"/></linearGradient></defs><rect width="32" height="32" rx="9" fill="url(#vt-mark)"/><g stroke="#fff" stroke-width="1.6" stroke-linecap="round"><path d="M9.5 15.5v8M16 11v9.5M22.5 6.5v10" opacity=".75"/></g><g fill="#fff"><rect x="7.5" y="17.5" width="4" height="4.5" rx="1"/><rect x="14" y="13" width="4" height="5.5" rx="1"/><rect x="20.5" y="8.5" width="4" height="6" rx="1"/></g></svg></span><span class="brand-name">Virtu<span class="brand-accent">Trade</span></span></a>
   <nav class="main-nav" aria-label="Main">
     <a href="/market" {% if current_page == 'market' %}aria-current="page"{% endif %}>Market</a>
     <a href="/trade" {% if current_page == 'trade' and side|default('buy') != 'sell' %}aria-current="page"{% endif %}>Buy shares</a>

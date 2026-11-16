@@ -4,6 +4,13 @@ import os
 import sqlite3
 
 from flask import Flask, jsonify, redirect, url_for
+
+FAVICON_SVG = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><defs>'
+               '<linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff5a76"/>'
+               '<stop offset="1" stop-color="#b8143c"/></linearGradient></defs>'
+               '<rect width="32" height="32" rx="9" fill="url(#g)"/><g fill="#fff">'
+               '<rect x="7.5" y="17.5" width="4" height="4.5" rx="1"/><rect x="14" y="13" width="4" height="5.5" rx="1"/>'
+               '<rect x="20.5" y="8.5" width="4" height="6" rx="1"/></g></svg>')
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 from virtutrade.accounts import blueprint as accounts_blueprint
@@ -51,6 +58,11 @@ def create_app(config=None):
     @app.get('/')
     def home():
         return redirect(url_for('market.index'))
+
+    @app.get('/favicon.ico')
+    def favicon():
+        return app.response_class(FAVICON_SVG, mimetype='image/svg+xml',
+                                  headers={'Cache-Control': 'public, max-age=86400'})
 
     @app.get('/health')
     def health():
