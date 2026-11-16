@@ -1047,3 +1047,12 @@ body{background:radial-gradient(1100px 480px at 88% -12%,rgba(239,64,85,.11),tra
 .row-action{transition:background-color .15s,border-color .15s}
 @media(min-width:701px){.app-header{padding-left:4vw;padding-right:4vw}}
 @media(max-width:700px){.app-header{position:static}.main-nav{gap:2px;overflow-x:auto;scrollbar-width:none}.main-nav a{padding:7px 11px}.brand{font-size:20px}}
+
+/* Signed-out visitors on Buy/Sell see one clear way in (#169). */
+.signin-callout{display:flex;align-items:center;gap:18px;padding:18px 22px;margin:0 0 24px;border:1px solid rgba(239,64,85,.45);border-radius:14px;background:linear-gradient(135deg,rgba(239,64,85,.17),rgba(239,64,85,.04) 60%,#14171d)}
+.signin-icon{display:grid;place-items:center;flex:none;width:44px;height:44px;border-radius:12px;background:rgba(239,64,85,.18);color:#ff8597}
+.signin-callout h2{font-size:16px;margin:0 0 5px}
+.signin-callout p{margin:0;color:#c3c8d3;font-size:13px;line-height:1.6}
+.signin-actions{margin-left:auto;display:flex;gap:10px;flex:none}
+.signin-actions .button{min-height:40px;padding:10px 20px;text-decoration:none;text-align:center}
+@media(max-width:700px){.signin-callout{flex-wrap:wrap;padding:16px}.signin-actions{margin-left:0;width:100%;display:grid;grid-template-columns:1fr 1fr}}

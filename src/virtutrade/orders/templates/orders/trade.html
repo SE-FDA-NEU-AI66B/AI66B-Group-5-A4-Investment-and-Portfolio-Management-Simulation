@@ -6,7 +6,7 @@
 <body>{% set current_page = 'trade' %}{% include 'market/_header.html' %}
 <main class="trade-main"><a class="back-link" href="/market">&larr; Back to market</a>
 <div class="page-heading"><div><div class="eyebrow">BUILD YOUR PRACTICE PORTFOLIO</div><h1>Make your next move.</h1><p class="intro">Choose a stock. Check the numbers. {{ 'Sell only shares you hold.' if selling else 'Buy with virtual capital.' }}</p></div></div>
-{% if not auth_ready %}<aside>Sign in before trading. Use Log in or Register in the navigation, then return to {{ 'Sell' if selling else 'Buy' }} shares.</aside>{% endif %}
+{% if not auth_ready %}<section class="signin-callout" role="alert" aria-labelledby="signin-title"><span class="signin-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span><div><h2 id="signin-title">Sign in before trading</h2><p>Log in, or register free, to {{ 'sell' if selling else 'buy' }} shares. New accounts start with 100,000,000 VND of virtual money.</p></div><div class="signin-actions"><a class="button primary" href="/login">Log in</a><a class="button secondary" href="/register">Register</a></div></section>{% endif %}
 <div class="trade-grid">
 <section class="card order-card" aria-labelledby="buy-title"><div class="card-heading"><span class="step">01</span><div><h2 id="buy-title">{{ 'Sell' if selling else 'Buy' }} shares</h2><p>Set up your virtual order</p></div></div>
 <form id="buy-form">
