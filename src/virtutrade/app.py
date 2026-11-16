@@ -15,6 +15,7 @@ from virtutrade.market.routes import api_blueprint
 from virtutrade.orders.routes import blueprint as orders_blueprint
 from virtutrade.portfolio import api_blueprint as portfolio_api_blueprint
 from virtutrade.portfolio import blueprint as portfolio_blueprint
+from virtutrade.portfolio import history_blueprint
 from virtutrade.portfolio.repository import SQLitePortfolioRepository
 
 
@@ -38,6 +39,7 @@ def create_app(config=None):
     app.register_blueprint(orders_blueprint)
     app.register_blueprint(portfolio_blueprint, url_prefix='/portfolio')
     app.register_blueprint(portfolio_api_blueprint, url_prefix='/api')
+    app.register_blueprint(history_blueprint, url_prefix='/history')
     init_auth(app)
 
     @app.context_processor

@@ -9,7 +9,16 @@ import sqlite3
 from pathlib import Path
 
 from virtutrade.portfolio.errors import AccountNotFound, PortfolioDataUnavailable
-from virtutrade.portfolio.models import Position
+from virtutrade.portfolio.models import Position, Trade, TradeTotals
+
+TRADE_COLUMNS = """t.executed_at, i.symbol, i.name, t.side, t.quantity, t.fill_price_vnd,
+       t.quantity * t.fill_price_vnd AS value_vnd, t.realised_pnl_vnd"""
+TOTALS_COLUMNS = """COUNT(*) AS count,
+       COALESCE(SUM(CASE WHEN t.side = 'buy' THEN t.quantity * t.fill_price_vnd END), 0) AS bought_vnd,
+       COALESCE(SUM(CASE WHEN t.side = 'sell' THEN t.quantity * t.fill_price_vnd END), 0) AS sold_vnd,
+       COALESCE(SUM(t.realised_pnl_vnd), 0) AS realised_pnl_vnd"""
+TRADED_SYMBOLS_QUERY = """SELECT DISTINCT i.symbol FROM trade AS t
+JOIN instrument AS i ON i.id = t.instrument_id WHERE t.account_id = ? ORDER BY i.symbol"""
 
 CASH_QUERY = 'SELECT cash_vnd FROM account WHERE id = ?'
 
@@ -59,3 +68,39 @@ class SQLitePortfolioRepository:
             # broken database, so the controller can answer 404 rather than 503.
             raise AccountNotFound(f'No account with id {account_id}.')
         return cash_row['cash_vnd'], [Position(**dict(row)) for row in rows]
+
+    def fetch_trades(self, account_id: int, *, start=None, end=None, symbol=None, side=None,
+                     limit=50, offset=0) -> tuple[list[Trade], TradeTotals, list[str]]:
+        """Return one page of this account's trades, newest first, the totals for
+        every matching trade, and the symbols the account has ever traded.
+
+        `start`/`end` are UTC ISO strings (`end` exclusive); stored `executed_at`
+        values use the same ISO form, so they compare as text.
+        """
+        where, params = ['t.account_id = ?'], [account_id]
+        for clause, value in (('t.executed_at >= ?', start), ('t.executed_at < ?', end),
+                              ('i.symbol = ?', symbol), ('t.side = ?', side)):
+            if value is not None:
+                where.append(clause)
+                params.append(value)
+        source = ('FROM trade AS t JOIN instrument AS i ON i.id = t.instrument_id WHERE '
+                  + ' AND '.join(where))
+        try:
+            connection = self._connect()
+        except sqlite3.Error as exc:
+            raise PortfolioDataUnavailable('The trade history could not be read.') from exc
+        try:
+            connection.row_factory = sqlite3.Row
+            connection.execute('BEGIN')
+            rows = connection.execute(
+                f'SELECT {TRADE_COLUMNS} {source} ORDER BY t.executed_at DESC, t.id DESC '
+                'LIMIT ? OFFSET ?', (*params, limit, offset)).fetchall()
+            totals = connection.execute(f'SELECT {TOTALS_COLUMNS} {source}', params).fetchone()
+            symbols = [row['symbol'] for row in
+                       connection.execute(TRADED_SYMBOLS_QUERY, (account_id,))]
+            connection.execute('COMMIT')
+        except sqlite3.Error as exc:
+            raise PortfolioDataUnavailable('The trade history could not be read.') from exc
+        finally:
+            connection.close()
+        return [Trade(**dict(row)) for row in rows], TradeTotals(**dict(totals)), symbols
