@@ -40,7 +40,6 @@ def main(evidence_dir=None):
                 status = page.locator("#refresh-status")
                 for selector in (
                     "#quote-rows a.quote-link",
-                    "#quote-rows a.row-action",
                     "#ticker-strip a.ticker-tile",
                     "#market-query",
                 ):
@@ -60,7 +59,7 @@ def main(evidence_dir=None):
                             "element => [element.selectionStart, element.selectionEnd]"
                         ) == [1, 2]
 
-                focus_target = page.locator("#quote-rows a.row-action").first
+                focus_target = page.locator("#quote-rows a.quote-link").first
                 for width, height in ((1440, 1000), (390, 844)):
                     page.set_viewport_size({"width": width, "height": height})
                     with page.expect_response(
