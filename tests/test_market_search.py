@@ -1,6 +1,7 @@
 """US03 stored-quote search/detail acceptance checks."""
 
 import sqlite3
+from pathlib import Path
 
 import pytest
 
@@ -104,6 +105,19 @@ def test_quote_list_and_detail_json_share_stored_quote_contract(tmp_path):
     detail = client.get('/api/market/quotes/hpg')
     assert detail.status_code == 200
     assert detail.get_json()['quote']['price_vnd'] == 28000
+
+
+def test_stock_page_offers_buy_and_sell_and_the_board_has_no_buy_only_action(tmp_path):
+    client, _ = client_with_quotes(tmp_path)
+    page = client.get('/market/HPG').data
+    assert b'href="/trade?side=buy&amp;symbol=HPG">Buy HPG</a>' in page
+    assert b'href="/trade?side=sell&amp;symbol=HPG">Sell HPG</a>' in page
+    board = client.get('/market').data
+    assert b'class="row-action"' not in board and b'aria-label="Buy ' not in board
+    assert b'href="/market/HPG"' in board
+    script = (Path(__file__).resolve().parents[1] / 'src' / 'virtutrade' / 'market' / 'static'
+              / 'market.js').read_text(encoding='utf-8')
+    assert 'row-action' not in script
 
 
 def test_detail_html_and_stale_states(tmp_path):

@@ -37,15 +37,15 @@ def main(evidence_dir):
                 errors = []
                 page.on("pageerror", lambda error: errors.append(str(error)))
                 page.goto(f"http://127.0.0.1:{server.server_port}/")
-                expect(page.get_by_role("link", name="Buy HPG", exact=True)).to_be_visible()
+                expect(page.locator('#quote-rows a.quote-link[href="/market/HPG"]')).to_be_visible()
                 expect(page.locator("#breadth-board .breadth-cell")).to_have_count(4)
                 expect(page.locator("#ticker-strip .ticker-tile")).to_have_count(6)
                 expect(page.locator("#movement-rows tr")).to_have_count(5)
                 capture(page, "market-desktop")
-                page.get_by_role("link", name="Buy HPG", exact=True).focus()
+                page.locator('#quote-rows a.quote-link[href="/market/HPG"]').focus()
                 # Verify the per-row action and keyboard focus survive polling.
                 expect(page.locator("#refresh-status")).to_contain_text("Snapshot refreshed", timeout=10000)
-                expect(page.get_by_role("link", name="Buy HPG", exact=True)).to_be_focused()
+                expect(page.locator('#quote-rows a.quote-link[href="/market/HPG"]')).to_be_focused()
                 # Missing DNSE references must not become flat/zero-change movers.
                 snapshot = page.request.get(f"http://127.0.0.1:{server.server_port}/api/market/quotes").json()
                 for quote in snapshot["quotes"][:2]:
@@ -59,6 +59,7 @@ def main(evidence_dir):
                 expect(page.locator("#movement-rows")).not_to_contain_text("ACB")
                 expect(page.locator("#movement-rows")).not_to_contain_text("BID")
                 page.unroute("**/api/market/quotes", missing_reference)
+                page.locator('#quote-rows a.quote-link[href="/market/HPG"]').click()  # #161: open the stock first, then choose Buy
                 page.get_by_role("link", name="Buy HPG", exact=True).click()
                 expect(page.get_by_label("Stock symbol")).to_have_value("HPG")
                 expect(page.locator("#selected-name")).to_contain_text("Hoa Phat")
@@ -73,7 +74,7 @@ def main(evidence_dir):
                 page.get_by_label("Email", exact=True).fill("missing@example.test")
                 page.get_by_label("Password", exact=True).fill(secrets.token_urlsafe(16))
                 page.get_by_role("button", name="Log in", exact=True).click()
-                expect(page.get_by_role("alert")).to_have_text("Invalid email or password")
+                expect(page.get_by_role("alert")).to_contain_text("Invalid email or password")
                 expect(page.get_by_label("Email", exact=True)).to_have_value("missing@example.test")
                 expect(page.get_by_label("Password", exact=True)).to_have_value("")
                 capture(page, "login-error-mobile")
@@ -85,6 +86,7 @@ def main(evidence_dir):
                 disposable = secrets.token_urlsafe(16)
                 page.get_by_label("Password", exact=False).fill(disposable)
                 page.get_by_role("button", name="Register", exact=True).click()
+                page.goto(f"http://127.0.0.1:{server.server_port}/market/HPG")
                 page.get_by_role("link", name="Buy HPG", exact=True).click()
                 picker = page.get_by_role("combobox", name="Stock symbol")
                 expect(picker).to_have_attribute("aria-busy", "false")
@@ -150,7 +152,7 @@ def main(evidence_dir):
                 table = page.get_by_role("region", name="Stock quotes; scroll horizontally on small screens")
                 table.evaluate("element => element.scrollLeft = element.scrollWidth")
                 capture(page, "market-mobile")
-                expect(page.get_by_role("link", name="Buy HPG", exact=True)).to_be_visible()
+                expect(page.locator('#quote-rows a.quote-link[href="/market/HPG"]')).to_be_visible()
                 assert not errors, errors
                 browser.close()
             if evidence_dir:

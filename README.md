@@ -33,8 +33,8 @@ Every story starts from the first page, **Market**, by clicking only.
 | US01 Register / log in | **Register** or **Log in**, top right |
 | US02 Initial virtual capital | After **Register**: the header on Market shows 100,000,000 VND |
 | US03 Current market price | **Market**: the price board; search by symbol or company, then select a stock for its chart |
-| US04 Market buy | **Buy shares** in the menu, or **Buy ↗** on a row of the price board |
-| US05 Market sell | **Sell shares** in the menu (needs a holding from US04) |
+| US04 Market buy | **Buy shares** in the menu, or select a stock on the price board, then **Buy** (for example **Buy HPG**) |
+| US05 Market sell | **Sell shares** in the menu, or select a stock, then **Sell** (needs a holding from US04) |
 | US06 Portfolio holdings and P&L | **Portfolio** in the menu, after signing in |
 | US10 Balance warning | **Buy shares**: enter more shares than your cash covers; the preview shows the shortfall and blocks **Confirm** |
 
