@@ -48,7 +48,7 @@ def main():
                 page.screenshot(path=str(EVIDENCE / "grant-balance.png"))
 
                 page.get_by_role("button", name="Log out").click()
-                page.get_by_role("link", name="Log in", exact=True).click()
+                page.locator(".app-header").get_by_role("link", name="Log in", exact=True).click()
                 page.get_by_label("Email", exact=True).fill(email)
                 page.get_by_label("Password", exact=False).fill(password)
                 page.get_by_role("button", name="Log in", exact=True).click()

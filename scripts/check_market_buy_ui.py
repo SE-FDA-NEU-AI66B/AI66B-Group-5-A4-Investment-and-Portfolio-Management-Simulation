@@ -64,7 +64,7 @@ def main(evidence_dir):
                 expect(page.get_by_label("Stock symbol")).to_have_value("HPG")
                 expect(page.locator("#selected-name")).to_contain_text("Hoa Phat")
                 expect(page.get_by_role("button", name="Confirm buy")).to_be_disabled()
-                page.get_by_role("link", name="Register", exact=True).click()
+                page.locator(".app-header").get_by_role("link", name="Register", exact=True).click()
                 capture(page, "register-desktop")
                 page.get_by_role("link", name="Log in", exact=True).click()
                 capture(page, "login-desktop")

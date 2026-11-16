@@ -716,7 +716,6 @@ without an estimate and add no points.
 **Release.** The app went live on Google Cloud on 16 November 2026 at
 <https://35-206-119-222.sslip.io>. `v1.0` is tagged on the commit
 `/health` reports, after CI on it is green ([release](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/releases/tag/v1.0)).
-The last change before the tag removed **Sell shares** from the menu (#169).
 
 **Not done.** The `main-protection` ruleset requires a pull request and one
 approval but not a green check: changing it needs a repository admin
