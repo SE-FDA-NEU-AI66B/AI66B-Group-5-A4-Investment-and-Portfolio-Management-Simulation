@@ -428,7 +428,24 @@ footer strong {
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:24px;
-  align-items:start
+  align-items:stretch
+}
+/* Both columns end on one line: the order card keeps step 02 and Confirm at its
+   foot, and the summary card grows when the order card is the taller one. */
+.order-card,#buy-form,.summary-column {
+  display:flex;
+  flex-direction:column
+}
+#buy-form,.summary-card {
+  flex:1
+}
+.order-card .order-footer {
+  margin-top:auto
+}
+.trade-grid+.quiet-note {
+  margin:14px 0 0;
+  padding:0;
+  text-align:center
 }
 .card {
   background:#15181f;
