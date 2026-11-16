@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Transaction history &middot; VirtuTrade</title>
+  <link rel="stylesheet" href="{{ url_for('market.static', filename='market.css') }}">
+  <link rel="stylesheet" href="{{ url_for('portfolio.static', filename='portfolio.css') }}">
+</head>
+<body>{% set current_page = 'history' %}{% include 'market/_header.html' %}
+<main>
+  <div class="page-heading"><div><div class="eyebrow">VIRTUTRADE / HISTORY</div><h1>Every trade you made.</h1><p class="intro">Filled orders, newest first. <a href="/portfolio">Back to Portfolio</a></p></div><span class="page-note">Times in UTC+7 <span>VND</span></span></div>
+  {% if error == 503 %}
+    <section class="market-panel empty" role="alert">
+      <h2>The trade history could not be read</h2>
+      <p>Please ask the project operator to check the database setup, then reload.</p>
+    </section>
+  {% else %}
+    <form class="market-panel history-filters" method="get" action="/history" aria-label="Filter trades">
+      <label>From <input type="date" name="from" value="{{ form['from'] }}"></label>
+      <label>To <input type="date" name="to" value="{{ form['to'] }}"></label>
+      <label>Symbol <select name="symbol"><option value="">All symbols</option>{% for symbol in symbols %}<option value="{{ symbol }}" {% if symbol == form['symbol'] %}selected{% endif %}>{{ symbol }}</option>{% endfor %}</select></label>
+      <label>Side <select name="side"><option value="">Buy and sell</option><option value="buy" {% if form['side'] == 'buy' %}selected{% endif %}>Buy</option><option value="sell" {% if form['side'] == 'sell' %}selected{% endif %}>Sell</option></select></label>
+      <button class="button secondary" type="submit">Apply</button>{% if filtered %}<a class="text-button" href="/history">Clear filters</a>{% endif %}
+    </form>
+
+    {% if totals.count %}
+      <section class="market-summary history-totals" aria-label="Totals for the listed trades">
+        <div class="metric"><span>Trades</span><strong>{{ totals.count|vnd }}</strong></div>
+        <div class="metric"><span>Total bought</span><strong>{{ totals.bought_vnd|vnd }} VND</strong></div>
+        <div class="metric"><span>Total sold</span><strong>{{ totals.sold_vnd|vnd }} VND</strong></div>
+        {% set tone = 'positive' if totals.realised_pnl_vnd > 0 else 'negative' if totals.realised_pnl_vnd < 0 else 'neutral' %}
+        <div class="metric"><span>Realised P&amp;L</span><strong class="{{ tone }}">{{ '+' if totals.realised_pnl_vnd > 0 else '' }}{{ totals.realised_pnl_vnd|vnd }} VND</strong></div>
+      </section>
+
+      <section class="market-panel" aria-labelledby="history-heading">
+        <div class="section-heading"><div><h2 id="history-heading">Trade history</h2><p>The simulator charges no fees or tax, so trade value is quantity &times; fill price.</p></div><span>Page {{ page }}</span></div>
+        <div class="table-wrap" tabindex="0" role="region" aria-label="Trades; scroll horizontally on small screens">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Time (UTC+7)</th>
+                <th scope="col">Symbol</th>
+                <th scope="col">Side</th>
+                <th scope="col" class="number">Quantity</th>
+                <th scope="col" class="number">Fill price (VND)</th>
+                <th scope="col" class="number">Trade value (VND)</th>
+                <th scope="col" class="number">Realised P&amp;L (VND)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for trade in trades %}
+              <tr>
+                <td><time datetime="{{ trade.executed_at }}">{{ trade.executed_at|local_time }}</time></td>
+                <td><a class="quote-link" href="/market/{{ trade.symbol|urlencode }}"><strong>{{ trade.symbol }}</strong><small>{{ trade.name }}</small></a></td>
+                <td class="{{ 'positive' if trade.side == 'buy' else 'negative' }}">{{ 'Buy' if trade.side == 'buy' else 'Sell' }}</td>
+                <td class="number">{{ trade.quantity|vnd }}</td>
+                <td class="number">{{ trade.fill_price_vnd|vnd }}</td>
+                <td class="number">{{ trade.value_vnd|vnd }}</td>
+                {% if trade.realised_pnl_vnd is none %}
+                  <td class="number unpriced">&mdash;</td>
+                {% else %}
+                  <td class="number {{ 'positive' if trade.realised_pnl_vnd > 0 else 'negative' if trade.realised_pnl_vnd < 0 else 'neutral' }}">{{ '+' if trade.realised_pnl_vnd > 0 else '' }}{{ trade.realised_pnl_vnd|vnd }}</td>
+                {% endif %}
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% if newer or older %}
+          <nav class="history-pages" aria-label="Trade history pages">{% if newer %}<a class="row-action" href="{{ newer }}">Newer trades</a>{% endif %}{% if older %}<a class="row-action" href="{{ older }}">Older trades</a>{% endif %}</nav>
+        {% endif %}
+      </section>
+    {% elif filtered %}
+      <section class="market-panel empty">
+        <h2>No trades match these filters</h2>
+        <p><a href="/history">Clear the filters</a> to see every trade.</p>
+      </section>
+    {% else %}
+      <section class="market-panel empty">
+        <h2>No transactions yet</h2>
+        <p>Buy a stock and it will be listed here.</p>
+        <p class="portfolio-actions"><a class="row-action" href="{{ url_for('market.index') }}">Browse the market</a></p>
+      </section>
+    {% endif %}
+  {% endif %}
+  <footer><strong>VirtuTrade &middot; Team 05</strong><span>Learn with virtual capital. Every trade here is simulated.</span></footer>
+</main>
+</body>
+</html>

@@ -39,6 +39,30 @@ class ValuedPosition(Position):
 
 
 @dataclass(frozen=True)
+class Trade:
+    """One stored fill, newest first on `/history` (US08)."""
+
+    executed_at: str
+    symbol: str
+    name: str
+    side: str
+    quantity: int
+    fill_price_vnd: int
+    value_vnd: int
+    realised_pnl_vnd: int | None
+
+
+@dataclass(frozen=True)
+class TradeTotals:
+    """Totals over every trade that matches the filter, not just one page."""
+
+    count: int
+    bought_vnd: int
+    sold_vnd: int
+    realised_pnl_vnd: int
+
+
+@dataclass(frozen=True)
 class Portfolio:
     """Everything the page and `GET /api/portfolio` need for one account.
 

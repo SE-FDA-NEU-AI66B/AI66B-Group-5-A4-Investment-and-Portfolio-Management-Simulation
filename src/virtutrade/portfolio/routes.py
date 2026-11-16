@@ -9,9 +9,19 @@ from the session cookie before every request. Nothing here reads an account id
 from the URL, the query string or a request body.
 """
 
+from datetime import date, datetime, time, timedelta, timezone
 from decimal import ROUND_HALF_UP, Decimal
 
-from flask import Blueprint, current_app, g, jsonify, render_template
+from flask import (
+    Blueprint,
+    current_app,
+    g,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 
 from virtutrade.portfolio.errors import AccountNotFound, PortfolioDataUnavailable
 from virtutrade.portfolio.service import as_api_payload, build_portfolio
@@ -20,6 +30,7 @@ blueprint = Blueprint(
     'portfolio', __name__, template_folder='templates', static_folder='static'
 )
 api_blueprint = Blueprint('portfolio_api', __name__)
+history_blueprint = Blueprint('history', __name__, template_folder='templates')
 
 ERROR_MESSAGES = {
     401: 'Sign in to view your portfolio.',
@@ -71,6 +82,63 @@ def index():
     return _private(current_app.make_response(
         render_template('portfolio/index.html', portfolio=portfolio, error=None)
     ))
+
+
+HISTORY_PAGE_SIZE = 50
+VIETNAM = timezone(timedelta(hours=7))
+
+
+def _history_filters(args):
+    """Read the optional filters; an invalid value is ignored, never trusted."""
+    def day(name):
+        try:
+            return date.fromisoformat(args.get(name, ''))
+        except ValueError:
+            return None
+
+    def utc(value):
+        moment = datetime.combine(value, time.min, tzinfo=VIETNAM).astimezone(timezone.utc)
+        return moment.strftime('%Y-%m-%dT%H:%M:%S')
+
+    start, end = day('from'), day('to')
+    symbol = args.get('symbol', '').strip().upper()
+    side = args.get('side', '')
+    try:
+        page = max(1, int(args.get('page', '1')))
+    except ValueError:
+        page = 1
+    form = {'from': start.isoformat() if start else '', 'to': end.isoformat() if end else '',
+            'symbol': symbol if symbol.isalnum() and len(symbol) <= 10 else '',
+            'side': side if side in ('buy', 'sell') else ''}
+    query = {'start': utc(start) if start else None,
+             'end': utc(end + timedelta(days=1)) if end else None,
+             'symbol': form['symbol'] or None, 'side': form['side'] or None}
+    return form, query, page
+
+
+@history_blueprint.get('')
+def history():
+    """`/history` (US08): the signed-in account's fills, newest first."""
+    account = g.get('current_account')
+    if account is None:
+        return redirect('/login')
+    form, query, page = _history_filters(request.args)
+    try:
+        reader = current_app.extensions['portfolio_reader_factory']()
+        trades, totals, symbols = reader.fetch_trades(
+            account.id, **query, limit=HISTORY_PAGE_SIZE + 1,
+            offset=(page - 1) * HISTORY_PAGE_SIZE)
+    except PortfolioDataUnavailable:
+        current_app.logger.exception('Could not load trade history')
+        return _private(current_app.make_response(
+            (render_template('portfolio/history.html', error=503), 503)))
+    filters = {key: value for key, value in form.items() if value}
+    return _private(current_app.make_response(render_template(
+        'portfolio/history.html', error=None, trades=trades[:HISTORY_PAGE_SIZE],
+        totals=totals, symbols=symbols, form=form, filtered=bool(filters), page=page,
+        newer=url_for('history.history', **filters, page=page - 1) if page > 1 else None,
+        older=(url_for('history.history', **filters, page=page + 1)
+               if len(trades) > HISTORY_PAGE_SIZE else None))))
 
 
 @api_blueprint.get('/portfolio')
