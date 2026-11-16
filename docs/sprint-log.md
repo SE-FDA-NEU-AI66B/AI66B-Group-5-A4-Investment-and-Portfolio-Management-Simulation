@@ -688,3 +688,53 @@ rotation above are assignments, not evidence.
 This section will be updated, not replaced silently, when items 1-4 change.
 The issue #115 is not closed by this pull request's merge until the final
 entry exists and has been reviewed.
+
+## Sprint 5 - Milestone 5
+
+**Scrum Master:** @bianh13 (Thanh), who is also PO. **Goal:** put VirtuTrade on a
+public HTTPS URL that a stranger can use for every P0 story, with CI, operations
+notes and a `v1.0` release on the commit that runs there.
+
+**Committed: 19 points** at planning (#147-#155). **Added during the sprint: 6
+points** (#161, #162, #163), raised from the deploy and from review. **Completed:
+25 points. Velocity: 25.** Two bugs found on the way (#146, #152) were fixed
+without an estimate and add no points.
+
+| Issue | Pts | Owner | Status | Evidence |
+|---|---:|---|---|---|
+| #147 Live charts, practice market, free deployment | 8 | Thanh | Closed | Chart and simulator PRs; `docs/DEPLOY.md` |
+| #148 Market chart links and accessibility | 2 | Vu | Closed | PR #159, reviewed by @bianh13 |
+| #149 Portfolio links to price charts | 2 | Long | Closed | PR #160 |
+| #150 Codespaces register/login/trade evidence | 2 | Tue | Closed | PR #158, reviewed by @bianh13 |
+| #153 `/health` and seeded test accounts | 2 | Thanh | Closed | PR #154 |
+| #155 README first screen and `docs/operations.md` | 3 | Thanh | Closed | PR #156, reviewed by @VuSiSi |
+| #161 Stock page with Buy and Sell (added) | 2 | Thanh | Closed | PR #165, reviewed by @nguyentue110 |
+| #162 Transaction history `/history` (added) | 3 | Thanh | Closed | PR #166, reviewed by @nguyentue110 |
+| #163 `setup.sh` kept VM settings (added) | 1 | Thanh | Closed | PR #164, reviewed by @nguyentue110 |
+| #146, #152 Codespaces bugs | - | Thanh | Closed | PRs #145, #157 |
+
+**Release.** The app went live on Google Cloud on 16 November 2026 at
+<https://35-206-119-222.sslip.io>. `v1.0` is tagged on `bb44480`, the commit
+`/health` reports, with CI green ([run 43798721309](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/actions/runs/43798721309)).
+
+**Not done.** The `main-protection` ruleset requires a pull request and one
+approval but not a green check: changing it needs a repository admin
+(`docs/operations.md`, section 4). Thanh carried most of the added points; the
+next sprint should spread new work at planning instead.
+
+### All five sprints
+
+Committed is the planning baseline each sprint recorded; completed counts
+accepted, closed work only.
+
+| Sprint | Milestone | Scrum Master | Committed | Completed | Velocity |
+|---|---|---|---:|---:|---:|
+| 1 | M1 discovery and specification | @VuSiSi | 61 | 61 | 61 |
+| 2 | M2 design and walking skeleton | @nguyentue110 | 45 | 31 | 31 |
+| 3 | M3 P0 features | @longbk761-bot | 52 | 49 | 49 |
+| 4 | M4 testing | @bianh13 | 40 | 40 | 40 |
+| 5 | M5 deployment and operations | @bianh13 | 25 | 25 | 25 |
+
+Sprint 2's 31 is the proposed figure recorded in its Result; #59 (5 points)
+moved to Sprint 3. Sprint 3 and 4 completed points are the estimates of the
+closed issues in their GitHub milestones.
