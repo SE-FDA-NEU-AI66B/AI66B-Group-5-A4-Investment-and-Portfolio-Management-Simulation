@@ -33,12 +33,11 @@
       if (quote.change === null) changeCell.append(element("small", "Reference unavailable"));
       const timestamp = document.createElement("td"); const time = element("time", quoteTime(quote.quoted_at)); time.dateTime = quote.quoted_at; time.title = quote.quoted_at; timestamp.append(time);
       const source = document.createElement("td"); source.append(element("span", sourceName(quote), "source")); source.append(element("small", quote.stale ? "Price may be delayed" : "Freshness checked", quote.stale ? "delayed" : ""));
-      const action = document.createElement("td"); const buy = element("a", "Buy ↗", "row-action"); buy.href = `/trade?symbol=${encodeURIComponent(quote.symbol)}`; buy.setAttribute("aria-label", `Buy ${quote.symbol}`); action.append(buy);
       const delta = hasReference ? quote.price_vnd - quote.previous_close_vnd : null;
-      row.append(company, element("td", hasReference ? money.format(quote.previous_close_vnd) : "—", "number reference"), element("td", money.format(quote.price_vnd), `number price ${direction(quote)}`), element("td", delta === null ? "—" : `${delta > 0 ? "+" : ""}${money.format(delta)}`, `number ${direction(quote)}`), changeCell, timestamp, source, action);
+      row.append(company, element("td", hasReference ? money.format(quote.previous_close_vnd) : "—", "number reference"), element("td", money.format(quote.price_vnd), `number price ${direction(quote)}`), element("td", delta === null ? "—" : `${delta > 0 ? "+" : ""}${money.format(delta)}`, `number ${direction(quote)}`), changeCell, timestamp, source);
       fragment.append(row);
     }
-    if (!quotes.length) { const row = document.createElement("tr"); const cell = element("td", query ? `No stocks match “${query}”.` : "No quotes yet."); cell.colSpan = 8; row.append(cell); fragment.append(row); }
+    if (!quotes.length) { const row = document.createElement("tr"); const cell = element("td", query ? `No stocks match “${query}”.` : "No quotes yet."); cell.colSpan = 7; row.append(cell); fragment.append(row); }
     rows.replaceChildren(fragment);
     document.getElementById("instrument-total").textContent = `${quotes.length} symbols`;
     document.getElementById("symbol-count").textContent = query ? `${quotes.length} matching symbols · VND` : `${quotes.length} symbols · VND`;
