@@ -120,6 +120,12 @@ def test_stock_page_offers_buy_and_sell_and_the_board_has_no_buy_only_action(tmp
     assert 'row-action' not in script
 
 
+def test_menu_has_no_sell_item_selling_starts_from_a_holding(tmp_path):
+    client, _ = client_with_quotes(tmp_path)
+    page = client.get('/market').data
+    assert b'>Buy shares</a>' in page and b'>Sell shares</a>' not in page
+
+
 def test_detail_html_and_stale_states(tmp_path):
     client, database = client_with_quotes(tmp_path)
     page = client.get('/market/HPG')

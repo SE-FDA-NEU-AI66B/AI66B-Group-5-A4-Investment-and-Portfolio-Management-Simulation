@@ -54,9 +54,10 @@ def main():
                 expect(page.locator("#result")).to_contain_text("Holding: 1000 shares")
 
                 page.get_by_role("link", name="Market", exact=True).click()
-                page.get_by_role("link", name="Sell shares", exact=True).click()
-                expect(page.get_by_role("link", name="Sell shares", exact=True)).to_have_attribute(
-                    "aria-current", "page")
+                # Selling starts from a holding in Portfolio; the menu has no Sell item.
+                expect(page.get_by_role("link", name="Sell shares", exact=True)).to_have_count(0)
+                page.get_by_role("link", name="Portfolio", exact=True).click()
+                page.get_by_role("link", name="Sell HPG", exact=True).click()
                 expect(page.get_by_role("link", name="Buy shares", exact=True)).not_to_have_attribute(
                     "aria-current", "page")
                 expect(page.get_by_role("heading", name="Sell shares")).to_be_visible()
