@@ -1025,3 +1025,35 @@ main{max-width:1600px;margin-top:25px;padding:0 28px}
 @media(max-width:1199px){.watch-grid[data-count="5"]{--watch-columns:3}}
 @media(max-width:899px){.watch-grid[data-count="3"],.watch-grid[data-count="4"],.watch-grid[data-count="6"]{--watch-columns:2}}
 @media(max-width:700px){.watch-grid{--watch-columns:1!important}}
+
+/* Visual refresh (#169): brand mark, glass header, pill navigation, softer panels. */
+body{background:radial-gradient(1100px 480px at 88% -12%,rgba(239,64,85,.11),transparent 62%),radial-gradient(900px 420px at -10% 110%,rgba(57,214,156,.05),transparent 60%),#0c0e12;background-attachment:fixed;min-height:100vh}
+.app-header{position:sticky;top:0;z-index:50;background:rgba(13,15,20,.84);-webkit-backdrop-filter:saturate(150%) blur(14px);backdrop-filter:saturate(150%) blur(14px);border-bottom:1px solid rgba(255,255,255,.07)}
+.brand{gap:11px;font-size:21px;font-weight:760;letter-spacing:-.4px}
+.brand-mark{width:34px;height:34px;margin:0;border:0;border-radius:9px;box-shadow:0 8px 22px -8px rgba(255,64,96,.7)}
+.brand-mark svg{display:block}
+.brand-accent{background:linear-gradient(90deg,#ff6b84,#ff9a7a);-webkit-background-clip:text;background-clip:text;color:transparent}
+.main-nav{gap:4px}
+.main-nav a{padding:8px 14px;border-radius:999px;transition:color .15s,background-color .15s}
+.main-nav a:hover{color:#fff;background:rgba(255,255,255,.06)}
+.main-nav a[aria-current]{color:#fff;background:rgba(239,64,85,.15);box-shadow:inset 0 0 0 1px rgba(239,64,85,.38)}
+.badge{border-color:rgba(239,64,85,.38);background:rgba(239,64,85,.08);border-radius:999px;padding:6px 11px}
+.header-button{border-radius:999px;padding:8px 16px;transition:background-color .15s,border-color .15s}
+.header-button:hover{background:#2f3441;border-color:#4a5060}
+.metric,.market-panel,.card,.quote-facts>div{background:linear-gradient(180deg,#171a22 0%,#13161c 100%);border-color:#262a35;box-shadow:0 1px 0 rgba(255,255,255,.03) inset,0 14px 34px -24px rgba(0,0,0,.9)}
+.metric-accent{background:linear-gradient(160deg,rgba(239,64,85,.16),rgba(239,64,85,.04) 55%,#14171d)}
+.primary{background:linear-gradient(180deg,#f14a60,#d9324a);border-color:#e23a52;box-shadow:0 8px 20px -10px rgba(239,64,85,.8)}
+.primary:hover:not(:disabled){background:linear-gradient(180deg,#e03a51,#c22a40)}
+.row-action{transition:background-color .15s,border-color .15s}
+@media(min-width:701px){.app-header{padding-left:4vw;padding-right:4vw}}
+@media(max-width:700px){.app-header{position:static}.main-nav{gap:2px;overflow-x:auto;scrollbar-width:none}.main-nav a{padding:7px 11px}.brand{font-size:20px}}
+
+/* Signed-out visitors on Buy/Sell see one clear way in (#169). */
+.signin-callout{display:flex;align-items:center;gap:18px;padding:18px 22px;margin:0 0 24px;border:1px solid rgba(239,64,85,.45);border-radius:14px;background:linear-gradient(135deg,rgba(239,64,85,.17),rgba(239,64,85,.04) 60%,#14171d)}
+.signin-icon{display:grid;place-items:center;flex:none;width:44px;height:44px;border-radius:12px;background:rgba(239,64,85,.18);color:#ff8597}
+.signin-callout h2{font-size:16px;margin:0 0 5px}
+.signin-callout p{margin:0;color:#c3c8d3;font-size:13px;line-height:1.6}
+.signin-actions{margin-left:auto;display:flex;gap:10px;flex:none}
+.signin-actions .button{min-height:40px;padding:10px 20px;text-decoration:none;text-align:center}
+@media(max-width:700px){.signin-callout{flex-wrap:wrap;padding:16px}.signin-actions{margin-left:0;width:100%;display:grid;grid-template-columns:1fr 1fr}}
+.error-page{max-width:640px;margin:40px auto;padding:36px;text-align:center}.error-page h1{font-size:28px}.error-page p{color:var(--muted);line-height:1.7}.error-page .portfolio-actions{justify-content:center}.error-page .button{text-decoration:none}.error-code{display:inline-block;padding:6px 14px;border-radius:999px;background:rgba(239,64,85,.15);color:#ff8597;font-weight:750;letter-spacing:1px}

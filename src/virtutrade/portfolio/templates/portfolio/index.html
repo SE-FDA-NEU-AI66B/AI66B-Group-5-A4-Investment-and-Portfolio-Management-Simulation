@@ -88,7 +88,7 @@
                     {% endif %}
                   </td>
                   <td>
-                    <time datetime="{{ position.quoted_at }}">{{ position.quoted_at }}</time>
+                    <time datetime="{{ position.quoted_at }}">{{ position.quoted_at|local_time }}</time>
                     {% if position.stale %}<small class="delayed">Price may be delayed</small>{% endif %}
                   </td>
                 {% else %}

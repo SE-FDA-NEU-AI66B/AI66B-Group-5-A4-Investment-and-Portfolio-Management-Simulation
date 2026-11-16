@@ -120,6 +120,19 @@ def test_stock_page_offers_buy_and_sell_and_the_board_has_no_buy_only_action(tmp
     assert 'row-action' not in script
 
 
+def test_menu_has_no_sell_item_selling_starts_from_a_holding(tmp_path):
+    client, _ = client_with_quotes(tmp_path)
+    page = client.get('/market').data
+    assert b'>Buy shares</a>' in page and b'>Sell shares</a>' not in page
+    assert b'class="brand-mark"' in page and b'<svg' in page
+    missing = client.get('/no-such-page')
+    assert missing.status_code == 404 and b'This page does not exist' in missing.data
+    assert b'Back to Market' in missing.data
+    assert client.get('/api/no-such-endpoint').get_json() == {'error': 'Not found.'}
+    icon = client.get('/favicon.ico')
+    assert icon.status_code == 200 and icon.mimetype == 'image/svg+xml'
+
+
 def test_detail_html_and_stale_states(tmp_path):
     client, database = client_with_quotes(tmp_path)
     page = client.get('/market/HPG')

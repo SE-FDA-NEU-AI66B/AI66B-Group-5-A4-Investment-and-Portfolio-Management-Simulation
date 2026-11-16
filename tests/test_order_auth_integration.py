@@ -117,6 +117,7 @@ def test_guest_trade_page_offers_login_without_calling_private_token(setup):
     page = app.test_client().get("/trade")
     assert page.status_code == 200
     assert b'Sign in before trading' in page.data and b'href="/login"' in page.data
+    assert b'class="signin-callout"' in page.data and b'class="button primary" href="/login"' in page.data
     assert b'href="/portfolio"' not in page.data
 
 

@@ -714,8 +714,8 @@ without an estimate and add no points.
 | #146, #152 Codespaces bugs | - | Thanh | Closed | PRs #145, #157 |
 
 **Release.** The app went live on Google Cloud on 16 November 2026 at
-<https://35-206-119-222.sslip.io>. `v1.0` is tagged on `bb44480`, the commit
-`/health` reports, with CI green ([run 43798721309](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/actions/runs/43798721309)).
+<https://35-206-119-222.sslip.io>. `v1.0` is tagged on the commit
+`/health` reports, after CI on it is green ([release](https://github.com/SE-FDA-NEU-AI66B/AI66B-Group-5-A4-Investment-and-Portfolio-Management-Simulation/releases/tag/v1.0)).
 
 **Not done.** The `main-protection` ruleset requires a pull request and one
 approval but not a green check: changing it needs a repository admin
