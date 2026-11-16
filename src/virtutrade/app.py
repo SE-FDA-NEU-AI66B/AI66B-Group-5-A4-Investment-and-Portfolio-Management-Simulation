@@ -3,7 +3,7 @@
 import os
 import sqlite3
 
-from flask import Flask, jsonify, redirect, url_for
+from flask import Flask, jsonify, redirect, render_template, request, url_for
 
 FAVICON_SVG = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><defs>'
                '<linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff5a76"/>'
@@ -58,6 +58,16 @@ def create_app(config=None):
     @app.get('/')
     def home():
         return redirect(url_for('market.index'))
+
+    @app.errorhandler(404)
+    @app.errorhandler(500)
+    def error_page(error):
+        """Unknown pages and unexpected failures get a styled page with a way back;
+        API callers keep a JSON body. No exception text reaches the visitor."""
+        code = getattr(error, 'code', 500)
+        if request.path.startswith('/api/'):
+            return jsonify({'error': 'Not found.' if code == 404 else 'Server error.'}), code
+        return render_template('market/error.html', code=code), code
 
     @app.get('/favicon.ico')
     def favicon():

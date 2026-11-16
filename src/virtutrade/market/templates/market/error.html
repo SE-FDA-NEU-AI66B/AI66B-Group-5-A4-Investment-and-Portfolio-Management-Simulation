@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{{ 'Page not found' if code == 404 else 'Something went wrong' }} &middot; VirtuTrade</title>
+  <link rel="stylesheet" href="{{ url_for('market.static', filename='market.css') }}">
+</head>
+<body>{% set current_page = 'error' %}{% include 'market/_header.html' %}
+<main>
+  <section class="market-panel empty error-page" role="alert">
+    <span class="error-code">{{ code }}</span>
+    {% if code == 404 %}
+      <h1>This page does not exist</h1>
+      <p>The link may be mistyped or out of date. Your account and virtual money are safe.</p>
+    {% else %}
+      <h1>Something went wrong on our side</h1>
+      <p>Nothing was charged and no order was placed. Try again in a moment; if it keeps happening, tell the project team.</p>
+    {% endif %}
+    <p class="portfolio-actions"><a class="button primary" href="{{ url_for('market.index') }}">Back to Market</a>{% if code != 404 %}<a class="button secondary" href="{{ request.path }}">Try again</a>{% endif %}</p>
+  </section>
+  <footer><strong>VirtuTrade &middot; Team 05</strong><span>Learn with virtual capital. Every trade here is simulated.</span></footer>
+</main>
+</body>
+</html>

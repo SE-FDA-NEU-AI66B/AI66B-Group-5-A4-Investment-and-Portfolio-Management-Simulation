@@ -1056,3 +1056,4 @@ body{background:radial-gradient(1100px 480px at 88% -12%,rgba(239,64,85,.11),tra
 .signin-actions{margin-left:auto;display:flex;gap:10px;flex:none}
 .signin-actions .button{min-height:40px;padding:10px 20px;text-decoration:none;text-align:center}
 @media(max-width:700px){.signin-callout{flex-wrap:wrap;padding:16px}.signin-actions{margin-left:0;width:100%;display:grid;grid-template-columns:1fr 1fr}}
+.error-page{max-width:640px;margin:40px auto;padding:36px;text-align:center}.error-page h1{font-size:28px}.error-page p{color:var(--muted);line-height:1.7}.error-page .portfolio-actions{justify-content:center}.error-page .button{text-decoration:none}.error-code{display:inline-block;padding:6px 14px;border-radius:999px;background:rgba(239,64,85,.15);color:#ff8597;font-weight:750;letter-spacing:1px}
